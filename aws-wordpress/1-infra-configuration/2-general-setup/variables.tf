@@ -53,6 +53,16 @@ variable "ec2_instance_type" {
   default = "t2.micro"
 }
 
+variable "ec2_instance_tags" {
+  description = "Tags to attach to the EC2 instance"
+  type = object({
+    Snapshot = string
+  })
+  default = {
+    Snapshot = "True"
+  }
+}
+
 variable "ec2_keypair_name" {
   description = "Key Pair name (must already exist!)"
   type = string
@@ -77,3 +87,64 @@ variable "eip_name_tag" {
   default = "EIP for MasterNode"
 }
 # END EC2 SETTINGS
+
+
+##############################################
+# BEGIN Data Lifecycle Manager (DLM) Settings
+variable "dlm_schedule_name" {
+  description = "Name for the DLM schedule"
+  type = string
+  default = "2 weeks of daily snapshots"
+}
+
+variable "dlm_schedule_interval" {
+  description = "Interval for the schdeule"
+  type = number
+  default = 24
+}
+
+variable "dlm_schedule_unit" {
+  description = "Unit for the schedule interval"
+  type = string
+  default = "HOURS"
+}
+
+variable "dlm_schedule_time" {
+  description = "When the policy should be evaluated."
+  type = list(string)
+  default = ["16:30"]  # 24 hour clock in UTC (equivalent to 2AM in Sydney)
+}
+
+variable "dlm_retain_count" {
+  description = "Number of snapshots to retain"
+  type = number
+  default = 14
+}
+
+variable "dlm_copy_tags" {
+  description = "Copy all user-defined tags on a source volume to the snapshot created by DLM"
+  type = bool
+  default = true
+}
+
+variable "dlm_tags_to_add" {
+  description = "Extra adds to add"
+  type = object({
+    SnapshotCreator = string
+  })
+  default = {
+    SnapshotCreator = "DLM"
+  }
+}
+
+variable "dlm_target_tags" {
+  description = "Volumes with these tags will be targetted by DLM to take snapshots"
+  type = object({
+    Snapshot = string
+  })
+  default = {
+    Snapshot = "true"
+    Snapshot = "True"
+  }
+}
+# END Data Lifecycle Manager (DLM) Settings

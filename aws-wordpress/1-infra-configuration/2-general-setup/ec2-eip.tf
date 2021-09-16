@@ -25,6 +25,8 @@ module "ec2_instance" {
   key_name               = var.ec2_keypair_name
   vpc_security_group_ids = [aws_security_group.SG_EC2.id]
   subnet_id              = module.vpc.public_subnets[0]
+
+  tags = var.ec2_instance_tags
 }
 
 resource "aws_eip" "ec2-eip" {
@@ -35,4 +37,3 @@ resource "aws_eip" "ec2-eip" {
       Name = var.eip_name_tag
   }
 }
-
