@@ -1,0 +1,39 @@
+---
+- name: Install NFS package
+  ansible.builtin.apt:
+    name:
+      - nfs-kernel-server
+    state: present
+    update_cache: yes
+
+- name: Create directory for NFS exports for Prod
+  ansible.builtin.file:
+    path: "{{ export_path }}"
+    state: directory
+    mode: 0755
+
+- name: Create NFS export for Prod
+  lineinfile:
+    path: /etc/exports
+    regexp: "^{{ export_path }}"
+    line: "{{ export_path }} {{ k8s_cluster_subnet }}(rw,sync,no_root_squash)"
+    state: present
+
+- name: Enable and restart NFS service
+  ansible.builtin.service:
+    name: "{{ item }}"
+    enabled: yes
+    state: restarted
+  with_items:
+    - nfs-server
+    - nfs-idmapd
+
+# Reference: https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner
+# Run as my standard user, it has access into Microk8s while the root user doesn't
+- name: Install nfs-subdir-external-provisioner for Dynamic Storage Provisioning
+  shell: |
+    helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
+    helm install nfs-subdir-external-provisioner nfs-subdir-external-provisioner/nfs-subdir-external-provisioner \
+      --set nfs.server={{ hostvars['masternode']['ansible_default_ipv4']['address'] }} \
+      --set nfs.path={{ export_path }}
+  become_user: "{{ ansible_env.SUDO_USER }}"

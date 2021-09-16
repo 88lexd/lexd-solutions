@@ -1,0 +1,9 @@
+apiVersion: v2
+name: wordpress
+version: 0.1
+description: My personal WordPress site running in k8s
+home: https://lexdsolutions.com
+
+maintainers:
+  - name: Alex Dinh
+    email: alex.dinh@lexdsolutions.com

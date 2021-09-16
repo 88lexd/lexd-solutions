@@ -1,0 +1,211 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Base setup for new AWS account
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Base Setup
+        Parameters:
+          - IAMUsername
+          - IAMUserPassword
+          - TerraformStateBucketName
+          - TerraformStateTableName
+
+    ParameterLabels:
+      IAMUsername:
+        default: Username
+      IAMUserPassword:
+        default: Password
+      TerraformStateBucketName:
+        default: Bucket Name
+      TerraformStateTableName:
+        default: DynamoDB Table Name
+
+Parameters:
+  IAMUsername:
+    Type: String
+    Description: Name of the first IAM user
+    Default: alex
+
+  IAMUserPassword:
+      Type: String
+      Description: Compex password for first IAM user (will reset on first logon)
+      # This does not make it secure, it is only the initial password. Will prompt to reset on first login
+      NoEcho: true
+
+  TerraformStateBucketName:
+    Type: String
+    Description: Name of the S3 bucket to store Terraform state (must be in lowercases!)
+    Default: lexd-solutions-tfstate
+
+  TerraformStateTableName:
+    Type: String
+    Description: Name of the DynamoDB table to store Terraform state locking (must be in lowercases!)
+    Default: lexd-solutions-tflockstate
+
+Resources:
+  ############################
+  # BEGIN IAM USER AND ROLES
+  FirstIAMUser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref IAMUsername
+      LoginProfile:
+        Password: !Ref IAMUserPassword
+        PasswordResetRequired: yes
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/IAMUserChangePassword  # Require so user can change password
+        - !Ref AssumeRolePolicy
+        - !Ref IAMSelfServicePolicy
+
+  # Policy to allow user to manage own password, MFA and access keys
+  IAMSelfServicePolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: "LEXD - IAM SelfService Policy"
+      PolicyDocument:
+        # Policy document taken from
+        # https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_examples_aws_my-sec-creds-self-manage.html
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowViewAccountInfo
+            Effect: Allow
+            Action:
+              - iam:GetAccountPasswordPolicy
+              - iam:ListVirtualMFADevices
+            Resource: "*"
+          - Sid: AllowManageOwnPasswords
+            Effect: Allow
+            Action:
+              - iam:ChangePassword
+              - iam:GetUser
+            Resource: arn:aws:iam::*:user/${aws:username}
+          - Sid: AllowManageOwnAccessKeys
+            Effect: Allow
+            Action:
+              - iam:CreateAccessKey
+              - iam:DeleteAccessKey
+              - iam:ListAccessKeys
+              - iam:UpdateAccessKey
+            Resource: arn:aws:iam::*:user/${aws:username}
+          - Sid: AllowManageOwnSigningCertificates
+            Effect: Allow
+            Action:
+              - iam:DeleteSigningCertificate
+              - iam:ListSigningCertificates
+              - iam:UpdateSigningCertificate
+              - iam:UploadSigningCertificate
+            Resource: arn:aws:iam::*:user/${aws:username}
+          - Sid: AllowManageOwnSSHPublicKeys
+            Effect: Allow
+            Action:
+              - iam:DeleteSSHPublicKey
+              - iam:GetSSHPublicKey
+              - iam:ListSSHPublicKeys
+              - iam:UpdateSSHPublicKey
+              - iam:UploadSSHPublicKey
+            Resource: arn:aws:iam::*:user/${aws:username}
+          - Sid: AllowManageOwnGitCredentials
+            Effect: Allow
+            Action:
+              - iam:CreateServiceSpecificCredential
+              - iam:DeleteServiceSpecificCredential
+              - iam:ListServiceSpecificCredentials
+              - iam:ResetServiceSpecificCredential
+              - iam:UpdateServiceSpecificCredential
+            Resource: arn:aws:iam::*:user/${aws:username}
+          - Sid: AllowManageOwnVirtualMFADevice
+            Effect: Allow
+            Action:
+              - iam:CreateVirtualMFADevice
+              - iam:DeleteVirtualMFADevice
+            Resource: arn:aws:iam::*:mfa/${aws:username}
+          - Sid: AllowManageOwnUserMFA
+            Effect: Allow
+            Action:
+              - iam:DeactivateMFADevice
+              - iam:EnableMFADevice
+              - iam:ListMFADevices
+              - iam:ResyncMFADevice
+            Resource: arn:aws:iam::*:user/${aws:username}
+
+  # Allow user to AssumeRol
+  AssumeRolePolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: "LEXD - AssumeRole Policy"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action:
+              - sts:AssumeRole
+            Resource:
+              - !Sub "arn:aws:iam::${AWS::AccountId}:role/LEXD-Admin"
+
+  # Admin role requires MFA
+  LexdAdminRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: LEXD-Admin
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          # Trust own account but enforce MFA to use this role.
+          - Effect: Allow
+            Principal:
+              AWS:
+                - !Sub "arn:aws:iam::${AWS::AccountId}:root"
+            Action:
+              - sts:AssumeRole
+            Condition:
+              Bool:
+                aws:MultiFactorAuthPresent: 'true'
+  # END IAM USER AND ROLES
+
+  ####################################
+  # BEGIN S3 and DynamoDB Creation
+
+  # S3 bucket for Terraform States
+  TerraformStateS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref TerraformStateBucketName
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - BucketKeyEnabled: yes
+            ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      LifecycleConfiguration:
+        Rules:
+          - Status: Enabled
+            ExpiredObjectDeleteMarker: true
+            NoncurrentVersionExpirationInDays: 14
+            AbortIncompleteMultipartUpload:
+              DaysAfterInitiation: 14
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: yes
+        BlockPublicPolicy: yes
+        IgnorePublicAcls: yes
+        RestrictPublicBuckets: yes
+      VersioningConfiguration:
+        Status: Enabled
+
+  TerraformStateLockDynamoDB:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: LockID
+          AttributeType: S
+      BillingMode: PROVISIONED
+      KeySchema:
+        - AttributeName: LockID
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 25  # To keep within free tier
+        WriteCapacityUnits: 25  # To keep within free tier
+      TableName: !Ref TerraformStateTableName

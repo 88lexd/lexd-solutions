@@ -1,0 +1,11 @@
+---
+# This YAML file contains the "default" values to build the prod resources
+wordpress:
+  deployment_image: wordpress:5.8.1-apache
+  deployment_replicas: 1
+  ingress_external_url: dev.lexdsolutions.com
+  ingress_internal_url: dev.lexdsolutions.local
+
+mysql:
+  deployment_image: mysql:5.6
+  deployment_replicas: 1

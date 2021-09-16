@@ -1,0 +1,18 @@
+---
+- hosts: masternode,workernode
+  gather_facts: yes
+  become: yes
+  vars:
+    # This is the subnet which the hosts itself are on
+    k8s_cluster_subnet: "192.168.198.0/24"
+    export_path: "/nfs/k8s"
+  tasks:
+  - name: Apply base configuration
+    include_tasks: ansible_tasks/base-config.yml
+
+  - name: Install and configure MicroK8s
+    include_tasks: ansible_tasks/setup-microk8s.yml
+
+  - name: Setup NFS Server on Master Node
+    include_tasks: ansible_tasks/setup-nfs-server.yml
+    when: inventory_hostname == "masternode"

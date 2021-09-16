@@ -1,0 +1,10 @@
+# # Find another way to create this secret so password does not have to be commited into git
+# ---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql-pass
+type: Opaque
+data:
+  # Password must be base64 encoded (e.g. $ echo -n 'SQL_PASSWORD123' | base64)
+  password: "U1FMX1BBU1NXT1JEMTIz"
