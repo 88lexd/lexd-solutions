@@ -5,6 +5,8 @@ resource "aws_security_group" "SG_EC2" {
 
   ingress = [
     {
+      # Allow all for SSH is temporarily. Allows me to bring the site up as I dont have a static public IP at home.
+      # Eventually I should have a script that can dynamically update the SG with my current public IP
       description      = "Allow SSH"
       from_port        = 22
       to_port          = 22

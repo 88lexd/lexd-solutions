@@ -3,7 +3,7 @@ data "aws_ami" "ubuntu" {
 
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+    values = var.ec2_ami_name
   }
 
   filter {
@@ -11,21 +11,20 @@ data "aws_ami" "ubuntu" {
     values = ["hvm"]
   }
 
-  owners = ["099720109477"] # Canonical
+  owners = var.ec2_ami_owner_id
 }
 
 module "ec2_instance" {
   source  = "terraform-aws-modules/ec2-instance/aws"
   version = "3.1.0"
 
-  name = "My Instance"
+  name = var.ec2_instance_name
 
   ami                    = data.aws_ami.ubuntu.id
-  instance_type          = "t2.micro"
-  key_name               = "alex-lexdsolutions"  # This key must already exist! Unfortunately cannot automate this.
+  instance_type          = var.ec2_instance_type
+  key_name               = var.ec2_keypair_name
   vpc_security_group_ids = [aws_security_group.SG_EC2.id]
   subnet_id              = module.vpc.public_subnets[0]
-
 }
 
 resource "aws_eip" "ec2-eip" {
@@ -33,7 +32,7 @@ resource "aws_eip" "ec2-eip" {
   vpc      = true
   depends_on = [module.vpc.vpc_id]
   tags = {
-      Name = "EIP for MasterNode"
+      Name = var.eip_name_tag
   }
 }
 
