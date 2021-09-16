@@ -1,5 +1,5 @@
 # Base Setup on AWS
-The base setup requires the following (assuming my AWS account is newly created with nothing else configured but the root user).
+The base setup creates the following resources (assuming the AWS account is newly created with nothing else configured but the root user).
 
  - 1x IAM User (best practice to not use the root account)
  - 1x S3 bucket for Terraform states
@@ -7,7 +7,7 @@ The base setup requires the following (assuming my AWS account is newly created 
  - 1x DynamoDB table for Terraform state and locking
  - Admin Role and permissions (allow IAM user to assume into role for extra security)
 
-All other infrastructure will be created using Terraform. I have chosen to use CloudFormation for this is because I don't want to manually create any resources including the S3 bucket and the DynamoDB used by Terraform.
+All other infrastructure is created using Terraform. I have chosen to use CloudFormation here is because I don't want to manually create any resources including the S3 bucket and the DynamoDB used by Terraform. I also cannot use Terraform to create these resources due to the "chicken and egg" problem.
 
 To deploy this for a new account is as simple as uploading the `cfn-base-setup.yml` file into CloudFormation with the root account.
 
