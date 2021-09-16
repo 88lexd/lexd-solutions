@@ -60,11 +60,11 @@ terraform {
 
 ## High Level Requirements (TO DO)
 The following will be configured through Terraform
- - VPC
- - Public / Private Subnets
- - Internet Gateway??
- - EIP ??
- - Security Groups
- - SES (free tier -62,000 Outbound Messages per month to any recipient when you call Amazon SES from an Amazon EC2)
- - 1x EC2 to run MicroK8s (t3a.medium (2vCPU and 4GB RAM))
- - Automated EBS snapsots?
+ - [x] VPC
+ - [x] Public / Private Subnets
+ - [x] Internet Gateway
+ - [x] EIP
+ - [x] Security Groups
+ - [x] 1x EC2 to run MicroK8s (t3a.medium (2vCPU and 4GB RAM))
+ - [ ] SES (free tier -62,000 Outbound Messages per month to any recipient when you call Amazon SES from an Amazon EC2)
+ - [ ] Automated EBS snapsots?
