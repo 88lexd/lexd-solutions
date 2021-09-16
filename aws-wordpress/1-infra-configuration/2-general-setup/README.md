@@ -1,4 +1,20 @@
-# Terraform Setup
+# How to run this
+
+## Install AWSCLI
+Will require AWSCLI to interface with AWS.
+
+```bash
+$ curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+$ unzip awscliv2.zip
+$ sudo ./aws/install
+
+$ aws --version
+
+# Remove cache
+$ rm awscliv2.zip
+$ rm -rf ./aws
+```
+## Install Terraform
 Download and setup Terraform. Run the following:
 
 ```bash
@@ -11,54 +27,33 @@ terraform -v
 rm terraform_1.0.6_linux_amd64.zip
 ```
 
-## Setup Provider for AWS
-Visit: https://www.terraform.io/docs/language/providers/index.html
+## Configure AWS Cred
+First log onto AWS (IAM user, do not use root), create Access Keys, then run the following command to save it
 
-Which then takes takes us to https://registry.terraform.io/browse/providers where we can see all the supported providers.
+```bash
+$ aws configure
+AWS Access Key ID [None]: AKIA...
+AWS Secret Access Key [None]: G4gb...
+Default region name [None]: ap-southeast-2
+Default output format [None]: json
 
-Look for AWS and see how it to install the provider.
-
-Example: *To install this provider, copy and paste this code into your Terraform configuration. Then, run terraform init.*
-
+# This will create a default credential and saves this to
+$ ls ~/.aws/{credentials,config}
 ```
-terraform {
-  required_providers {
-    aws = {
-      source = "hashicorp/aws"
-      version = "3.58.0"
-    }
-  }
-}
+**IMPORTANT** - Must fix up later!!
+
+The above is NOT very secure! My credentials are saved locally on my machine and it does not expire! Later on I will need to setup a role which requires MFA and then have a script that can perform the assume role function to retrieve a temporary token via STS
+
+## Run Terraform
+After setting up the above, can now run Terraform to apply the template.
 ```
-
-Once configured, the providers and modules will be saved to a directory called .terraform/ in this same directory.
-
-e.g. `./.terraform/modules` and `./.terraform/providers`
-
-## Setup backend for tfstate and state locking
-By default, the state file is saved locally as `terraform.tfstate`. This is a very bad because if something happens to this file, then we lose the state of our deployed infrastructure.
-
-Locking is also used to make sure multiple users cannot run terraform at the sametime.
-
-The following is used to ensure we are using S3 and DynamoDB as the backend for state and locking.
-
-Reference: https://quileswest.medium.com/how-to-lock-terraform-state-with-s3-bucket-in-dynamodb-3ba7c4e637
-
-Note: The bucket and dynamodb is created by the base-setup.yml (through cloudformation).
-
-```
-terraform {
-  backend "s3" {
-    bucket = "lexd-solutions-tfstate"
-    key    = "terraform/tfstate"
-    dynamodb_table = "lexd-solutions-tflockstate"
-    region = "ap-southeast-2"
-  }
-}
+$ terraform init
+$ terraform plan
+$ terraform apply
 ```
 
 
-## High Level Requirements (TO DO)
+# High Level Requirements (TO DO)
 The following will be configured through Terraform
  - [x] VPC
  - [x] Public / Private Subnets
@@ -67,4 +62,4 @@ The following will be configured through Terraform
  - [x] Security Groups
  - [x] 1x EC2 to run MicroK8s (t3a.medium (2vCPU and 4GB RAM))
  - [ ] SES (free tier -62,000 Outbound Messages per month to any recipient when you call Amazon SES from an Amazon EC2)
- - [ ] Automated EBS snapsots?
+ - [ ] Automated EBS snapsots? (https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/dlm_lifecycle_policy)
