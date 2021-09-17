@@ -29,11 +29,17 @@ module "ec2_instance" {
   tags = var.ec2_instance_tags
 }
 
-resource "aws_eip" "ec2-eip" {
-  instance = module.ec2_instance.id
-  vpc      = true
-  depends_on = [module.vpc.vpc_id]
-  tags = {
-      Name = var.eip_name_tag
-  }
+resource "aws_eip_association" "eip_assoc" {
+  instance_id   = module.ec2_instance.id
+  allocation_id = var.eip_alloc_id
 }
+
+# Let's not create EIP with Terraform as a 'terraform destroy' will remove this production IP with it
+# resource "aws_eip" "ec2-eip" {
+#   instance = module.ec2_instance.id
+#   vpc      = true
+#   depends_on = [module.vpc.vpc_id]
+#   tags = {
+#       Name = var.eip_name_tag
+#   }
+# }

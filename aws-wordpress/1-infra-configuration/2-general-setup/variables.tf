@@ -4,6 +4,11 @@ variable "aws_region" {
   default = "ap-southeast-2"
 }
 
+variable "eip_alloc_id" {
+  description = "Allocation ID of an existing EIP"
+  type = string
+  default = "eipalloc-0a68ead1a441b9730"
+}
 
 ####################################
 # Begin VPC Settings
