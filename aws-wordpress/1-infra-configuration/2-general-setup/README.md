@@ -5,7 +5,7 @@ Before continuing running the general setup, the following must be done first
    - This will setup the VPC, S3 and DynamoDB etc.
  - Manually setup keypair under EC2 Console and refected the key name in `variables.tf`
    - This must be done manually so you can download the private key during creation.
- - Manually allocate EIP (Elastic IP) VPC Console and reflect the "Allocation ID" in `variables.tf`
+ - Manually allocate EIP (Elastic IP) under VPC Console and reflect the "Allocation ID" in `variables.tf`
    - Rather not create the EIP via Terraform in case a `terraform destroy` will permanently delete the allocated IP for the production use.
 
 One the above is done, then continue with the below
