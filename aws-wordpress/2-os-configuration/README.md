@@ -6,14 +6,14 @@ The playbook will take in the inventory file (inventory.txt) and will configure 
 
 This playbook was developed when I had 2x VM running locally. On AWS, we will just be starting off with 1x EC2 instance to keep cost to the minimum. The single node will be the master node.
 
-Update the `inventory.txt` with the server IP and then run:
+Update the `inventory.ini` with the server IP and then run:
 
 Note: When prompt, enter the Ansible vault password which was used to encrypt the MySQL password variable.
 
 ```
 # Example:
 
-$ ansible-playbook -i inventory.txt main.yml -u ubuntu --private-key ~/.ssh/my-key.pem --ask-vault-pass
+$ ansible-playbook -i inventory.ini main.yml -u ubuntu --private-key ~/.ssh/my-key.pem --ask-vault-pass
 Vault password:
 
 PLAY [masternode,workernode] ******************************************************************************************************************************************
