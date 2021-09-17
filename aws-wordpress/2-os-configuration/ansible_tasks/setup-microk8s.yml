@@ -25,6 +25,10 @@
     groups: microk8s
     append: yes
 
+# Login again to refresh membership change
+- name: Reset SSH connection
+  meta: reset_connection
+
 - name: Enable microk8s addons
   shell: microk8s enable dns dashboard storage ingress helm3
   become_user: "{{ ansible_env.SUDO_USER }}"
