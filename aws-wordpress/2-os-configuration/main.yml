@@ -28,8 +28,8 @@
   # Final configuration
   - name: Final touches for k8s (create MySQL password secret and k8s namespaces)
     shell: |
-      kubectl create secret generic --namespace prod {{ k8s_mysql_secret_name }} --from-literal=password={{ k8s_mysql_prod_password }}
       kubectl create namespace prod
       kubectl create namespace dev
+      kubectl create secret generic --namespace prod {{ k8s_mysql_secret_name }} --from-literal=password={{ k8s_mysql_prod_password }}
     become_user: "{{ ansible_env.SUDO_USER }}"
     when: inventory_hostname == "masternode"
