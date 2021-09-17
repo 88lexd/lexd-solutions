@@ -3,6 +3,13 @@
 This Helm Chart is **created from scratch** to meet my requirements.
 
 # How to Deploy this Helm Chart
+First copy the helm chart over to the remote server (unless local helm/kubectl is configured to remote server)
+
+```
+$ scp -r -i ~/.ssh/my.pem wordpress-helm ubuntu@<remote-server>:
+```
+
+SSH onto remote server and continue the below (helm is installed on server server via Ansible)
 
 ## Install Prod
 Note: Namespace is created by Ansible during setup
