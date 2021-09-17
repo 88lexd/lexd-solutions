@@ -3,9 +3,17 @@
   gather_facts: yes
   become: yes
   vars:
-    # This is the subnet which the hosts itself are on
-    k8s_cluster_subnet: "192.168.198.0/24"
+    # Allow connection from VPC CIDR but using security groups to control which server can access this NFS port
+    k8s_cluster_subnet: "10.0.0.0/16"
     export_path: "/nfs/k8s"
+    k8s_mysql_secret_name: mysql-prod
+    k8s_mysql_prod_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          66656662623939316666643035363937646666356230393132623832306563623765356133373036
+          6535303333323132636231346264626232376639343237370a646436396538373038623334353831
+          38386362326331353633653935386131663836316363663561653731613032376331353330363532
+          6237383137373531640a336162313762393632386262373833653236613861393763663335653537
+          63363333383336393335663731316137333738643561333862313130313461613366
   tasks:
   - name: Apply base configuration
     include_tasks: ansible_tasks/base-config.yml
@@ -15,4 +23,13 @@
 
   - name: Setup NFS Server on Master Node
     include_tasks: ansible_tasks/setup-nfs-server.yml
+    when: inventory_hostname == "masternode"
+
+  # Final configuration
+  - name: Final touches for k8s (create MySQL password secret and k8s namespaces)
+    shell: |
+      kubectl create secret generic --namespace prod {{ k8s_mysql_secret_name }} --from-literal=password={{ k8s_mysql_prod_password }}
+      kubectl create namespace prod
+      kubectl create namespace dev
+    become_user: "{{ ansible_env.SUDO_USER }}"
     when: inventory_hostname == "masternode"

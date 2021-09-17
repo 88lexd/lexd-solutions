@@ -13,21 +13,10 @@ spec:
   tls:
   # Must be valid hosts in the secret
   - hosts:
-     - {{ .Values.wordpress.ingress_external_url }}
-     - {{ .Values.wordpress.ingress_internal_url }}
-    secretName: lexdsolutionslocal  # The name of the TLS secret
+     - {{ .Values.wordpress.ingress_url }}
+    secretName: lexdsolutions  # The name of the TLS secret
   rules:
-  - host: {{ .Values.wordpress.ingress_external_url }}
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: wordpress-service  # references [service]metadata.name in 'deployment-wordpress.yaml'
-            port:
-              number: 80
-  - host: {{ .Values.wordpress.ingress_internal_url }}
+  - host: {{ .Values.wordpress.ingress_url }}
     http:
       paths:
       - path: /

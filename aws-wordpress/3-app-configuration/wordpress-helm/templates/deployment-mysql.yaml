@@ -64,7 +64,7 @@ spec:
         - name: MYSQL_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: mysql-pass  # this is created by kustomization.yaml
+              name: {{ .Values.mysql.k8s_secret_name }}
               key: password
         volumeMounts:
         - name: mysql-volume

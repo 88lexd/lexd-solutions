@@ -4,19 +4,15 @@ This Helm Chart is **created from scratch** to meet my requirements.
 
 # How to Deploy this Helm Chart
 
-## Create Namespace (prod and dev)
-```
-$ kubectl create namespace prod
-$ kubectl create namespace dev
-```
-
 ## Install Prod
+Note: Namespace is created by Ansible during setup
 ```
 $ cd wordpress-helm/
 $ helm install wordpress-prod . --namespace=prod
 ```
 
 ## Install Dev
+Note: Namespace is created by Ansible during setup
 ```
 $ cd wordpress-helm/
 $ helm install wordpress-dev . --values=values-dev.yaml --namespace=dev

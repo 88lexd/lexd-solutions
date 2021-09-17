@@ -8,10 +8,13 @@ This playbook was developed when I had 2x VM running locally. On AWS, we will ju
 
 Update the `inventory.txt` with the server IP and then run:
 
-```
-ansible-playbook -i inventory.txt main.yml -u ubuntu --private-key ~/.ssh/my-key.pem
+Note: When prompt, enter the Ansible vault password which was used to encrypt the MySQL password variable.
 
-Example Output:
+```
+# Example:
+
+$ ansible-playbook -i inventory.txt main.yml -u ubuntu --private-key ~/.ssh/my-key.pem --ask-vault-pass
+Vault password:
 
 PLAY [masternode,workernode] ******************************************************************************************************************************************
 
