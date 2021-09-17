@@ -65,7 +65,7 @@ spec:
         - name: WORDPRESS_DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: mysql-pass  # Referencing [secret]metadata.name in 'kustomization.yaml'
+              name: {{ .Values.mysql.k8s_secret_name }}
               key: password
         volumeMounts:
         - name: wordpress-volume
