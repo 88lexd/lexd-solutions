@@ -56,6 +56,6 @@ resource "aws_security_group" "SG_EC2" {
   ]
 
   tags = {
-      Name = "Allow SSH"
+      Name = "Allow traffic into EC2"
   }
 }
