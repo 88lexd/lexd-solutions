@@ -27,7 +27,6 @@ Parameters:
   IAMUsername:
     Type: String
     Description: Name of the first IAM user
-    Default: alex
 
   IAMUserPassword:
       Type: String
