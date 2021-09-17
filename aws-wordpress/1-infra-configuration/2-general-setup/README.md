@@ -73,5 +73,4 @@ The following will be configured through Terraform
  - [x] EIP
  - [x] Security Groups
  - [x] 1x EC2 to run MicroK8s (t3a.medium (2vCPU and 4GB RAM))
- - [ ] SES (free tier -62,000 Outbound Messages per month to any recipient when you call Amazon SES from an Amazon EC2)
  - [x] Automated EBS snapsots
