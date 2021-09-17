@@ -4,6 +4,7 @@ wordpress:
   deployment_image: wordpress:5.8.1-apache
   deployment_replicas: 1
   ingress_url: lexdsolutions.com
+  ingress_tls_secret_name: lexdsolutions.com.tls
 
 mysql:
   deployment_image: mysql:5.6

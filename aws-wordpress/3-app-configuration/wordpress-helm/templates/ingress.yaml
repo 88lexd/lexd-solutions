@@ -8,13 +8,15 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: wordpress-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
 spec:
   # When using TLS, ingress will rediect http to https
   tls:
   # Must be valid hosts in the secret
   - hosts:
      - {{ .Values.wordpress.ingress_url }}
-    secretName: lexdsolutions  # The name of the TLS secret
+    secretName: {{ .Values.wordpress.ingress_tls_secret_name }}
   rules:
   - host: {{ .Values.wordpress.ingress_url }}
     http:
