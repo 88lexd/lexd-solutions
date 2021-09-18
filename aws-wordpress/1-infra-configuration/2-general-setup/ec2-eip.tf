@@ -25,6 +25,8 @@ module "ec2_instance" {
   key_name               = var.ec2_keypair_name
   vpc_security_group_ids = [aws_security_group.SG_EC2.id]
   subnet_id              = module.vpc.public_subnets[0]
+  enable_volume_tags     = true
+  volume_tags            = var.ec2_instance_tags
 
   tags = var.ec2_instance_tags
 }
