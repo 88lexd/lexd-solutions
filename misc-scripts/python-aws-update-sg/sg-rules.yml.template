@@ -1,0 +1,14 @@
+---
+security_group_id: sg-xxxx
+rule_description: A unique description  # This description is later used for by rule removal. Ensure it is unique enough
+
+ingress_rules:
+- protocol: tcp
+  source_cidr: USE_CURRENT_PUBLIC_IP  # Either set an IPv4 CIDR or set the string "USE_CURRENT_PUBLIC_IP" to auto detect
+  from_port: 22
+  to_port: 22
+
+- protocol: tcp
+  source_cidr: 0.0.0.0/0
+  from_port: 22
+  to_port: 22

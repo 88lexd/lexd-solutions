@@ -1,31 +1,113 @@
 #!/usr/bin/env python3
 import argparse
-import logging
 import sys
+import os
+from threading import current_thread
+import yaml
 import boto3
+import urllib.request
 
 
 def main():
     parser = get_parser()
-    global opts
+    global opts, ec2
     opts = parser.parse_args()
+    ec2 = boto3.resource('ec2')
 
-    set_logging(log_level=opts.logging)
+    _CONFIG = read_config(opts.rule_file)
 
-    if opts.quiet:
-        logging.disable()
+    if opts.add_rules:
+        show_current_ingress_rules(sg_id=_CONFIG['security_group_id'])
+        add_rules_to_sg(_CONFIG)
 
-    if opts.file is None:
-        logging.critical("Missing file option")
-        # parser.print_help()
-        exit(1)
-    elif opts.export_csv is None:
-        logging.critical("Missing filename for export CSV!")
-        # parser.print_help()
-        exit(1)
-    else:
-        # START DOING COOL STUFF
-        continue
+    if opts.remove_rules:
+        pass
+
+
+def read_config(conf_file):
+    _CONFIG = dict()
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    conf_file = f"{script_dir}/{conf_file}"
+
+    with open(conf_file, 'r') as stream:
+        try:
+            config = yaml.load(stream, Loader=yaml.BaseLoader)
+            for key, value in config.items():
+                _CONFIG[key] = value
+        except yaml.YAMLError as err:
+            print(err)
+            raise Exception("Cannot parse config.yml file")
+
+    return _CONFIG
+
+
+def get_confirmation(prompt):
+    input_text = input(f"{prompt} (yes/no): ")
+
+    options = { 'yes': True, 'no': False }
+
+    try:
+        return options[input_text]
+    except KeyError:
+        print("Bad input, try again")
+        get_confirmation(prompt)
+
+
+def add_rules_to_sg(config):
+    global ec2
+    curent_external_ip = ""
+
+    print(f"\nScript will add the following rules into - {config['security_group_id']}")
+    for rule in config['ingress_rules']:
+        if rule['source_cidr'] == 'USE_CURRENT_PUBLIC_IP':
+            curent_external_ip = f"{get_current_public_ip()}/32"
+            print(f"  Protcol: {rule['protocol']} | From Port: {rule['from_port']} | To Port: {rule['to_port']} | Source (current): {curent_external_ip} | Description: {config['rule_description']}")
+        else:
+            print(f"  Protcol: {rule['protocol']} | From Port: {rule['from_port']} | To Port: {rule['to_port']} | Source: {rule['source_cidr']} | Description: {config['rule_description']}")
+
+    if not get_confirmation("\nContinue with the script?"):
+        print("You have chosen to stop the script.")
+        exit()
+
+    security_group = ec2.SecurityGroup(config['security_group_id'])
+
+    print("Updating security group...")
+    for rule in config['ingress_rules']:
+        if rule['source_cidr'] == 'USE_CURRENT_PUBLIC_IP':
+            source_cidr = curent_external_ip
+        else:
+            source_cidr = rule['source_cidr']
+
+        security_group.authorize_ingress(
+                IpPermissions=[
+                    {
+                        'IpProtocol': rule['protocol'],
+                        'FromPort': int(rule['from_port']),
+                        'ToPort': int(rule['to_port']),
+                        'IpRanges': [
+                            {
+                                'CidrIp': source_cidr,
+                                'Description': config['rule_description']
+                            }
+                        ]
+                    }
+                ]
+            )
+
+    print("Update completed!")
+
+
+def show_current_ingress_rules(sg_id):
+    global ec2
+    security_group = ec2.SecurityGroup(sg_id)
+    print(f"Displaying current ingress rules for - {sg_id} (only showing rules where 'source' is an IP CIDR)")
+    for rule in security_group.ip_permissions:
+        print(f"  Protcol: {rule['IpProtocol']} | From Port: {rule['FromPort']} | To Port: {rule['ToPort']} | Source: {rule['IpRanges']}")
+
+
+def get_current_public_ip():
+    external_ip = urllib.request.urlopen('https://ifconfig.me').read().decode('utf8')
+    return external_ip
 
 
 def get_parser():
@@ -35,32 +117,22 @@ def get_parser():
             formatter(None, **kwargs)
             return lambda prog: formatter(prog, **kwargs)
         except TypeError:
-            logging.warning("argparse help formatter failed, falling back.")
+            print("argparse help formatter failed, falling back.")
             return formatter
 
-    description = "Description: Script to update a single AWS security group"
+    description = "Script to update a single AWS security group using a locally defined config file"
     parser = argparse.ArgumentParser(description=description,
                                      formatter_class=_make_wide(argparse.ArgumentDefaultsHelpFormatter))
-    # Logging options
-    logging_choices = ['critical', 'error', 'warning', 'info','debug']
-    group = parser.add_mutually_exclusive_group()  # only allows one or the other to be configured
-    group.add_argument("--logging", choices=logging_choices, default='info' ,help="Sets logging level")
-    group.add_argument("-q", "--quiet", action="store_true", help="Disables logging (overwrites logging setting)")
+
+    # Exclusive actions for script
+    actions_group = parser.add_mutually_exclusive_group(required=True)
+    actions_group.add_argument("--add-rules", action="store_true" , help="Add rules into security group")
+    actions_group.add_argument("--remove-rules", action="store_true" , help="Remove rules into security group")
 
     # Options for script
-    parser.add_argument("-f", "--file", required=True, help="Path to file")
-    parser.add_argument("-e", "--export-csv", help="Name of the exported csv file (eg. blah.csv)")
+    parser.add_argument("--rule-file", required=True, help="yaml file which defines the SG rules to add/remove")
 
     return parser
-
-
-def set_logging(log_level):
-    logging.basicConfig(format='%(asctime)s %(levelname)s %(filename)s[%(lineno)d]: %(message)s',
-                        datefmt='%d/%m/%Y %I:%M:%S %p',
-                        stream=sys.stdout,
-                        level=getattr(logging, log_level.upper()))
-    logging.getLogger('requests').setLevel(logging.WARNING)
-    logging.getLogger("urllib3").setLevel(logging.WARNING)
 
 
 if __name__ == "__main__":

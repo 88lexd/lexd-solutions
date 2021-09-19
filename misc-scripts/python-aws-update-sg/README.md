@@ -33,5 +33,30 @@ Append the alias configuration as indicated by the output above (must include th
 
 You can now run the script by calling `$ aws-update-sg`
 
-## How to use the script
-TBD
+# How to use the script
+There are 2 functions of this script, add rule and remove rules.
+## Adding Rule
+Make a copy of `sg-rules.yml.template` and call it `sg-rules.yml`.
+
+Modify the yaml file with the rules as desired.
+
+*Note: "source_cidr: USE_CURRENT_PUBLIC_IP" means to allow script to find the current public IP and use that as source CIDR!*
+
+Exampl:
+```
+$ aws-update-sg --add-rules --rule-file sg-rules.yml
+Displaying current ingress rules for - sg-091d91a3132ebef48 (only showing rules where 'source' is an IP CIDR)
+  Protcol: tcp | From Port: 80 | To Port: 80 | Source: [{'CidrIp': '0.0.0.0/0', 'Description': 'Allow HTTP'}]
+  Protcol: tcp | From Port: 443 | To Port: 443 | Source: [{'CidrIp': '0.0.0.0/0', 'Description': 'Allow HTTPS'}]
+
+Script will add the following rules into - sg-091d91a3132ebef48
+  Protcol: tcp | From Port: 22 | To Port: 22 | Source (current): 49.179.xx.yy/32 | Description: Testing 123
+  Protcol: tcp | From Port: 22 | To Port: 22 | Source: 0.0.0.0/0 | Description: Testing 123
+
+Continue with the script? (yes/no): yes
+Updating security group...
+Update completed!
+```
+
+## Adding Rule
+TDB

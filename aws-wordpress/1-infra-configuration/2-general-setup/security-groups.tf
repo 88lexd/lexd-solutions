@@ -4,19 +4,19 @@ resource "aws_security_group" "SG_EC2" {
   vpc_id      = module.vpc.vpc_id
 
   ingress = [
-    {
-      # Allow all for SSH is temporarily. Allows me to bring the site up as I dont have a static public IP at home.
-      # Eventually I should have a script that can dynamically update the SG with my current public IP
-      description      = "Allow SSH"
-      from_port        = 22
-      to_port          = 22
-      protocol         = "tcp"
-      cidr_blocks      = ["0.0.0.0/0"]
-      ipv6_cidr_blocks = null
-      prefix_list_ids  = null
-      security_groups  = null
-      self             = null
-    },
+    # My non-static public IP problem: not required to allow SSH to the world anymore.
+    # Using this Python script to update SG - https://github.com/88lexd/lexd-solutions/tree/main/misc-scripts/python-aws-update-sg
+    # {
+    #   description      = "Allow SSH"
+    #   from_port        = 22
+    #   to_port          = 22
+    #   protocol         = "tcp"
+    #   cidr_blocks      = ["0.0.0.0/0"]
+    #   ipv6_cidr_blocks = null
+    #   prefix_list_ids  = null
+    #   security_groups  = null
+    #   self             = null
+    # },
     {
       description      = "Allow HTTP"
       from_port        = 80
