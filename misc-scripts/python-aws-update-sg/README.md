@@ -3,11 +3,10 @@ Unfortunately I do not have a static public IP address at home and I do not like
 
 For me to log onto the AWS Console each time I need to SSH onto my instance, it just makes no sense.
 
-This script uses AWS Boto3 and can do 3 things.
+This script uses AWS Boto3 and can do 2 things.
 
- - Add my current public IP for ingress SSH on the security group
- - Remove from my current public IP for ingress SSH on the security
- - Select an ingress rule to remove
+ - Add ingress rules from config file into existing security group
+ - Remove the script created ingress rules from the security group
 
 ## Prerequisite and Setup
 Ensure `virtualenv` is installed
@@ -61,7 +60,7 @@ Update completed!
 ## Removing Rule
 The script will delete ingress rules which matches the `rule_description:` in the yml file.
 ```
-aws-update-sg --remove-rules --rule-file sg-rules.yml
+$ aws-update-sg --remove-rules --rule-file sg-rules.yml
 Displaying current ingress rules for - sg-091d91a3132ebef48 (only showing rules where 'source' is an IP CIDR)
   Protcol: tcp | From Port: 80 | To Port: 80 | Source: [{'CidrIp': '0.0.0.0/0', 'Description': 'Allow HTTP'}]
   Protcol: tcp | From Port: 22 | To Port: 22 | Source: [{'CidrIp': '49.179.xx.yy/32', 'Description': 'Testing 123'}, {'CidrIp': '0.0.0.0/0', 'Description': 'Testing 123'}]
