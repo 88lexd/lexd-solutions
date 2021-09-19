@@ -41,7 +41,7 @@ Modify the yaml file with the rules as desired.
 
 *Note: "source_cidr: USE_CURRENT_PUBLIC_IP" means to allow script to find the current public IP and use that as source CIDR!*
 
-Exampl:
+Example:
 ```
 $ aws-update-sg --add-rules --rule-file sg-rules.yml
 Displaying current ingress rules for - sg-091d91a3132ebef48 (only showing rules where 'source' is an IP CIDR)
@@ -59,6 +59,7 @@ Update completed!
 
 ## Removing Rule
 The script will delete ingress rules which matches the `rule_description:` in the yml file.
+Example:
 ```
 $ aws-update-sg --remove-rules --rule-file sg-rules.yml
 Displaying current ingress rules for - sg-091d91a3132ebef48 (only showing rules where 'source' is an IP CIDR)
