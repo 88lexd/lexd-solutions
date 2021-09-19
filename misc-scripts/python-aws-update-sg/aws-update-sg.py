@@ -21,7 +21,8 @@ def main():
         add_rules_to_sg(_CONFIG)
 
     if opts.remove_rules:
-        pass
+        show_current_ingress_rules(sg_id=_CONFIG['security_group_id'])
+        remove_rules_from_sg(_CONFIG)
 
 
 def read_config(conf_file):
@@ -65,6 +66,7 @@ def add_rules_to_sg(config):
         else:
             print(f"  Protcol: {rule['protocol']} | From Port: {rule['from_port']} | To Port: {rule['to_port']} | Source: {rule['source_cidr']} | Description: {config['rule_description']}")
 
+
     if not get_confirmation("\nContinue with the script?"):
         print("You have chosen to stop the script.")
         exit()
@@ -79,22 +81,44 @@ def add_rules_to_sg(config):
             source_cidr = rule['source_cidr']
 
         security_group.authorize_ingress(
-                IpPermissions=[
-                    {
-                        'IpProtocol': rule['protocol'],
-                        'FromPort': int(rule['from_port']),
-                        'ToPort': int(rule['to_port']),
-                        'IpRanges': [
-                            {
-                                'CidrIp': source_cidr,
-                                'Description': config['rule_description']
-                            }
-                        ]
-                    }
-                ]
-            )
+            IpPermissions=[
+                {
+                    'IpProtocol': rule['protocol'],
+                    'FromPort': int(rule['from_port']),
+                    'ToPort': int(rule['to_port']),
+                    'IpRanges': [{ 'CidrIp': source_cidr, 'Description': config['rule_description'] }]
+                }
+            ]
+        )
 
     print("Update completed!")
+
+
+def remove_rules_from_sg(config):
+    global ec2
+
+    print(f"\nScript will remove the rules where description == {config['rule_description']}")
+    if not get_confirmation("Continue with the script?"):
+        print("You have chosen to stop the script.")
+        exit()
+
+    security_group = ec2.SecurityGroup(config['security_group_id'])
+
+    for rule in security_group.ip_permissions:
+        for ip_range in rule['IpRanges']:
+            if ip_range.get('Description') == config['rule_description']:
+                print(f"  Removing -- Protcol: {rule['IpProtocol']} | From Port: {rule['FromPort']} | To Port: {rule['ToPort']} | Source: {ip_range['CidrIp']}")
+                security_group.revoke_ingress(
+                    IpPermissions=[
+                        {
+                            'IpProtocol': rule['IpProtocol'],
+                            'FromPort': rule['FromPort'],
+                            'ToPort': rule['ToPort'],
+                            'IpRanges': [{ 'CidrIp': ip_range['CidrIp'], 'Description': ip_range['Description'] }],
+                        }
+                    ]
+                )
+    print("All ingress rules matching description has been removed!")
 
 
 def show_current_ingress_rules(sg_id):

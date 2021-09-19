@@ -58,5 +58,18 @@ Updating security group...
 Update completed!
 ```
 
-## Adding Rule
-TDB
+## Removing Rule
+The script will delete ingress rules which matches the `rule_description:` in the yml file.
+```
+aws-update-sg --remove-rules --rule-file sg-rules.yml
+Displaying current ingress rules for - sg-091d91a3132ebef48 (only showing rules where 'source' is an IP CIDR)
+  Protcol: tcp | From Port: 80 | To Port: 80 | Source: [{'CidrIp': '0.0.0.0/0', 'Description': 'Allow HTTP'}]
+  Protcol: tcp | From Port: 22 | To Port: 22 | Source: [{'CidrIp': '49.179.xx.yy/32', 'Description': 'Testing 123'}, {'CidrIp': '0.0.0.0/0', 'Description': 'Testing 123'}]
+  Protcol: tcp | From Port: 443 | To Port: 443 | Source: [{'CidrIp': '0.0.0.0/0', 'Description': 'Allow HTTPS'}]
+
+Script will remove the rules where description == Testing 123
+Continue with the script? (yes/no): yes
+  Removing -- Protcol: tcp | From Port: 22 | To Port: 22 | Source: 49.179.xx.yy/32
+  Removing -- Protcol: tcp | From Port: 22 | To Port: 22 | Source: 0.0.0.0/0
+All ingress rules matching description has been removed!
+```
