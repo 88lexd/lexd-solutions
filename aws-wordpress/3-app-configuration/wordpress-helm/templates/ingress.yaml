@@ -11,12 +11,14 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
 spec:
-  # When using TLS, ingress will rediect http to https
+  # Use TLS only if the secret variable is defined
+  {{- if .Values.wordpress.ingress_tls_secret_name }}
   tls:
   # Must be valid hosts in the secret
   - hosts:
      - {{ .Values.wordpress.ingress_url }}
     secretName: {{ .Values.wordpress.ingress_tls_secret_name }}
+  {{- end }}
   rules:
   - host: {{ .Values.wordpress.ingress_url }}
     http:
