@@ -27,7 +27,7 @@ module "ec2_instance" {
   subnet_id              = module.vpc.public_subnets[0]
   enable_volume_tags     = true
   volume_tags            = var.ec2_instance_tags
-
+  iam_instance_profile    = aws_iam_instance_profile.ec2_iam_instance_profile.name
   tags = var.ec2_instance_tags
 }
 
