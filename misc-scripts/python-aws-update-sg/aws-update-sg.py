@@ -2,7 +2,6 @@
 import argparse
 import sys
 import os
-from threading import current_thread
 import yaml
 import boto3
 import urllib.request
