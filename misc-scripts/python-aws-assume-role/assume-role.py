@@ -1,3 +1,4 @@
+from botocore.exceptions import ClientError
 import enquiries
 import argparse
 import yaml
