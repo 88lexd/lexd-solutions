@@ -27,12 +27,15 @@ metadata:
     app: wordpress
     tier: mysql
 spec:
+  type: ClusterIP  # This is the default but is a good practice to define it.
+  clusterIP: None
   ports:
-    - port: 3306
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
   selector:
     app: wordpress
     tier: mysql
-  clusterIP: None
 
 
 ---
