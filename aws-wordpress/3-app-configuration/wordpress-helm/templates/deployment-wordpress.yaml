@@ -28,7 +28,9 @@ metadata:
 spec:
   type: ClusterIP  # This is the default but is a good practice to define it.
   ports:
-    - port: 80
+    - protocol: TCP
+      port: 80
+      targetPort: 80
   selector:
     app: wordpress
     tier: frontend
