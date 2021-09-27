@@ -1,0 +1,4 @@
+boto3>=1.18.44
+pyyaml>=5.4.1
+configparser>=5.0.2
+enquiries>=0.1.0
