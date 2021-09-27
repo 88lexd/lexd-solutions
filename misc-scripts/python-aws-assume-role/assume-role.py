@@ -1,5 +1,3 @@
-from botocore.exceptions import ClientError, ValidationError
-from botocore.retryhandler import EXCEPTION_MAP
 import enquiries
 import argparse
 import yaml
