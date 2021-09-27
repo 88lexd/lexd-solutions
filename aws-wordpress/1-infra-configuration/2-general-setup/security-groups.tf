@@ -38,6 +38,17 @@ resource "aws_security_group" "SG_EC2" {
       prefix_list_ids  = null
       security_groups  = null
       self             = null
+    },
+    {
+      description      = "Allow NFS"
+      from_port        = 2049
+      to_port          = 2049
+      protocol         = "tcp"
+      self             = true
+      cidr_blocks      = null
+      ipv6_cidr_blocks = null
+      prefix_list_ids  = null
+      security_groups  = null
     }
   ]
 
