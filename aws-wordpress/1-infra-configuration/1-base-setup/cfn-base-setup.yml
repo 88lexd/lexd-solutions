@@ -151,6 +151,7 @@ Resources:
       RoleName: LEXD-Admin
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AdministratorAccess
+      MaxSessionDuration: 7200  # 2 hours
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
