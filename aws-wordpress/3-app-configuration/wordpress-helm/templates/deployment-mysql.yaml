@@ -28,7 +28,7 @@ metadata:
     tier: mysql
 spec:
   type: ClusterIP  # This is the default but is a good practice to define it.
-  clusterIP: None
+  clusterIP: None  # Defining a headless service for this stateful app.
   ports:
     - protocol: TCP
       port: 3306
