@@ -19,7 +19,7 @@ def main():
     opts = parser.parse_args()
 
     # Check for profile expiry only
-    if opts.expire:
+    if opts.expiry:
         check_credental_expiry(opts.profile)
         exit(0)
 
@@ -107,15 +107,14 @@ def assume_role(cred, role):
 
     print(f"Assuming role to: {role_arn}")
 
-    session = boto3.Session(
+    sts_client = boto3.Session(
         aws_access_key_id=cred['aws_access_key_id'],
         aws_secret_access_key=cred['aws_secret_access_key'],
-        region_name=cred['region'])
-
-    sts_client = session.client('sts')
+        region_name=cred['region']
+    ).client('sts')
 
     try:
-      response = sts_client.assume_role(
+      result = sts_client.assume_role(
           RoleArn=role_arn,
           RoleSessionName=role['role_name'],
           SerialNumber=iam_mfa_serial,
@@ -123,20 +122,19 @@ def assume_role(cred, role):
           # DurationSeconds=7200  # 2 hours to match role config. Default is 1hr otherwise
       ).get('Credentials')
     except ClientError as ce:
-        print(ce.response)
+        print(ce.result)
         exit(1)
 
-    target_session = boto3.Session(
-        aws_access_key_id=response['AccessKeyId'],
-        aws_secret_access_key=response['SecretAccessKey'],
-        aws_session_token=response['SessionToken'],
+    assumed_role_arn = boto3.Session(
+        aws_access_key_id=result['AccessKeyId'],
+        aws_secret_access_key=result['SecretAccessKey'],
+        aws_session_token=result['SessionToken'],
         region_name=cred['region']
-    )
+    ).client('sts').get_caller_identity()
 
-    assumed_role_arn = target_session.client('sts').get_caller_identity()
     print(f"\nSuccessfully assumed role: {assumed_role_arn['Arn']}\n")
 
-    return response
+    return result
 
 
 def save_credentials(response, cred):
