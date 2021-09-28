@@ -7,5 +7,5 @@ pip install -r ${SCRIPT_DIR}/requirements.txt
 deactivate
 
 echo -e "\n========================================================================="
-echo "Append the following line to your bash.rc as an alias for easy script trigger"
+echo "Append the following line to your .bashrc as an alias for easy script trigger"
 echo "alias aws-update-sg='${SCRIPT_DIR}/venv/bin/python3 ${SCRIPT_DIR}/aws-update-sg.py '"

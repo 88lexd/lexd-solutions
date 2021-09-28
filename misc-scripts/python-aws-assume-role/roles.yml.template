@@ -1,0 +1,12 @@
+---
+# The name is for the description used the script menu
+# role_name is case sensitive!
+- name: My Admin Role
+  aws_account_id: 12345
+  role_name: My-Admin-Role
+
+# The script supports connecting to another AWS account.
+# As long as the target account role allows you to assume into that role.
+- name: My NonAdmin Role
+  aws_account_id: 56789
+  role_name: My-Admin-Role
