@@ -24,7 +24,7 @@ def main():
         exit(0)
 
     if not opts.cred_file or not opts.roles_file:
-        print("Missing --cred-file and --roles-file!")
+        print("Missing --cred-file or --roles-file!")
         exit(1)
 
     cred_file = get_full_path_to(opts.cred_file)
