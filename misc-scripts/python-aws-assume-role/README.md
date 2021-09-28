@@ -3,6 +3,10 @@ Using a privileged account to log directly into AWS is not a good security pract
 
 On Linux, it is best practice to use sudo under a standard user. This should also apply to AWS when managing cloud resources.
 
+Lastly, what would you do if you only have IAM users (e.g. no SSO like ADFS or Okta) and you have a dozen AWS accounts to manage? You wouldn't want to create an IAM user for each of those accounts do you!?
+
+By using assume roles you can have a single IAM user and this user can assume role into all the various AWS accounts that you manage.
+
 ## What is AssumeRole?
 AssumeRole on AWS allows you to temporarily get security credentials into a different role. The role assuming into will generally provide more privileged access.
 
