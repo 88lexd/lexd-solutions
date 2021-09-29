@@ -87,10 +87,9 @@ You can also assume into a role to a completely different AWS account. More abou
     [2] My NonAdmin Role (My-NonAdmin@56789)
 
   Enter MFA token code for [ arn:aws:iam::12345:user/myusername ]: 123456
+
   Assuming role to: arn:aws:iam::12345:role/My-Admin
-
-  Successfully assumed role: arn:aws:sts::12345:assumed-role/My-Admin/My-Admin
-
+  Successfully assumed role!
   Updating /home/alex/.aws/credentials file...
 
   Your new AWS credentials will now work with awscli. e.g.

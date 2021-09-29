@@ -105,7 +105,7 @@ def assume_role(cred, role):
     role_arn = f"arn:aws:iam::{role['aws_account_id']}:role/{role['role_name']}"
     aws_iam_token = input(f"\nEnter MFA token code for [ {cred['user_arn']} ]: ")
 
-    print(f"Assuming role to: {role_arn}")
+    print(f"\nAssuming role to: {role_arn}")
 
     sts_client = boto3.Session(
         aws_access_key_id=cred['aws_access_key_id'],
@@ -125,14 +125,7 @@ def assume_role(cred, role):
         print(ce.result)
         exit(1)
 
-    assumed_role_arn = boto3.Session(
-        aws_access_key_id=result['AccessKeyId'],
-        aws_secret_access_key=result['SecretAccessKey'],
-        aws_session_token=result['SessionToken'],
-        region_name=cred['region']
-    ).client('sts').get_caller_identity()
-
-    print(f"\nSuccessfully assumed role: {assumed_role_arn['Arn']}\n")
+    print(f"Successfully assumed role!")
 
     return result
 
