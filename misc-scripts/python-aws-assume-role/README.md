@@ -1,3 +1,8 @@
+# Why I made developed this script?
+Read my blog post here to know why I've developed this script in the first place.
+
+URL: https://lexdsolutions.com/2021/09/how-to-assume-role-on-aws-and-using-python/
+
 # AWS - AssumeRole
 Using a privileged account to log directly into AWS is not a good security practice. This is almost like using the root account to log onto a Linux machine.
 
