@@ -1,6 +1,13 @@
 # OS Configuration
 This section contains Ansible playbooks for configuring the underlying EC2 Operating System (Ubuntu 20.04).
 
+## Install Ansible and Dependencies
+```
+$ sudo apt-install ansible
+$ ansible-galaxy collection install community.kubernetes
+```
+Note: Install the collection by using standard account (not root). The collection will be saved to `~/.ansible/collections`
+
 ## How to Run Playbook
 The playbook will take in the inventory file (inventory.txt) and will configure the servers as defined.
 

@@ -15,7 +15,7 @@
 - name: Install microk8s with option --channel=1.21/stable
   community.general.snap:
     name: microk8s
-    channel:
+    channel: "{{ snap_microk8s_channel }}"
     state: present
     classic: yes
 
@@ -39,17 +39,22 @@
     state: directory
   become_user: "{{ ansible_env.SUDO_USER }}"
 
-- name: Configure kube config for current user with auto complete for bash
+- name: Configure kube config for current user
   shell: |
     cd .kube && microk8s config > config
     chmod 600 config
-    echo "source <(kubectl completion bash)" >> ~/.bashrc
   become_user: "{{ ansible_env.SUDO_USER }}"
 
-# Get the latest version by checking this URL: https://github.com/helm/helm/releases
+- name: Setup auto complete for kubectl in bash
+  ansible.builtin.lineinfile:
+    path: .bashrc
+    regexp: '^source <\(kubectl completion bash'
+    line: "source <(kubectl completion bash)"
+    state: present
+
 - name: Install helm binary
   ansible.builtin.unarchive:
-    src: "https://get.helm.sh/helm-v3.7.0-rc.2-linux-amd64.tar.gz"
+    src: "{{ helm_binary_src }}"
     remote_src: yes
     dest: /tmp
   register: download_helm_result

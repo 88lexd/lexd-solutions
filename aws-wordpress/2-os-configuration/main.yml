@@ -6,6 +6,9 @@
     # Allow connection from VPC CIDR but using security groups to control which server can access this NFS port
     k8s_cluster_subnet: "10.0.0.0/16"
     export_path: "/nfs/k8s"
+    snap_microk8s_channel: "1.21/stable"
+    # Get the latest version of Helm checking this URL: https://github.com/helm/helm/releases
+    helm_binary_src: "https://get.helm.sh/helm-v3.7.0-rc.2-linux-amd64.tar.gz"
     k8s_mysql_secret_name: mysql-prod
     k8s_mysql_prod_password: !vault |
           $ANSIBLE_VAULT;1.1;AES256
