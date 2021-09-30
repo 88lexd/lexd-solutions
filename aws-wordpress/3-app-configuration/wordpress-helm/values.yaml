@@ -1,12 +1,14 @@
 ---
-# This YAML file contains the "default" values to build the prod resources
+# This YAML file contains the "schema" for the values to build the prod resources
 wordpress:
-  deployment_image: wordpress:5.8.1-apache
-  deployment_replicas: 2
-  ingress_url: lexdsolutions.com
-  ingress_tls_secret_name: lexdsolutions.com.tls
+  deployment_image: null
+  deployment_replicas: null
+  ingress_url: null
+  ingress_tls_secret_name: null
+  container_resources: null
 
 mysql:
-  deployment_image: mysql:5.6
-  deployment_replicas: 1
-  k8s_secret_name: mysql-prod  # This secret is created by Ansible during OS configuration
+  deployment_image: null
+  deployment_replicas: null
+  k8s_secret_name: null
+  container_resources: null

@@ -72,7 +72,12 @@ spec:
               key: password
         volumeMounts:
         - name: wordpress-volume
-          mountPath: "/var/www/html"          # which data will be stored
+          mountPath: "/var/www/html"  # which data will be stored
+        {{- if .Values.wordpress.container_resources }}
+        resources:
+          {{ .Values.wordpress.container_resources | toJson }}
+        {{- end }}
+
       volumes:
       - name: wordpress-volume
         persistentVolumeClaim:

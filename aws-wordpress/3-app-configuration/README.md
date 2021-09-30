@@ -15,14 +15,14 @@ SSH onto remote server and continue the below (helm is installed on server serve
 Note: Namespace is created by Ansible during setup
 ```
 $ cd wordpress-helm/
-$ helm install wordpress-prod . --namespace=prod
+$ helm install wordpress-prod . --namespace=prod --values=values-prod.yaml
 ```
 
 ## Install Dev
 Note: Namespace is created by Ansible during setup
 ```
 $ cd wordpress-helm/
-$ helm install wordpress-dev . --values=values-dev.yaml --namespace=dev
+$ helm install wordpress-dev . --namespace=dev --values=values-dev.yaml
 ```
 
 

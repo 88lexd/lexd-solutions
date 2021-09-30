@@ -72,6 +72,10 @@ spec:
         volumeMounts:
         - name: mysql-volume
           mountPath: /var/lib/mysql
+        {{- if .Values.wordpress.container_resources }}
+        resources:
+          {{ .Values.mysql.container_resources | toJson }}
+        {{- end }}
       volumes:
       - name: mysql-volume
         persistentVolumeClaim:
