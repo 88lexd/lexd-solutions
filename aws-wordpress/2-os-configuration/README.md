@@ -1,6 +1,35 @@
 # OS Configuration
 This section contains Ansible playbooks for configuring the underlying EC2 Operating System (Ubuntu 20.04).
 
+## Install Ansible and Dependencies
+Should install the newer version of Ansible (ansible-core)
+```
+$ sudo apt install python3-pip
+
+# Remove any existing ansible install
+$ apt remove ansible
+$ pip uninstall ansible
+
+# Install latest ansible using pip (run as non root user, will this install for the current user)
+$ pip install ansible
+
+# Confirm is for current user only
+$ ansible --version
+ansible [core 2.11.5]
+  config file = /etc/ansible/ansible.cfg
+  configured module search path = ['/home/alex/.ansible/plugins/modules', '/usr/share/ansible/plugins/modules']
+  ansible python module location = /home/alex/.local/lib/python3.8/site-packages/ansible
+  ansible collection location = /home/alex/.ansible/collections:/usr/share/ansible/collections
+  executable location = /home/alex/.local/bin/ansible
+  python version = 3.8.10 (default, Jun  2 2021, 10:49:15) [GCC 9.4.0]
+  jinja version = 2.10.1
+  libyaml = True
+
+# Install Kubernetes modules
+$ ansible-galaxy collection install kubernetes.core
+```
+Note: Install the collection by using standard account (not root). The collection will be saved to `~/.ansible/collections`
+
 ## How to Run Playbook
 The playbook will take in the inventory file (inventory.txt) and will configure the servers as defined.
 

@@ -30,10 +30,23 @@
 
 # Reference: https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner
 # Run as my standard user, it has access into Microk8s while the root user doesn't
-- name: Install nfs-subdir-external-provisioner for Dynamic Storage Provisioning
-  shell: |
-    helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
-    helm install nfs-subdir-external-provisioner nfs-subdir-external-provisioner/nfs-subdir-external-provisioner \
-      --set nfs.server={{ hostvars['masternode']['ansible_default_ipv4']['address'] }} \
-      --set nfs.path={{ export_path }}
+- name: Add Helm repo for nfs-subdir-external-provisioner
+  kubernetes.core.helm_repository:
+    name: nfs-subdir-external-provisioner
+    repo_url: https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
   become_user: "{{ ansible_env.SUDO_USER }}"
+  tags:
+    - subdir
+
+- name: Install nfs-subdir-external-provisioner using Helm
+  kubernetes.core.helm:
+    release_name: nfs-subdir-external-provisioner
+    release_namespace: default
+    chart_ref: nfs-subdir-external-provisioner/nfs-subdir-external-provisioner
+    release_values:
+      nfs:
+        server: "{{ hostvars['masternode']['ansible_default_ipv4']['address'] }}"
+        path: "{{ export_path }}"
+  become_user: "{{ ansible_env.SUDO_USER }}"
+  tags:
+    - subdir

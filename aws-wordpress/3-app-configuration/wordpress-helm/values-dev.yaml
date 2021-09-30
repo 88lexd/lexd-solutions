@@ -3,7 +3,7 @@
 wordpress:
   deployment_image: wordpress:5.8.1-apache
   deployment_replicas: 1
-  ingress_url: lexdsolutions.local
+  ingress_url: dev.lexdsolutions.com
   ingress_tls_secret_name: null
 
 mysql:
