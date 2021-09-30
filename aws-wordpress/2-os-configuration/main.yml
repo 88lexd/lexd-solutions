@@ -12,11 +12,11 @@
     k8s_mysql_secret_name: mysql-prod
     k8s_mysql_prod_password: !vault |
           $ANSIBLE_VAULT;1.1;AES256
-          66656662623939316666643035363937646666356230393132623832306563623765356133373036
-          6535303333323132636231346264626232376639343237370a646436396538373038623334353831
-          38386362326331353633653935386131663836316363663561653731613032376331353330363532
-          6237383137373531640a336162313762393632386262373833653236613861393763663335653537
-          63363333383336393335663731316137333738643561333862313130313461613366
+          62643637356466343736346165383133383337656630376464306432363034383834323630643162
+          6461346161383939326163636264363164326333373138390a356661396435356163626332616633
+          65316235616635666632613638353865333738373963653635346566643737656533653134396534
+          6236333237373231310a326131373563323737623734313438383038323737313265613465323535
+          3630
   tasks:
   - name: Apply base configuration
     include_tasks: ansible_tasks/base-config.yml
@@ -30,6 +30,8 @@
   - name: Setup NFS Server on Master Node
     include_tasks: ansible_tasks/setup-nfs-server.yml
     when: inventory_hostname == "masternode"
+    tags:
+      - subdir
 
   - name: Create PROD namespace in the cluster
     kubernetes.core.k8s:
@@ -51,15 +53,15 @@
           name: dev
     become_user: "{{ ansible_env.SUDO_USER }}"  # Use the standard user. This is where the Kubernetes Python module is installed.
 
-  - name: Create secret for the MySQL password in Dev
+  - name: Create secret for the MySQL password in PROD
     kubernetes.core.k8s:
       state: present
       definition:
         apiVersion: v1
         kind: Secret
         metadata:
-          name: mysql-password-dev
-          namespace: dev
+          name: mysql-prod
+          namespace: prod
         type: Opaque
         data:
           password: "{{ k8s_mysql_prod_password | b64encode }}"
