@@ -31,11 +31,36 @@
     include_tasks: ansible_tasks/setup-nfs-server.yml
     when: inventory_hostname == "masternode"
 
-  # Final configuration
-  - name: Final touches for k8s (create MySQL password secret and k8s namespaces)
-    shell: |
-      kubectl create namespace prod
-      kubectl create namespace dev
-      kubectl create secret generic --namespace prod {{ k8s_mysql_secret_name }} --from-literal=password={{ k8s_mysql_prod_password }}
-    become_user: "{{ ansible_env.SUDO_USER }}"
-    when: inventory_hostname == "masternode"
+  - name: Create PROD namespace in the cluster
+    kubernetes.core.k8s:
+      state: present
+      definition:
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: prod
+    become_user: "{{ ansible_env.SUDO_USER }}"  # Use the standard user. This is where the Kubernetes Python module is installed.
+
+  - name: Create DEV namespace in the cluster
+    kubernetes.core.k8s:
+      state: present
+      definition:
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: dev
+    become_user: "{{ ansible_env.SUDO_USER }}"  # Use the standard user. This is where the Kubernetes Python module is installed.
+
+  - name: Create secret for the MySQL password in Dev
+    kubernetes.core.k8s:
+      state: present
+      definition:
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: mysql-password-dev
+          namespace: dev
+        type: Opaque
+        data:
+          password: "{{ k8s_mysql_prod_password | b64encode }}"
+    become_user: "{{ ansible_env.SUDO_USER }}"  # Use the standard user. This is where the Kubernetes Python module is installed.
