@@ -22,3 +22,18 @@ $ python3 main.py --token $TOKEN
 ```
 
 ## Push Image to Docker Hub
+Git Hub Actions is being used to perform CI over to Docker Hub. See the workflow:
+
+https://github.com/88lexd/lexd-solutions/blob/main/.github/workflows/lets-encrypt-cron-img.yml
+
+A simply push/merge request to the main branch is enough to trigger the workflow.
+
+Once the action completes, the new image will be available at: https://hub.docker.com/r/88lexd/lets-encrypt-cron
+
+## Manual Push to Docker Hub
+For whatever reason to push this image up to Docker Hub manuall, then use the following command:
+```
+$ docker login
+# Login with creds
+$ docker push 88lexd/lets-encrypt-cron
+```
