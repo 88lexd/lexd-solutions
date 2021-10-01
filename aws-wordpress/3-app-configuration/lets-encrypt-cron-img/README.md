@@ -13,12 +13,16 @@ $ docker build -t 88lexd/lets-encrypt-cron .
 ```
 
 ## Run Interactively to Test
-Will mount source code to /app_local
+Use this while developing using local MicroK8s cluster. This will mount source code to /app_local
+Note: Token is taken from the pod which uses the service account that has the role allowed to use API.
+
+On the pod, extract the tokenfrom: `/var/run/secrets/kubernetes.io/serviceaccount/token`
 ```
 $ docker run --rm -it -v $(pwd)/src:/app_local --entrypoint /bin/bash --workdir /app_local 88lexd/lets-encrypt-cron
 
 TOKEN='eyJhbGciOiJSUzI...'
-$ python3 main.py --token $TOKEN
+HOST='https://192.168.198.101:16443'
+$ python3 main.py --token $TOKEN --host=$HOST
 ```
 
 ## Push Image to Docker Hub

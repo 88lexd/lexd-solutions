@@ -13,10 +13,13 @@ def main():
         config.load_incluster_config()
         kclient = client.CoreV1Api()
     else:
+        if opts.host is None:
+          print("Missing --host input!")
+          exit(1)
         configuration = kubernetes.client.Configuration()
         configuration.api_key['authorization'] = opts.token
         configuration.api_key_prefix['authorization'] = 'Bearer'
-        configuration.host = "https://192.168.198.101:16443"
+        configuration.host = opts.host
         configuration.verify_ssl=False
 
         # Enter a context with an instance of the API kubernetes.client
@@ -33,6 +36,8 @@ def get_parser():
     actions_group = parser.add_mutually_exclusive_group(required=True)
     actions_group.add_argument("--cluster-config", action="store_true" , help="Use cluser config. Only applicable when using inside a pod!")
     actions_group.add_argument("--token" , help="Apply a valid API token")
+
+    parser.add_argument("--host", help="The K8s host! including the port. e.g. 192.168.x.x:16443")
     return parser
 
 

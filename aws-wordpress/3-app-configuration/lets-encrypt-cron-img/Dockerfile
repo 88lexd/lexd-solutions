@@ -5,4 +5,5 @@ RUN pip install -r /app/requirements.txt
 
 COPY ./src /app
 
-CMD ["python3", "/app/main.py"]
+ENTRYPOINT ["python3"]
+CMD ["/app/main.py", "--cluster-config"]
