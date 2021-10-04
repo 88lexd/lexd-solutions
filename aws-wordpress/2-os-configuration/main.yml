@@ -25,6 +25,7 @@
           37393432373234623062343665303137636233376235363864663066323939316534646537303238
           6136373962353534370a613334613866343565663465646433613638376238663237333864386534
           31666535343165663364396463636635323139653034356261303838643438333665
+    lets_encrypt_account_key: files/lets-encrypt-account.key
   tasks:
   - name: Apply base configuration
     include_tasks: ansible_tasks/base-config.yml
@@ -61,6 +62,8 @@
           name: dev
     become_user: "{{ ansible_env.SUDO_USER }}"  # Use the standard user. This is where the Kubernetes Python module is installed.
 
+  ###########################################
+  # Begin setup secrets for MySQL password
   - name: Create secret for the MySQL password in PROD
     kubernetes.core.k8s:
       state: present
@@ -88,4 +91,21 @@
         data:
           password: "{{ k8s_mysql_dev_password | b64encode }}"
     become_user: "{{ ansible_env.SUDO_USER }}"  # Use the standard user. This is where the Kubernetes Python module is installed.
+  # End setup secrets for MySQL password
 
+  ###########################
+  # Begin setup TLS secrets
+  - name: Create secret for Lets Encrypt account key
+    copy:
+      src: "{{ lets_encrypt_account_key }}"
+      dest: lets_enccrypt_account.key
+      mode: 0600
+    become_user: "{{ ansible_env.SUDO_USER }}"
+    register: lets_encrypt_account_key
+    tags:
+      - aa
+
+  - debug:
+      var: lets_encrypt_account_key
+    tags:
+      - aa
