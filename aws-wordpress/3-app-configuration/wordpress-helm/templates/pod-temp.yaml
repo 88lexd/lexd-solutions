@@ -1,12 +1,14 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: testpod2
+  name: testpod
 spec:
   serviceAccountName: svc-tls-secret-handler
   automountServiceAccountToken: true
   containers:
   - image: 88lexd/lets-encrypt-cron:latest
     name: tls-secret-mgr
-    command: ["python3"]
-    args: ["/app/main.py", "--cluster-config"]
+    # command: ["python3"]
+    # args: ["/app/main.py", "--cluster-config"]
+    command: ["/bin/sh", "-c"]
+    args: ["sleep infinity"]

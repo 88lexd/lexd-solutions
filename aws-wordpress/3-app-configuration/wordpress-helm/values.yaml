@@ -12,3 +12,8 @@ mysql:
   deployment_replicas: null
   k8s_secret_name: null
   container_resources: null
+
+# These secrets are created by Ansible
+lets_encrypt:
+  account_key_secret_name: lets-encrypt-account-key
+  pivate_key_secret_name: lets-encrypt-private-key

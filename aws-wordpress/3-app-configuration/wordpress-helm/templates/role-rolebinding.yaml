@@ -6,8 +6,12 @@ metadata:
 rules:
 - apiGroups: [""]
   resources: ["secrets"]
-  resourceNames: ["{{ .Values.mysql.k8s_secret_name }}"]
-  verbs: ["get", "watch", "list", "describe"]
+  resourceNames: [
+    "{{ .Values.mysql.k8s_secret_name }}",
+    "{{ .Values.lets_encrypt.account_key_secret_name }}",
+    "{{ .Values.lets_encrypt.pivate_key_secret_name }}"
+  ]
+  verbs: ["get"]
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
