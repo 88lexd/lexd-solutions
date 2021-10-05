@@ -1,0 +1,7 @@
+name: okteto-lets-encrypt-cron  # This is the deployment name
+image: 88lexd/lets-encrypt-cron
+command: bash
+sync:
+- ./src:/app
+forward:
+- 5678:5678

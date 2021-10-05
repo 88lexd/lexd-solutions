@@ -3,12 +3,18 @@ import kubernetes.client
 import argparse
 import base64
 import os
+import debugpy
 
 
 def main():
     parser = get_parser()
     global opts
     opts = parser.parse_args()
+
+    debugpy.listen(5678)
+    print("Waiting for debugger attach")
+    debugpy.wait_for_client()
+    debugpy.breakpoint()
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
 

@@ -27,25 +27,87 @@ $ docker login
 $ docker push 88lexd/lets-encrypt-cron
 ```
 
-## Develop code using VS Code and Okteto
-Where VS Code is running, must have kubectl working and pointing to K8s cluster (e.g. WSL2).
+## Remote Develop and Debug using VS Code with Okteto
+Okteto allows remote development directly inside the pod! This makes it so much easier to write code and debug. It will sync the `./src` directory with `/app` in the container.
+
+Note: Where VS Code is running, kubeconfig must be working and pointing to a K8s cluster (e.g. in my case: I have Windows running VS Code which is using "WSL Target" and WSL has kubeconfig setup to point to a remote K8s cluster).
 
 Download and Install Okteto (this installs to /usr/local/bin/okteto)
 ```
 $ curl https://get.okteto.com -sSfL | sh
 ```
 
-
-
-## Debugging with VS Code on Docker
-Use this command while developing using Docker This will mount source code to /app_local
-Note: Token is taken from the pod which uses the service account that has the role allowed to use API.
-
-On the pod, extract the tokenfrom: `/var/run/secrets/kubernetes.io/serviceaccount/token`
+Take note of the context name. In my case, it is "microk8s". Will need it later.
 ```
-$ docker run --rm -it -v $(pwd)/src:/app_local --entrypoint /bin/bash --workdir /app_local 88lexd/lets-encrypt-cron
-
-TOKEN='eyJhbGciOiJSUzI...'
-HOST='https://192.168.198.101:16443'
-$ python3 main.py --token $TOKEN --host=$HOST
+$ cat ~/.kube/config | grep -A3 '\- context\:'
+- context:
+    cluster: microk8s-cluster
+    user: admin
+  name: microk8s
 ```
+
+Deploy Kubernetes manifest (we need the kind: Deployment) for later use.
+```
+$ kubectl apply -f okteto-pod.yml --namespace=dev
+deployment.apps/okteto-lets-encrypt-cron created
+$ kubectl get deployments -n dev
+NAME                       READY   UP-TO-DATE   AVAILABLE   AGE
+okteto-lets-encrypt-cron   1/1     1            0           18s
+```
+
+For the first time only. Run `okteto init --namespace=dev` which creates the okteto manifest (okteto.yml). This file is committed to git but putting it here for future reference.
+
+Start okteto! (Note: Foward 5678:5678 means that our local host is now forwarding to the containers 5678 port)
+```
+$ okteto up --context=microk8s --namespace=dev
+ ✓  Images successfully pulled
+ ✓  Files synchronized
+    Context:   microk8s
+    Namespace: dev
+    Name:      okteto-lets-encrypt-cron
+    Forward:   5678 -> 5678
+```
+
+Once Okteto starts, it will start a Bash shell. Now trigger the script manually and it will be ready for VS Code to attach to it. Example:
+```
+root@okteto-lets-encrypt-cron-6dc99c868d-jpv55:/app# python3 main.py
+usage: main.py [-h] (--cluster-config | --token TOKEN) [--host HOST]
+main.py: error: one of the arguments --cluster-config --token is required
+root@okteto-lets-encrypt-cron-6dc99c868d-jpv55:/app# python3 main.py --cluster-config
+Waiting for debugger attach
+```
+
+Setup VS Code with the following launch configuration (launch.json). Thanks to the forwarding above, I can now use "localhost" and just need to target port 5678.
+```
+{
+  "name": "Python: Attach",
+  "type": "python",
+  "request": "attach",
+  "port": 5678,
+  "host": "localhost",
+  "pathMappings": [
+    {
+      "localRoot": "${fileDirname}",  // This requires me to start debug in ./src/main.py
+      "remoteRoot": "/app"
+    }
+  ]
+}
+```
+
+To allow VS Code to start debugging, the following snippet must exist in the source code.
+```
+# Example code only, but you get the point that we need to use 'debugpy'
+import debugpy
+
+a = 1
+b = 2
+c = a + b
+
+debugpy.listen(5678)
+print("Waiting for debugger attach")
+debugpy.wait_for_client()
+debugpy.breakpoint()
+print(c)
+```
+
+**Final Note**: Every time I edit the code in `./src`, it will instantly get sync over to the container! This is all thanks to the okteto manifest (okteto.yml) file!

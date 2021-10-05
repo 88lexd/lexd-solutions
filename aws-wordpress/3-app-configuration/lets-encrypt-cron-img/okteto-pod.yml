@@ -1,0 +1,22 @@
+# This deployment is used by Okteto to sync code into container.
+# It enables "remote debugging" with VS Code
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: okteto-lets-encrypt-cron
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lets-encrypt-cron
+  template:
+    metadata:
+      labels:
+        app: lets-encrypt-cron
+    spec:
+      containers:
+      - image: 88lexd/lets-encrypt-cron
+        name: lets-encrypt-cron
+        command: ["python3"]
+        args: ["/app/main.py", "--cluster-config"]
