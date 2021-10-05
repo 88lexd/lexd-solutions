@@ -1,0 +1,22 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lets-encrypt-cron
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lets-encrypt-cron
+  template:
+    metadata:
+      labels:
+        app: lets-encrypt-cron
+    spec:
+      serviceAccountName: svc-tls-secret-handler
+      automountServiceAccountToken: true
+      containers:
+      - image: 88lexd/lets-encrypt-cron
+        name: lets-encrypt-cron
+        command: ["python3"]
+        args: ["/app/main.py", "--cluster-config"]

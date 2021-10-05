@@ -4,7 +4,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: okteto-lets-encrypt-cron
+  name: lets-encrypt-cron  # The name in okteto.yml must match this deployment name.
 spec:
   replicas: 1
   selector:
@@ -15,8 +15,14 @@ spec:
       labels:
         app: lets-encrypt-cron
     spec:
+      # Service account RBAC is configured by the Helm chart. https://github.com/88lexd/lexd-solutions/tree/main/aws-wordpress/3-app-configuration/wordpress-helm
+      # This deployment should be temporarily only during development.
+      # In fact, the Helm chart also creates this exact ame deployment. I can just use that... (no changes required, okteto manifest already points to the same name)
+      serviceAccountName: svc-tls-secret-handler
+      automountServiceAccountToken: true
       containers:
       - image: 88lexd/lets-encrypt-cron
         name: lets-encrypt-cron
         command: ["python3"]
         args: ["/app/main.py", "--cluster-config"]
+
