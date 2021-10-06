@@ -132,4 +132,34 @@
         data:
           key: "{{ lets_encrypt_keys.private_key | b64encode }}"
     become_user: "{{ ansible_env.SUDO_USER }}"  # Use the standard user. This is where the Kubernetes Python module is installed.
+
+  - name: Create secret for Lets Encrypt ACCOUNT key in PROD
+    kubernetes.core.k8s:
+      state: present
+      force: yes
+      definition:
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: "{{ lets_encrypt.account_key_secret_name }}"
+          namespace: prod
+        type: Opaque
+        data:
+          key: "{{ lets_encrypt_keys.account_key | b64encode }}"
+    become_user: "{{ ansible_env.SUDO_USER }}"  # Use the standard user. This is where the Kubernetes Python module is installed.
+
+  - name: Create secret for Lets Encrypt PRIVATE key in PROD
+    kubernetes.core.k8s:
+      state: present
+      force: yes
+      definition:
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: "{{ lets_encrypt.private_key_secret_name }}"
+          namespace: prod
+        type: Opaque
+        data:
+          key: "{{ lets_encrypt_keys.private_key | b64encode }}"
+    become_user: "{{ ansible_env.SUDO_USER }}"  # Use the standard user. This is where the Kubernetes Python module is installed.
   # End lets Encrypt keys
