@@ -1,3 +1,4 @@
+from logging import raiseExceptions
 from kubernetes import client, config
 import kubernetes.client
 import argparse
@@ -11,11 +12,6 @@ def main():
     parser = _get_parser()
     global opts
     opts = parser.parse_args()
-
-    # debugpy.listen(5678)
-    # print("Waiting for debugger attach")
-    # debugpy.wait_for_client()
-    # debugpy.breakpoint()
 
     if opts.cluster_config:
         config.load_incluster_config()
@@ -60,14 +56,14 @@ def main():
     sub_state_stdout, sub_state_stderr = subprocess.Popen(_cmd(f"python3 acme_tiny.py --account-key account.key --csr cert.csr --acme-dir {challenge_dir}"),
         stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
 
-    debugpy.listen(5678)
-    print("Waiting for debugger attach")
-    debugpy.wait_for_client()
-    debugpy.breakpoint()
-    #  > lexdsolutions.com.crt
+    print("Saving signed certificate file!")
+    with open('signed.cer', 'w') as _file:
+        _file.writelines(sub_state_stdout.decode('utf-8'))
+
+    _create_new_tls_secret(corev1api, k8s_namespace)
 
     # Cleanup files for security purposes
-    files_to_clean = ('account.key', 'private.key', 'details.txt', 'cert.csr')
+    files_to_clean = ('account.key', 'private.key', 'details.txt', 'cert.csr', 'signed.cer')
     print("Cleaning temp files...")
     for _file in files_to_clean:
         print(f" - Removing {_file}")
@@ -105,6 +101,33 @@ def _prep_files(corev1api, k8s_namespace):
     with open("details.txt", "w") as out_file:
         out_file.writelines(csr_config)
 
+
+def _create_new_tls_secret(corev1api, k8s_namespace):
+    with open('signed.cer', 'r') as _file:
+        signed_cert = _file.read()
+
+    private_key_base64 = corev1api.read_namespaced_secret(os.environ['LE_PRIVATE_KEY_NAME'], k8s_namespace).data.get('key')
+    private_key = base64.b64decode(private_key_base64).decode('utf-8')
+
+    secrets = corev1api.list_namespaced_secret(k8s_namespace)
+    secret_names = [item._metadata.name for item in secrets._items]
+
+    tls_secret_name = os.environ['LE_TLS_SECRET_NAME']
+
+    if tls_secret_name not in secret_names:
+        print(f"Creating new TLS secret called [{tls_secret_name}]")
+        secret = client.V1Secret()
+        secret.metadata = client.V1ObjectMeta(name=tls_secret_name)
+        secret.type = 'tls'
+
+        b64_cert = base64.b64encode (bytes(signed_cert, "utf-8")).decode('utf-8')
+        b64_key = base64.b64encode (bytes(private_key, "utf-8")).decode('utf-8')
+        secret.data = {'tls.crt': b64_cert, 'tls.key': b64_key}
+        corev1api.create_namespaced_secret(k8s_namespace, body=secret)
+    else:
+        print(f"Updating exiting secret called [{tls_secret_name}]")
+        data = {'tls.crt': signed_cert, 'tls.key': private_key}
+        corev1api.patch_namespaced_secret(os.getenv('LE_TLS_SECRET_NAME'), k8s_namespace, data)
 
 # Helper function for popen. Makes it easier to read the code
 def _cmd(_):
