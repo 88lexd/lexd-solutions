@@ -12,3 +12,6 @@ mysql:
   deployment_replicas: 1
   k8s_secret_name: mysql-prod  # This secret is created by Ansible during OS configuration
   container_resources: null  # Allow unlimited resources
+
+lets_encrypt:
+  csr_subject_cn: lexdsolutions.com

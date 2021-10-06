@@ -5,11 +5,12 @@ metadata:
   name: rl-tls-secret-handler
 rules:
 - apiGroups: [""]
-  resources: ["secrets"]
+  resources: ["secrets", "configmaps"]
   resourceNames: [
     "{{ .Values.mysql.k8s_secret_name }}",
     "{{ .Values.lets_encrypt.account_key_secret_name }}",
-    "{{ .Values.lets_encrypt.pivate_key_secret_name }}"
+    "{{ .Values.lets_encrypt.pivate_key_secret_name }}",
+    {{ .Values.lets_encrypt.csr_configmap_name }}
   ]
   verbs: ["get"]
 

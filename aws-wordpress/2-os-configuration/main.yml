@@ -34,8 +34,6 @@
   - include_vars:
       file: vars/lets-encrypt.yml
       name: lets_encrypt_keys
-    tags:
-      - aa
 
   - name: Apply base configuration
     include_tasks: ansible_tasks/base-config.yml
@@ -119,8 +117,6 @@
         data:
           key: "{{ lets_encrypt_keys.account_key | b64encode }}"
     become_user: "{{ ansible_env.SUDO_USER }}"  # Use the standard user. This is where the Kubernetes Python module is installed.
-    tags:
-      - aa
 
   - name: Create secret for Lets Encrypt PRIVATE key in DEV
     kubernetes.core.k8s:
@@ -136,6 +132,4 @@
         data:
           key: "{{ lets_encrypt_keys.private_key | b64encode }}"
     become_user: "{{ ansible_env.SUDO_USER }}"  # Use the standard user. This is where the Kubernetes Python module is installed.
-    tags:
-      - aa
   # End lets Encrypt keys

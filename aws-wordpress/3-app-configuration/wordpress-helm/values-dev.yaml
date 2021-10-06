@@ -18,3 +18,6 @@ mysql:
     # Cannot configure memory limits because it cannot be compressed and will terminate the pod!
     limits:
       cpu: "0.5"
+
+lets_encrypt:
+  csr_subject_cn: dev.lexdsolutions.com

@@ -77,7 +77,6 @@ spec:
         resources:
           {{ .Values.wordpress.container_resources | toJson }}
         {{- end }}
-
       volumes:
       - name: wordpress-volume
         persistentVolumeClaim:
