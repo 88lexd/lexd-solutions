@@ -94,7 +94,9 @@ Setup VS Code with the following launch configuration (launch.json). Thanks to t
 }
 ```
 
-To allow VS Code to start debugging, the following snippet must exist in the source code.
+To allow VS Code to start debugging, the following snippet must exist in the source code
+
+Note: On VS Code, Start Debugging (F5) on `main.py` in ./src
 ```
 # Example code only, but you get the point that we need to use 'debugpy'
 import debugpy
@@ -111,3 +113,43 @@ print(c)
 ```
 
 **Final Note**: Every time I edit the code in `./src`, it will instantly get sync over to the container! This is all thanks to the okteto manifest (okteto.yml) file!
+
+## Okteto Troubleshooting
+When I need to make a change to my Kubernetes deployment, I must first stop Okteto and then apply the changes. Otherwise it will not work properly.
+
+Example (not working):
+```
+$ okteto up --context=microk8s --namespace=dev
+ x   'lets-encrypt-cron' has been modified while your development container was active
+    Follow these steps:
+          1. Execute 'okteto down'
+          2. Apply your manifest changes again: 'kubectl apply'
+          3. Execute 'okteto up' again
+    More information is available here: https://okteto.com/docs/reference/known-issues/#kubectl-apply-changes-are-undone-by-okteto-up
+```
+
+The fix:
+```
+$ okteto down --context=microk8s --namespace=dev
+ ✓  Development container deactivated
+
+$ cd /home/alex/code/git/lexd-solutions/aws-wordpress/3-app-configuration/wordpress-helm
+$ helm upgrade wordpress-dev . --namespace=dev --values=values-dev-local.yaml
+Release "wordpress-dev" has been upgraded. Happy Helming!
+NAME: wordpress-dev
+LAST DEPLOYED: Wed Oct  6 11:47:15 2021
+NAMESPACE: dev
+STATUS: deployed
+REVISION: 13
+TEST SUITE: None
+
+$ okteto up --context=microk8s --namespace=dev
+ ✓  Images successfully pulled
+ ✓  Files synchronized
+    Context:   microk8s
+    Namespace: dev
+    Name:      lets-encrypt-cron
+    Forward:   5678 -> 5678
+
+root@lets-encrypt-cron-7f74fbc497-6ntmv:/app#
+```
