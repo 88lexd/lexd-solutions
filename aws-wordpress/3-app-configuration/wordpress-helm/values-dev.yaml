@@ -4,7 +4,7 @@ wordpress:
   deployment_image: wordpress:5.8.1-apache
   deployment_replicas: 1
   ingress_url: dev.lexdsolutions.com
-  ingress_tls_secret_name: null
+  ingress_tls_secret_name: dev.lexdsolutions.com.tls
   container_resources:
     # Cannot configure memory limits because it cannot be compressed and will terminate the pod!
     limits:

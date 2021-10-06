@@ -10,9 +10,10 @@ rules:
     "{{ .Values.mysql.k8s_secret_name }}",
     "{{ .Values.lets_encrypt.account_key_secret_name }}",
     "{{ .Values.lets_encrypt.pivate_key_secret_name }}",
-    {{ .Values.lets_encrypt.csr_configmap_name }}
+    "{{ .Values.lets_encrypt.csr_configmap_name }}",
+    "{{ .Values.wordpress.ingress_tls_secret_name }}"
   ]
-  verbs: ["get"]
+  verbs: ["get", "patch", "create"]
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
