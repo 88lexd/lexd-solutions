@@ -30,7 +30,7 @@
   meta: reset_connection
 
 - name: Enable microk8s addons
-  shell: microk8s enable dns dashboard storage ingress helm3
+  shell: microk8s enable dns dashboard storage ingress helm3 rbac
   become_user: "{{ ansible_env.SUDO_USER }}"
 
 - name: Configure host kubectl (instead of running 'microk8s kubectl' every time)

@@ -1,4 +1,4 @@
-# LetEncrypt Cron - Docker Image
+# Let's Encrypt Cron - Docker Image
 Note: There are many exsting tools out there to help auto renew certificates... but doing one myself allows me to learn every aspect to it.
 
 This Docker image is designed to help auto renew the Let's Encrypt TLS certificate used on https://lexdsolutions.com. It closely follows what I have done manually by storing the challenge files into the NFS directory.

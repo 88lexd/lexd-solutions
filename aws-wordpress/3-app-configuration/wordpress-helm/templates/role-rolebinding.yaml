@@ -6,14 +6,19 @@ metadata:
 rules:
 - apiGroups: [""]
   resources: ["secrets", "configmaps"]
+  verbs: ["get"]
   resourceNames: [
-    "{{ .Values.mysql.k8s_secret_name }}",
     "{{ .Values.lets_encrypt.account_key_secret_name }}",
     "{{ .Values.lets_encrypt.pivate_key_secret_name }}",
-    "{{ .Values.lets_encrypt.csr_configmap_name }}",
-    "{{ .Values.wordpress.ingress_tls_secret_name }}"
+    "{{ .Values.lets_encrypt.csr_configmap_name }}"
   ]
-  verbs: ["get", "patch", "create"]
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["list", "create"]
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["delete"]
+  resourceNames: ["{{ .Values.wordpress.ingress_tls_secret_name }}"]
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1

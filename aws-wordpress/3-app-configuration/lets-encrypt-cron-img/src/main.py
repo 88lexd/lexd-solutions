@@ -1,4 +1,3 @@
-from logging import raiseExceptions
 from kubernetes import client, config
 import kubernetes.client
 import argparse
@@ -43,24 +42,41 @@ def main():
     if not os.environ.get('LE_CSR_CONFIGMAP_NAME'):
         print('Missing LE_CSR_CONFIGMAP_NAME in environmental variables!')
         exit(1)
+    if not os.environ.get('LE_TLS_SECRET_NAME'):
+        print('Missing LE_TLS_SECRET_NAME in environmental variables!')
+        exit(1)
+
+    # TO DO
+    """
+    - Check SSL certificate for expiry. Should only renew/create if
+        1) cert is about to expire (<30 days)
+        2) is using the default Kubernetes certificate
+    - Configure k8s cronjob for this
+    """
 
     # Get data from secrets and configmap and save as temp files
     _prep_files(corev1api, k8s_namespace)
 
+    print ("Begin requesting certficate from Lets Encrypt... ")
     # Use openssl binary to generate CSR
     subprocess.Popen(_cmd("openssl req -new -sha256 -nodes -out cert.csr -key private.key -config details.txt")).communicate()
 
     # This dir is an underlying NFS mount (PV). It is the same as the WordPress pods. Any files here will be public
     challenge_dir = '/var/www/html/.well-known/acme-challenge'
     os.makedirs(challenge_dir, exist_ok=True)
-    sub_state_stdout, sub_state_stderr = subprocess.Popen(_cmd(f"python3 acme_tiny.py --account-key account.key --csr cert.csr --acme-dir {challenge_dir}"),
+
+    if (opts.staging):
+        directory_url = "--directory-url https://acme-staging-v02.api.letsencrypt.org/directory"
+    else:
+        directory_url = ""
+    sub_state_stdout, sub_state_stderr = subprocess.Popen(_cmd(f"python3 acme_tiny.py --account-key account.key --csr cert.csr --acme-dir {challenge_dir} {directory_url}"),
         stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
 
     print("Saving signed certificate file!")
     with open('signed.cer', 'w') as _file:
         _file.writelines(sub_state_stdout.decode('utf-8'))
 
-    _create_new_tls_secret(corev1api, k8s_namespace)
+    _update_tls_secret(corev1api, k8s_namespace)
 
     # Cleanup files for security purposes
     files_to_clean = ('account.key', 'private.key', 'details.txt', 'cert.csr', 'signed.cer')
@@ -80,6 +96,7 @@ def _get_parser():
 
     parser.add_argument("--host", help="The K8s host! including the port. e.g. 192.168.x.x:16443")
     parser.add_argument("-n","--namespace", help="Name of the Kubernetes namespace")
+    parser.add_argument("--staging", action="store_true" , help="Use Lets Encrypts staging servers instead of prod! (recommended for dev)")
     return parser
 
 
@@ -102,32 +119,28 @@ def _prep_files(corev1api, k8s_namespace):
         out_file.writelines(csr_config)
 
 
-def _create_new_tls_secret(corev1api, k8s_namespace):
+def _update_tls_secret(corev1api, k8s_namespace):
     with open('signed.cer', 'r') as _file:
         signed_cert = _file.read()
 
     private_key_base64 = corev1api.read_namespaced_secret(os.environ['LE_PRIVATE_KEY_NAME'], k8s_namespace).data.get('key')
-    private_key = base64.b64decode(private_key_base64).decode('utf-8')
+    b64_cert = base64.b64encode(bytes(signed_cert, "utf-8")).decode('utf-8')
 
     secrets = corev1api.list_namespaced_secret(k8s_namespace)
     secret_names = [item._metadata.name for item in secrets._items]
 
     tls_secret_name = os.environ['LE_TLS_SECRET_NAME']
 
-    if tls_secret_name not in secret_names:
-        print(f"Creating new TLS secret called [{tls_secret_name}]")
-        secret = client.V1Secret()
-        secret.metadata = client.V1ObjectMeta(name=tls_secret_name)
-        secret.type = 'tls'
+    if tls_secret_name in secret_names:
+        print(f"Found existing TLS secret called [{tls_secret_name}]. Deleting it to create new one...")
+        corev1api.delete_namespaced_secret(tls_secret_name, k8s_namespace)
 
-        b64_cert = base64.b64encode (bytes(signed_cert, "utf-8")).decode('utf-8')
-        b64_key = base64.b64encode (bytes(private_key, "utf-8")).decode('utf-8')
-        secret.data = {'tls.crt': b64_cert, 'tls.key': b64_key}
-        corev1api.create_namespaced_secret(k8s_namespace, body=secret)
-    else:
-        print(f"Updating exiting secret called [{tls_secret_name}]")
-        data = {'tls.crt': signed_cert, 'tls.key': private_key}
-        corev1api.patch_namespaced_secret(os.getenv('LE_TLS_SECRET_NAME'), k8s_namespace, data)
+    print(f"Creating new TLS secret called [{tls_secret_name}]")
+    secret = client.V1Secret()
+    secret.metadata = client.V1ObjectMeta(name=tls_secret_name)
+    secret.type = 'tls'
+    secret.data = {'tls.crt': b64_cert, 'tls.key': private_key_base64}
+    corev1api.create_namespaced_secret(k8s_namespace, body=secret)
 
 # Helper function for popen. Makes it easier to read the code
 def _cmd(_):
