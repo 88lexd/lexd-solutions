@@ -1,0 +1,6 @@
+venv
+*.key
+details.txt
+*.csr
+*.crt
+*.cer

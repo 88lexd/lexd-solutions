@@ -2,7 +2,8 @@ FROM python:3-slim
 WORKDIR /app
 COPY requirements.txt /app/requirements.txt
 RUN pip install -r /app/requirements.txt
-
+ENV TZ=Australia/Sydney
 COPY ./src /app
 
-CMD ["python3", "/app/main.py"]
+ENTRYPOINT ["python3"]
+CMD ["/app/main.py", "--cluster-config"]
