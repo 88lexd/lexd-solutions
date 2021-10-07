@@ -1,9 +1,11 @@
 from kubernetes import client, config
+from datetime import datetime, timedelta
 import kubernetes.client
 import argparse
 import base64
 import os
 import subprocess
+import check_cert
 import debugpy
 
 
@@ -33,26 +35,37 @@ def main():
         with kubernetes.client.ApiClient(configuration) as api_client:
             corev1api = kubernetes.client.CoreV1Api(api_client)
 
-    if not os.environ.get('LE_ACCOUNT_KEY_NAME'):
-        print('Missing LE_ACCOUNT_KEY in environmental variables!')
-        exit(1)
-    if not os.environ.get('LE_PRIVATE_KEY_NAME'):
-        print('Missing LE_PRIVATE_KEY_NAME in environmental variables!')
-        exit(1)
-    if not os.environ.get('LE_CSR_CONFIGMAP_NAME'):
-        print('Missing LE_CSR_CONFIGMAP_NAME in environmental variables!')
-        exit(1)
-    if not os.environ.get('LE_TLS_SECRET_NAME'):
-        print('Missing LE_TLS_SECRET_NAME in environmental variables!')
-        exit(1)
+    required_env_vars = [
+        "LE_ACCOUNT_KEY_NAME",
+        "LE_PRIVATE_KEY_NAME",
+        "LE_CSR_CONFIGMAP_NAME",
+        "LE_TLS_SECRET_NAME",
+        "INGRESS_URL"
+    ]
 
-    # TO DO
-    """
-    - Check SSL certificate for expiry. Should only renew/create if
-        1) cert is about to expire (<30 days)
-        2) is using the default Kubernetes certificate
-    - Configure k8s cronjob for this
-    """
+    for env in required_env_vars:
+        if not os.environ.get(env):
+            print(f'Missing {env} in environmental variables!')
+            exit(1)
+
+
+    print("Checking ingress URL for current ceritficate...")
+    current_endpoint_cert = check_cert.get_certificate(url=os.environ.get('INGRESS_URL'))
+
+    date_now = datetime.now()
+    cert_expire_date = current_endpoint_cert['not_after_date']
+    expire_date = "{day}/{month}/{year}".format(day=cert_expire_date.day,
+                                                month=cert_expire_date.month,
+                                                year=cert_expire_date.year)
+    until_expire = cert_expire_date - date_now
+
+    if until_expire.days > 30 and current_endpoint_cert['cert_valid']:
+        print(f"Current certificate has more than 30 days before it expires. (expires on {expire_date})")
+        print("Script completed")
+        exit(0)
+
+    if not current_endpoint_cert['cert_valid']:
+        print("Current certificate is not valid! Renewing certificate...")
 
     # Get data from secrets and configmap and save as temp files
     _prep_files(corev1api, k8s_namespace)
@@ -69,8 +82,15 @@ def main():
         directory_url = "--directory-url https://acme-staging-v02.api.letsencrypt.org/directory"
     else:
         directory_url = ""
+
     sub_state_stdout, sub_state_stderr = subprocess.Popen(_cmd(f"python3 acme_tiny.py --account-key account.key --csr cert.csr --acme-dir {challenge_dir} {directory_url}"),
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+                                                          stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+
+    print(sub_state_stderr.decode('utf-8'))
+
+    if sub_state_stdout.decode('utf-8') == '':
+        print("ERROR: Certificate response is empty! Check errors during registration!")
+        exit(1)
 
     print("Saving signed certificate file!")
     with open('signed.cer', 'w') as _file:

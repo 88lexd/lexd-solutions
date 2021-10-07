@@ -32,6 +32,8 @@ spec:
           value: {{ .Values.lets_encrypt.csr_configmap_name }}
         - name: LE_TLS_SECRET_NAME
           value: {{ .Values.wordpress.ingress_tls_secret_name }}
+        - name: INGRESS_URL
+          value: {{ .Values.wordpress.ingress_url }}
         volumeMounts:
         - name: wordpress-volume
           mountPath: "/var/www/html"  # Same directory as what the WordPress pods are using. This is where the challenge files will be stored
