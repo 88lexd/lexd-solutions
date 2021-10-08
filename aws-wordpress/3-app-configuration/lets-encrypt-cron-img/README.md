@@ -46,13 +46,13 @@ $ cat ~/.kube/config | grep -A3 '\- context\:'
   name: microk8s
 ```
 
-Deploy Kubernetes manifest (we need the kind: Deployment) for later use.
+Deploy Helm Chart (we need the kind: Deployment) for later use.
+The Helm Chart includes the template [deployment-lets-encrypt.yaml](https://github.com/88lexd/lexd-solutions/blob/main/aws-wordpress/3-app-configuration/wordpress-helm/templates/deployment-lets-encrypt.yaml).
+
+Note: Must first set the deployment replica to 1!
 ```
-$ kubectl apply -f okteto-pod.yml --namespace=dev
-deployment.apps/okteto-lets-encrypt-cron created
-$ kubectl get deployments -n dev
-NAME                       READY   UP-TO-DATE   AVAILABLE   AGE
-okteto-lets-encrypt-cron   1/1     1            0           18s
+$ cd ../wordpress-helm
+$ helm upgrade wordpress-dev . --namespace=dev --values=values-dev.yaml
 ```
 
 For the first time only. Run `okteto init --namespace=dev` which creates the okteto manifest (okteto.yml). This file is committed to git but putting it here for future reference.
