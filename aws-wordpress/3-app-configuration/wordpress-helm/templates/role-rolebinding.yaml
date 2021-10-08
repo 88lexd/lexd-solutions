@@ -32,5 +32,5 @@ roleRef:
   name: rl-tls-secret-handler
 subjects:
 - kind: ServiceAccount
-  name: svc-tls-secret-handler
+  name: {{ .Values.lets_encrypt.service_account_name }}
   namespace: {{ .Release.Namespace }}

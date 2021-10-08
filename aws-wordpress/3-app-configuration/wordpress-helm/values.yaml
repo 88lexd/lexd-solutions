@@ -14,6 +14,7 @@ mysql:
   container_resources: null
 
 lets_encrypt:
+  service_account_name: svc-tls-secret-handler
   # These 2 secrets are created by Ansible
   account_key_secret_name: lets-encrypt-account-key
   pivate_key_secret_name: lets-encrypt-private-key

@@ -15,7 +15,7 @@ spec:
       labels:
         app: lets-encrypt-cron-pod
     spec:
-      serviceAccountName: svc-tls-secret-handler
+      serviceAccountName: {{ .Values.lets_encrypt.service_account_name }}
       automountServiceAccountToken: true
       containers:
       - image: 88lexd/lets-encrypt-cron:latest
