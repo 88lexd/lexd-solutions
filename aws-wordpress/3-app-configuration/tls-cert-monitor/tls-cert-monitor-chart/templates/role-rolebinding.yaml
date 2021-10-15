@@ -2,35 +2,24 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   namespace: {{ .Release.Namespace }}
-  name: rl-tls-secret-handler
+  name: rl-tls-cert-monitor
 rules:
 - apiGroups: [""]
-  resources: ["secrets", "configmaps"]
   verbs: ["get"]
-  resourceNames: [
-    "{{ .Values.lets_encrypt.account_key_secret_name }}",
-    "{{ .Values.lets_encrypt.pivate_key_secret_name }}",
-    "{{ .Values.lets_encrypt.csr_configmap_name }}"
-  ]
-- apiGroups: [""]
-  resources: ["secrets"]
-  verbs: ["list", "create"]
-- apiGroups: [""]
-  resources: ["secrets"]
-  verbs: ["delete"]
-  resourceNames: ["{{ .Values.wordpress.ingress_tls_secret_name }}"]
+  resources: ["ingress"]
+
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: rlb-tls-secret-handler
+  name: rlb-tls-cert-monitor
   namespace: {{ .Release.Namespace }}
 roleRef:
   kind: Role
   apiGroup: rbac.authorization.k8s.io
-  name: rl-tls-secret-handler
+  name: rl-tls-cert-monitor
 subjects:
 - kind: ServiceAccount
-  name: {{ .Values.lets_encrypt.service_account_name }}
+  name: {{ .Values.service_account_name }}
   namespace: {{ .Release.Namespace }}

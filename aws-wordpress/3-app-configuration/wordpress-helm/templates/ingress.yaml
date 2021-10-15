@@ -31,6 +31,9 @@ spec:
             name: wordpress-service  # references [service]metadata.name in 'deployment-wordpress.yaml'
             port:
               number: 80
+
+
+
   - host: prod.lexdsolutions.com # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<< REMOVE THE BELOW!!!
     http:
       paths:

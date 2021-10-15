@@ -1,0 +1,28 @@
+# This deployment should only be used during development with Okteto.
+# Once finished with development, it should be removed!
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dev-tls-cert-monitor-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tls-cert-monitor-pod
+  template:
+    metadata:
+      labels:
+        app: tls-cert-monitor-pod
+    spec:
+      serviceAccountName: {{ .Values.service_account_name }}
+      automountServiceAccountToken: true
+      containers:
+      - image: 88lexd/tls-cert-monitor:latest
+        imagePullPolicy: Always
+        name: lets-encrypt-cron
+        command: ["python3"]
+        args: ["/app/main.py"]
+        env:
+        - name: TZ
+          value: {{ .Values.time_zone }}
