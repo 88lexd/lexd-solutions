@@ -1,0 +1,9 @@
+apiVersion: v2
+name: tls-cert-monitor
+version: 0.1
+description: TLS certificate monitor by looking at Ingress Controller host configuration
+home: https://lexdsolutions.com
+
+maintainers:
+  - name: Alex Dinh
+    email: alex.dinh@lexdsolutions.com

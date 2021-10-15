@@ -17,10 +17,21 @@ spec:
   # Must be valid hosts in the secret
   - hosts:
      - {{ .Values.wordpress.ingress_url }}
+     - prod.lexdsolutions.com     # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<< REMOVE!!
     secretName: "{{ .Values.wordpress.ingress_tls_secret_name }}"
   {{- end }}
   rules:
   - host: {{ .Values.wordpress.ingress_url }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: wordpress-service  # references [service]metadata.name in 'deployment-wordpress.yaml'
+            port:
+              number: 80
+  - host: prod.lexdsolutions.com # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<< REMOVE THE BELOW!!!
     http:
       paths:
       - path: /
