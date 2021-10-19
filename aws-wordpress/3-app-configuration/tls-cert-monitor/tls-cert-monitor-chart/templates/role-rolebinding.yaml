@@ -4,9 +4,9 @@ metadata:
   namespace: {{ .Release.Namespace }}
   name: rl-tls-cert-monitor
 rules:
-- apiGroups: [""]
-  verbs: ["get"]
-  resources: ["ingress"]
+- apiGroups: ["extensions"]
+  verbs: ["get", "list"]
+  resources: ["ingresses"]
 
 
 ---
