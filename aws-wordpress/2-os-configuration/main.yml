@@ -40,6 +40,8 @@
 
   - name: Setup AWS CloudWatch Agent
     include_tasks: ansible_tasks/setup-aws-cw-agent.yml
+    tags:
+      - cloudwatch
 
   - name: Install and configure MicroK8s
     include_tasks: ansible_tasks/setup-microk8s.yml

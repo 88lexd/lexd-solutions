@@ -12,7 +12,7 @@
     mode: 0755
 
 # Use "$ snap info microk8s" to know what versions are published
-- name: Install microk8s with option --channel=1.21/stable
+- name: "Install microk8s with option --channel={{ snap_microk8s_channel }}"
   community.general.snap:
     name: microk8s
     channel: "{{ snap_microk8s_channel }}"
