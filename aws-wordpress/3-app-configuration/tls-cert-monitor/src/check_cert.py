@@ -1,10 +1,10 @@
 from OpenSSL import SSL  # pip install pyopenssl
 from datetime import datetime
-from optparse import OptionParser
 import socket
 import urllib3
 import requests
-import os
+import logging
+
 
 # Suppress all SSL certificate warning (ignore expired or self signed)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -27,7 +27,7 @@ def _get_ssl_cert(url):
         ssl_sock.do_handshake()
         return ssl_sock
     except Exception:
-        print(f"WARNING: [ {url} ] Failed to use TLSv1.2.. using TLSv1 instead")
+        logging.info(f"WARNING: Failed to use TLSv1.2.. using TLSv1 instead")
         ssl_sock = SSL.Connection(SSL.Context(SSL.TLSv1_METHOD), socket.socket())  # using TLSv1
         ssl_sock.set_tlsext_host_name(bytes(url, 'utf-8'))  # This will allow SNI (Server Name Indication) support
         ssl_sock.connect((url, 443))
@@ -49,15 +49,15 @@ def _check_response_code(url):
         try:
             response = requests.head(f'https://{url}', verify=False, timeout=3)
             code = response.status_code
-            print (f"WARNING: [ {url} ] has an invalid certificate.")
+            logging.info(f"WARNING: Invalid certificate!")
             return {'status': True, 'code': code, 'cert_valid': False}
         # Exception for checking INVALID certs
         except Exception as e:
-            print (f"WARNING: [ {url} ] failed to check response code.")
+            logging.info(f"WARNING: Failed to check response code")
             return {'status': False}
     # Exception for checking VALID certs
     except Exception as e:
-        print (f"WARNING: [ {url} ] failed to check response code.")
+        logging.info(f"WARNING: Failed to check response code")
         return {'status': False}
 
 

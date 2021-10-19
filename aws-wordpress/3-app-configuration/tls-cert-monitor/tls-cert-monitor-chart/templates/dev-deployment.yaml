@@ -26,3 +26,5 @@ spec:
         env:
         - name: TZ
           value: {{ .Values.time_zone }}
+        - name: DAYS_REMAINING_THRESHOLD
+          value: {{ quote .Values.days_remaining_threshold }}

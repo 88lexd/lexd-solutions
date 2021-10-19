@@ -5,7 +5,7 @@ metadata:
   name: rl-tls-cert-monitor
 rules:
 - apiGroups: ["extensions"]
-  verbs: ["get", "list"]
+  verbs: ["list"]
   resources: ["ingresses"]
 
 
