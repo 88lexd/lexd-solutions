@@ -7,4 +7,4 @@ ENV TZ=Australia/Sydney
 COPY ./src /app
 
 ENTRYPOINT ["python3"]
-CMD ["/app/main.py"]
+CMD ["/app/main.py", "--ingress-hosts"]

@@ -7,7 +7,10 @@ rules:
 - apiGroups: ["extensions"]
   verbs: ["list"]
   resources: ["ingresses"]
-
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get"]
+  resourceNames: [{{ .Values.smtp_details.k8s_secret_name }}]
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1

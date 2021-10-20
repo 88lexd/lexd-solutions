@@ -6,7 +6,7 @@ kind: Deployment
 metadata:
   name: dev-tls-cert-monitor-deployment
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: tls-cert-monitor-pod
@@ -28,3 +28,13 @@ spec:
           value: {{ .Values.time_zone }}
         - name: DAYS_REMAINING_THRESHOLD
           value: {{ quote .Values.days_remaining_threshold }}
+        - name: SMTP_SERVER
+          value: {{ .Values.smtp_details.server }}
+        - name: SMTP_PORT
+          value: {{ quote .Values.smtp_details.port }}
+        - name: SMTP_TOADDR
+          value: {{ .Values.smtp_details.to_address }}
+        - name: SMTP_EMAIL_SUBJECT
+          value: {{ .Values.smtp_details.email_subject }}
+        - name: SMTP_SECRET_NAME
+          value: {{ .Values.smtp_details.k8s_secret_name }}

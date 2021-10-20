@@ -1,11 +1,15 @@
 from kubernetes import client, config
 from jinja2 import Environment, FileSystemLoader
 from datetime import datetime
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import smtplib
 import argparse
 import check_cert
 import sys
 import os
 import logging
+import base64
 import debugpy
 
 
@@ -23,6 +27,7 @@ def main():
 
     config.load_incluster_config()
     networking_api = client.ExtensionsV1beta1Api()
+    corev1_api = client.CoreV1Api()
 
     with open('/var/run/secrets/kubernetes.io/serviceaccount/namespace', 'r') as f:
         k8s_namespace = f.read()
@@ -38,11 +43,11 @@ def main():
 
     expiring_certs, invalid_certs, failed_checks = check_certs(all_hosts)
     build_email_body(all_hosts, expiring_certs, invalid_certs, failed_checks)
+    send_email(corev1_api, k8s_namespace)
 
 
 def check_certs(all_hosts):
     days_threshold = int(os.environ['DAYS_REMAINING_THRESHOLD'])
-    # days_threshold = 180
     expiring_certs = list()
     invalid_certs = list()
     failed_checks = list()
@@ -97,10 +102,7 @@ def check_certs(all_hosts):
 
 
 def build_email_body(all_hosts, expiring_certs, invalid_certs, failed_checks):
-    # debugpy.listen(5678)
-    # print("Waiting for debugger attach")
-    # debugpy.wait_for_client()
-    # debugpy.breakpoint()
+    logging.info("Building HTML file to be used as the email body...")
 
     _expiring_certs = [ i['cert'] for i in expiring_certs ]
     _invalid_certs = [ i['cert'] for i in invalid_certs ]
@@ -120,6 +122,45 @@ def build_email_body(all_hosts, expiring_certs, invalid_certs, failed_checks):
     with open(f'{SCRIPT_DIR}/email_body.html', 'w') as _f:
         _f.write(template_output)
 
+
+def send_email(corev1_api, k8s_namespace):
+    to_addresses = os.environ['SMTP_TOADDR']
+    email_subject = os.environ['SMTP_EMAIL_SUBJECT']
+    smtp_server = os.environ['SMTP_SERVER']
+    smtp_port = int(os.environ['SMTP_PORT'])
+    smtp_port = 587
+
+    logging.info("Begin sending emails...")
+
+
+    uername_base64 = corev1_api.read_namespaced_secret(os.environ['SMTP_SECRET_NAME'], k8s_namespace).data.get('username')
+    username = base64.b64decode(uername_base64).decode('utf-8')
+
+    password_base64 = corev1_api.read_namespaced_secret(os.environ['SMTP_SECRET_NAME'], k8s_namespace).data.get('password')
+    password = base64.b64decode(password_base64).decode('utf-8')
+
+    message = MIMEMultipart("alternative")
+    message["Subject"] = email_subject
+    message["From"] = username
+    message["To"] = to_addresses
+    # message["Cc"] = ",".join(cc_addr)
+
+    with open(f'{SCRIPT_DIR}/email_body.html', 'r') as _f:
+        html_body = _f.read()
+
+    message.attach(MIMEText(html_body, "html"))
+    server = smtplib.SMTP(smtp_server, smtp_port)
+    server.ehlo()
+    server.starttls()
+    server.login(username, password)
+
+    # Setting recipients to both "TO" and "CC" addresses
+    # recipients = to_addresses + cc_addr
+    recipients = to_addresses
+    server.sendmail(username, recipients, message.as_string())
+    server.quit()
+
+    logging.info(f"Email sent to - {to_addresses}")
 
 def _get_parser():
     parser = argparse.ArgumentParser(description="Script to check TLS certificate expiry")
