@@ -75,7 +75,7 @@ def check_certs(all_hosts):
         if until_expire.days > days_threshold and endpoint_cert['cert_valid']:
             logging.info(f"OK: Certificate has more than {days_threshold} days before it expires. (expires on {expire_date})")
         elif until_expire.days <= days_threshold and endpoint_cert['cert_valid']:
-            logging.info(f"WARNING: Certificate is expiring in {until_expire.days} days! (threshold: {days_threshold} days) (expiring on {expire_date})")
+            logging.info(f"WARNING: Certificate is expiring in {until_expire.days} days! (threshold: {days_threshold} days) (expiring on {expire_date} with {until_expire.days} days remaining)")
 
             # Append extra info into response
             endpoint_cert.update({'days_until_expire': until_expire.days})
