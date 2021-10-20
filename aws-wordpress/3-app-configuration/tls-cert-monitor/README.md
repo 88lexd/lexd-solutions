@@ -18,7 +18,16 @@ $ cd tls-cert-monitor-chart/
 $ helm install tls-cert-monitor . -n dev
 ```
 
-## Docker Image
+## Auto Push Image to Docker Hub
+Git Hub Actions is being used to perform CI over to Docker Hub. See the workflow:
+
+https://github.com/88lexd/lexd-solutions/blob/main/.github/workflows/tls-cert-monitor.yml
+
+A simple push/merge request to the main branch is enough to trigger the workflow.
+
+Once the action completes, the new image will be available at: https://hub.docker.com/repository/docker/88lexd/tls-cert-monitor
+
+## Manual Push to Docker Hub
 Build docker image locally
 ```
 $ docker build -t 88lexd/tls-cert-monitor .
