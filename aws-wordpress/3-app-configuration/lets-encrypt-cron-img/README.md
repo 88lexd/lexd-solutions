@@ -17,7 +17,7 @@ https://github.com/88lexd/lexd-solutions/blob/main/.github/workflows/lets-encryp
 
 A simple push/merge request to the main branch is enough to trigger the workflow.
 
-Once the action completes, the new image will be available at: https://hub.docker.com/r/88lexd/lets-encrypt-cron
+Once the GitHub Action completes, the new image will be available on [Docker Hub](https://hub.docker.com/r/88lexd/lets-encrypt-cron)
 
 ## Manual Push to Docker Hub
 For whatever reason I need to manually push this image up to Docker Hub, then use the following command:
