@@ -1,0 +1,28 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: rl-tls-cert-monitor
+rules:
+- apiGroups: ["extensions"]
+  verbs: ["list"]
+  resources: ["ingresses"]
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get"]
+  resourceNames: [{{ .Values.smtp_details.k8s_secret_name }}]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: rlb-tls-cert-monitor
+  namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: Role
+  apiGroup: rbac.authorization.k8s.io
+  name: rl-tls-cert-monitor
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.service_account_name }}
+  namespace: {{ .Release.Namespace }}

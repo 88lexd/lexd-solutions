@@ -1,0 +1,23 @@
+---
+# The service account which a role is granted to so it can call "get ingress"
+service_account_name: svc-tls-cert-monitor
+
+# Timezone which the container should use through TZ environmental variable
+time_zone: Australia/Sydney
+
+# A list of email addresses which the script will send the notification email to
+emails_to_notify:
+  - alex.dinh@lexdsolutions.com
+
+# The amount of days remaining before a notification is sent.
+# e.g. If certificate expires in less than 30 days, a notification is triggered
+days_remaining_threshold: 30
+
+# Username and password is obtained through k8s secrets
+smtp_details:
+  email_subject: TLS Certificate Checker
+  # For multiple emails, use a comma to seperate the addresses (no spaces!). e.g. u1@aa.com,u2@bb.com
+  to_address: alex.dinh@lexdsolutions.com
+  server: smtp.live.com
+  port: 587
+  k8s_secret_name: cert-checker-smtp-secret  # This secret is created manually for personal security reasons

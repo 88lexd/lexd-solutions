@@ -1,0 +1,7 @@
+name: dev-tls-cert-monitor-deployment # This is the deployment name
+image: 88lexd/tls-cert-monitor
+command: bash
+sync:
+- ./src:/app
+forward:
+- 5678:5678

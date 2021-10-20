@@ -1,12 +1,14 @@
 # App Configuration
 
-This Helm Chart is **created from scratch** to meet my requirements.
+This Helm Chart is **created from scratch** to meet my own requirements.
+
+See my blog here to know more: https://lexdsolutions.com/2021/09/deploying-wordpress-and-mysql-on-kubernetes-using-helm-chart/
 
 # How to Deploy this Helm Chart
-First copy the helm chart over to the remote server (unless local helm/kubectl is configured to remote server)
+First copy the helm chart over to the remote server (unless local kubectl is configured to connect to remote server)
 
 ```
-$ scp -r -i ~/.ssh/my.pem wordpress-helm ubuntu@<remote-server>:
+$ scp -r -i ~/.ssh/my.pem . ubuntu@<remote-server>:
 ```
 
 SSH onto remote server and continue the below (helm is installed on server server via Ansible)
@@ -14,14 +16,12 @@ SSH onto remote server and continue the below (helm is installed on server serve
 ## Install Prod
 Note: Namespace is created by Ansible during setup
 ```
-$ cd wordpress-helm/
 $ helm install wordpress-prod . --namespace=prod --values=values-prod.yaml
 ```
 
 ## Install Dev
 Note: Namespace is created by Ansible during setup
 ```
-$ cd wordpress-helm/
 $ helm install wordpress-dev . --namespace=dev --values=values-dev.yaml
 ```
 

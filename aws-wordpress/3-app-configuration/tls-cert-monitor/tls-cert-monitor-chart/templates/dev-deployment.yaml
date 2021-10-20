@@ -1,0 +1,40 @@
+# This deployment should only be used during development with Okteto.
+# Once finished with development, it should be removed!
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dev-tls-cert-monitor-deployment
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: tls-cert-monitor-pod
+  template:
+    metadata:
+      labels:
+        app: tls-cert-monitor-pod
+    spec:
+      serviceAccountName: {{ .Values.service_account_name }}
+      automountServiceAccountToken: true
+      containers:
+      - image: 88lexd/tls-cert-monitor:latest
+        imagePullPolicy: Always
+        name: lets-encrypt-cron
+        command: ["python3"]
+        args: ["/app/main.py"]
+        env:
+        - name: TZ
+          value: {{ .Values.time_zone }}
+        - name: DAYS_REMAINING_THRESHOLD
+          value: {{ quote .Values.days_remaining_threshold }}
+        - name: SMTP_SERVER
+          value: {{ .Values.smtp_details.server }}
+        - name: SMTP_PORT
+          value: {{ quote .Values.smtp_details.port }}
+        - name: SMTP_TOADDR
+          value: {{ .Values.smtp_details.to_address }}
+        - name: SMTP_EMAIL_SUBJECT
+          value: {{ .Values.smtp_details.email_subject }}
+        - name: SMTP_SECRET_NAME
+          value: {{ .Values.smtp_details.k8s_secret_name }}
