@@ -36,20 +36,16 @@ def main():
         logging.warning("No hostnames found from the ingress rules!")
         exit(1)
 
-
-
-    invalid_or_expiring_certs = check_certs(all_hosts)
-    debugpy.listen(5678)
-    print("Waiting for debugger attach")
-    debugpy.wait_for_client()
-    debugpy.breakpoint()
-
-    build_email_body(invalid_or_expiring_certs)
+    expiring_certs, invalid_certs, failed_checks = check_certs(all_hosts)
+    build_email_body(all_hosts, expiring_certs, invalid_certs, failed_checks)
 
 
 def check_certs(all_hosts):
     days_threshold = int(os.environ['DAYS_REMAINING_THRESHOLD'])
-    invalid_or_expiring_certs = list()
+    # days_threshold = 180
+    expiring_certs = list()
+    invalid_certs = list()
+    failed_checks = list()
 
     for host in all_hosts:
         logging.info(f"Checking URL [{host}] for TLS certifcate...")
@@ -58,7 +54,7 @@ def check_certs(all_hosts):
         if endpoint_cert is None:
             # Allow skip and continue to check next URL
             logging.warning("WARNING: Unable check the TLS certificate!")
-            invalid_or_expiring_certs.append({
+            failed_checks.append({
                 'url': host,
                 'cert_status': 'failed'
             })
@@ -72,22 +68,22 @@ def check_certs(all_hosts):
         until_expire = cert_expire_date - date_now
 
         if until_expire.days > days_threshold and endpoint_cert['cert_valid']:
-            logging.info(f"OK: Certificate has more than 30 days before it expires. (expires on {expire_date})")
-            invalid_or_expiring_certs.append({
-                'url': host,
-                'cert_status': 'ok',
-                'cert': endpoint_cert
-            })
+            logging.info(f"OK: Certificate has more than {days_threshold} days before it expires. (expires on {expire_date})")
         elif until_expire.days <= days_threshold and endpoint_cert['cert_valid']:
-            logging.info(f"WARNING: Certificate is expiring in {until_expire.days} days! (expires on {expire_date})")
-            invalid_or_expiring_certs.append({
+            logging.info(f"WARNING: Certificate is expiring in {until_expire.days} days! (threshold: {days_threshold} days) (expiring on {expire_date})")
+
+            # Append extra info into response
+            endpoint_cert.update({'days_until_expire': until_expire.days})
+            endpoint_cert.update({'expire_date_str': expire_date})
+
+            expiring_certs.append({
                 'url': host,
                 'cert_status': 'ok',
                 'cert': endpoint_cert
             })
         elif not endpoint_cert['cert_valid']:
             logging.info("WARNING: Certificate is not valid!")
-            invalid_or_expiring_certs.append({
+            invalid_certs.append({
                 'url': host,
                 'cert_status': 'invalid',
                 'cert': endpoint_cert
@@ -97,23 +93,32 @@ def check_certs(all_hosts):
             logging.debug(endpoint_cert)
             exit(2)
 
-    return invalid_or_expiring_certs
+    return expiring_certs, invalid_certs, failed_checks
 
 
-def build_email_body(invalid_or_expiring_certs):
-    days_threshold = int(os.environ['DAYS_REMAINING_THRESHOLD'])
+def build_email_body(all_hosts, expiring_certs, invalid_certs, failed_checks):
+    # debugpy.listen(5678)
+    # print("Waiting for debugger attach")
+    # debugpy.wait_for_client()
+    # debugpy.breakpoint()
+
+    _expiring_certs = [ i['cert'] for i in expiring_certs ]
+    _invalid_certs = [ i['cert'] for i in invalid_certs ]
+    _failed_checks = [ i['url'] for i in failed_checks ]
 
     templateLoader = FileSystemLoader(searchpath=f"{SCRIPT_DIR}/email_templates/")
     templateEnv = Environment(loader=templateLoader, autoescape=True)
-    template = templateEnv.get_template("template.html")
-    outputText = template.render(
-    name="alex",
-    url="https://lexdsolutions.com"
+    template = templateEnv.get_template("email.j2")
+    template_output = template.render(
+        days_threshold=int(os.environ['DAYS_REMAINING_THRESHOLD']),
+        all_hosts=all_hosts,
+        expiring_certs=_expiring_certs,
+        invalid_certs=_invalid_certs,
+        failed_checks=_failed_checks
     )
 
-
-    with open('final.html', 'w') as _f:
-        _f.write(outputText)
+    with open(f'{SCRIPT_DIR}/email_body.html', 'w') as _f:
+        _f.write(template_output)
 
 
 def _get_parser():

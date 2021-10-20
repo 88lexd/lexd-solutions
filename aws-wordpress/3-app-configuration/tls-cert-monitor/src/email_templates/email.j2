@@ -1,0 +1,54 @@
+<html>
+<body>
+ <h1>TLS/SSL Certificate Expiry Notification</h1>
+
+  <h3>Expiring Certificates</h3>
+  The following endpoints have certificates expiring in less than {{ days_threshold }} days!
+
+  <ul>
+  {% if expiring_certs|count > 0 %}
+    {% for cert in expiring_certs %}
+      <li>{{ cert.secure_url }} (expiring in {{ cert.days_until_expire }} days) (expires on {{ cert.expire_date_str }})</li>
+    {% endfor %}
+  {% else %}
+      <li>No expiring certificates</li>
+  {% endif %}
+  </ul>
+
+  <h3>Invalid Certificates</h3>
+  The following endpoints have <b>invalid</b> certificates! e.g. broken chain or is self signed.
+
+  <ul>
+  {% if invalid_certs|count > 0 %}
+    {% for cert in invalid_certs %}
+      <li>{{ cert.secure_url }} (expiring in {{ cert.days_until_expire }} days) (expires on {{ cert.expire_date_str }})</li>
+    {% endfor %}
+  {% else %}
+      <li>No invalid certificates</li>
+  {% endif %}
+  </ul>
+
+  <h3>Failed Checks</h3>
+  The following endpoints failed to be checked by the script.
+
+  <ul>
+  {% if failed_checks|count > 0 %}
+    {% for url in failed_checks %}
+      <li>{{ url }}</li>
+    {% endfor %}
+  {% else %}
+      <li>No failed checks</li>
+  {% endif %}
+  </ul>
+
+  <h3>Endpoints Checked</h3>
+  Script attempts to check the following endpoints.
+  <ul>
+  {% for host in all_hosts %}
+    <li>{{ host }}</li>
+  {% endfor %}
+  </ul>
+
+
+</body>
+</html>
