@@ -2,7 +2,7 @@
 # This YAML file contains the values to build the dev resources
 wordpress:
   deployment_image: wordpress:5.8.1-apache
-  deployment_replicas: 0
+  deployment_replicas: 1
   ingress_url: dev.lexdsolutions.com
   ingress_tls_secret_name: dev.lexdsolutions.com.tls
   container_resources:
@@ -12,7 +12,7 @@ wordpress:
 
 mysql:
   deployment_image: mysql:5.6
-  deployment_replicas: 0
+  deployment_replicas: 1
   k8s_secret_name: mysql-dev  # This secret is created by Ansible during OS configuration
   container_resources:
     # Cannot configure memory limits because it cannot be compressed and will terminate the pod!

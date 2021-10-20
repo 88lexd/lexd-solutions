@@ -1,0 +1,34 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: tls-cert-monitor-cron
+spec:
+  schedule: "0 12 */7 * *"  # Every 7 days at 12PM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          serviceAccountName: {{ .Values.service_account_name }}
+          automountServiceAccountToken: true
+          containers:
+          - image: 88lexd/tls-cert-monitor:latest
+            imagePullPolicy: Always
+            name: tls-cert-monitor-cron
+            command: ["python3"]
+            args: ["/app/main.py", "--ingress-hosts"]
+            env:
+            - name: TZ
+              value: {{ .Values.time_zone }}
+            - name: DAYS_REMAINING_THRESHOLD
+              value: {{ quote .Values.days_remaining_threshold }}
+            - name: SMTP_SERVER
+              value: {{ .Values.smtp_details.server }}
+            - name: SMTP_PORT
+              value: {{ quote .Values.smtp_details.port }}
+            - name: SMTP_TOADDR
+              value: {{ .Values.smtp_details.to_address }}
+            - name: SMTP_EMAIL_SUBJECT
+              value: {{ .Values.smtp_details.email_subject }}
+            - name: SMTP_SECRET_NAME
+              value: {{ .Values.smtp_details.k8s_secret_name }}
