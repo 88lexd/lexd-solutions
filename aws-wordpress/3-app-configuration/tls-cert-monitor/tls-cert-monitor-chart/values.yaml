@@ -20,4 +20,4 @@ smtp_details:
   to_address: alex.dinh@lexdsolutions.com
   server: smtp.live.com
   port: 587
-  k8s_secret_name: cert-checker-smtp-secret
+  k8s_secret_name: cert-checker-smtp-secret  # This secret is created manually for personal security reasons
