@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: tls-cert-monitor-cron
 spec:
-  schedule: "0 12 */7 * *"  # Every 7 days at 12PM
+  schedule: {{ .Values.cron_schedule }}
   jobTemplate:
     spec:
       template:

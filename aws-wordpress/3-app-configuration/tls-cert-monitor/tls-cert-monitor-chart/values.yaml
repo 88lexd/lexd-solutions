@@ -5,6 +5,9 @@ service_account_name: svc-tls-cert-monitor
 # Timezone which the container should use through TZ environmental variable
 time_zone: Australia/Sydney
 
+# How often to execute this script
+cron_schedule: "49 12 * * *"  # Every 7 days at 12PM
+
 # A list of email addresses which the script will send the notification email to
 emails_to_notify:
   - alex.dinh@lexdsolutions.com
