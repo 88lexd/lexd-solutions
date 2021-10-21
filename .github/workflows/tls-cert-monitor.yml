@@ -5,11 +5,13 @@ on:
     branches: [ main ]
     paths:
     - 'aws-wordpress/3-app-configuration/tls-cert-monitor/**'
+    - '!aws-wordpress/3-app-configuration/tls-cert-monitor/tls-cert-monitor-chart/**'
     - '!aws-wordpress/3-app-configuration/tls-cert-monitor/README.md'
   pull_request:
     branches: [ main ]
     paths:
     - 'aws-wordpress/3-app-configuration/tls-cert-monitor/**'
+    - '!aws-wordpress/3-app-configuration/tls-cert-monitor/tls-cert-monitor-chart/**'
     - '!aws-wordpress/3-app-configuration/tls-cert-monitor/README.md'
 
   # Allows you to run this workflow manually from the Actions tab
