@@ -5,6 +5,8 @@ The script will look at all the ingress controllers in it's own namespace, get t
 
 If a certificate is coming to expire, it will send out an email notification.
 
+More details about this script can be found on my blog: https://lexdsolutions.com/2021/10/get-notified-when-your-tls-ssl-certificate-is-expiring-in-kubernetes/
+
 ## How to Deploy
 Prod
 ```
@@ -25,7 +27,7 @@ https://github.com/88lexd/lexd-solutions/blob/main/.github/workflows/tls-cert-mo
 
 A simple push/merge request to the main branch is enough to trigger the workflow.
 
-Once the action completes, the new image will be available at: https://hub.docker.com/repository/docker/88lexd/tls-cert-monitor
+Once the action completes, the new image will be available at: https://hub.docker.com/r/88lexd/tls-cert-monitor
 
 ## Manual Push to Docker Hub
 Build docker image locally
