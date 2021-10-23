@@ -128,7 +128,6 @@ def send_email(corev1_api, k8s_namespace):
     email_subject = os.environ['SMTP_EMAIL_SUBJECT']
     smtp_server = os.environ['SMTP_SERVER']
     smtp_port = int(os.environ['SMTP_PORT'])
-    smtp_port = 587
 
     logging.info("Begin sending emails...")
 
