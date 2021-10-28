@@ -54,9 +54,7 @@ $ ls ~/.aws/{credentials,config}
 ```
 **IMPORTANT**
 
-The above is NOT very secure! My credentials are saved locally on my machine and it does not expire! Later on I will need to setup a role which requires MFA and then have a script that can perform the assume role function to retrieve a temporary token via STS
-
-Instead, should use assume roles! see my blog here:https://lexdsolutions.com/2021/09/how-to-assume-role-on-aws-and-using-python/ 
+The above is NOT very secure! My credentials are saved locally on my machine and it does not expire! Instead, should use assume roles! see my blog post here: https://lexdsolutions.com/2021/09/how-to-assume-role-on-aws-and-using-python/ 
 
 ## Run Terraform
 After setting up the above, can now run Terraform to apply the template.
