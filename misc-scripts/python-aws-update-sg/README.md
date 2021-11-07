@@ -1,12 +1,12 @@
 # AWS Update Security Group
 Unfortunately I do not have a static public IP address at home and I do not like having SSH open to the world on my security group.
 
-For me to log onto the AWS Console each time I need to SSH onto my instance, it just makes no sense.
+For me to log onto the AWS Console to update the security group each time I need to SSH onto my instance, it just makes no sense.
 
 This script uses AWS Boto3 and can do 2 things.
 
  - Add ingress rules from config file into existing security group
- - Remove the script created ingress rules from the security group
+ - Remove the "script created ingress rules" from the security group
 
 ## Prerequisite and Setup
 Ensure `virtualenv` is installed
