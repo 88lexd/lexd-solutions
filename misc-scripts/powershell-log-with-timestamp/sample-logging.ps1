@@ -13,15 +13,18 @@ function WriteLog {
       Write-Host "[$TimeStamp] $Msg"
   }
 }
+
 function CleanLogs {
   $Retention = (Get-Date).AddDays(-$($Global:LogRetentionInDays))
   Get-ChildItem -Path $Global:LogPath -Recurse -Force | Where-Object { $_.Extension -eq ".log" -and $_.CreationTime -lt $Retention } |
       Remove-Item -Force -Confirm:$false
 }
+
 $Global:SaveLog = $true
 $Global:LogPath = "C:\Temp\Logs"
 $Global:LogFileName = "my.log"  # must end with .log
 $Global:LogRetentionInDays = 7
+
 WriteLog "Hello World!"
 
 # I always place this at the end of the script to ensure old logs are purged.
