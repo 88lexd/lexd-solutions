@@ -1,11 +1,11 @@
 function WriteLog {
   param ([String]$Msg)
-  $TimeStamp = "{0:dd/MM/yy} {0:HH:mm:ss}" -f (Get-Date)
+  $TimeStamp = Get-Date -Format "dd/MM/yy HH:mm:ss"
   if ($Global:SaveLog) {
       if (-not (Test-Path "$Global:LogPath")) {
-          New-Item -ItemType "directory" -Path "$Global:LogPath" | Out-Null
+          New-Item -ItemType "directory" -Path "$Global:LogPath" -Force -Confirm:$false | Out-Null
       }
-      $FileTimeStamp = "{0:yyyyMMdd}" -f (Get-Date)
+      $FileTimeStamp = Get-Date -Format "yyyyMMdd"
       $LogFileWithDate = ($Global:LogFileName.Replace(".log", "_$($FileTimeStamp).log"))
       Write-Output "[$TimeStamp] $Msg" | Out-File -FilePath "$($Global:LogPath)\$($LogFileWithDate)"  -Append
   }
