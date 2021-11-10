@@ -75,9 +75,10 @@ variable "ec2_keypair_name" {
 }
 
 variable "ec2_ami_name" {
-  description = "Name of the AMI to use (wild card to serach all but will use most recent)"
+  description = "Name of the AMI to use (wild card to search all but will use most recent)"
   type = list(string)
-  default = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+  # default = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]  # Using * will replace my instance when there's a new AMI!
+  default = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20210907"]
 }
 
 variable "ec2_ami_owner_id" {
@@ -99,7 +100,7 @@ variable "eip_name_tag" {
 variable "dlm_schedule_name" {
   description = "Name for the DLM schedule"
   type = string
-  default = "2 weeks of daily snapshots"
+  default = "Daily snapshots"
 }
 
 variable "dlm_schedule_interval" {
@@ -123,7 +124,7 @@ variable "dlm_schedule_time" {
 variable "dlm_retain_count" {
   description = "Number of snapshots to retain"
   type = number
-  default = 14
+  default = 7
 }
 
 variable "dlm_copy_tags" {
