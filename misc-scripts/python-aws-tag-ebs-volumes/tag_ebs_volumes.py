@@ -31,8 +31,9 @@ def main():
     ec2_resource, ec2_client = connect_to_aws(aws_profile, aws_region)
 
     print(" \nBegin tagging EC2 volumes!")
-    _start_tagging_volumes(ec2_resource, ec2_client, ebs_volume_ids)
+    start_tagging_volumes(ec2_resource, ec2_client, ebs_volume_ids)
 
+    print("Script completed!")
 
 def get_full_path_to(input_path):
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -65,7 +66,7 @@ def connect_to_aws(aws_profile, aws_region):
     return ec2_resource, ec2_client
 
 
-def _start_tagging_volumes(ec2_resource, ec2_client, ebs_volume_ids):
+def start_tagging_volumes(ec2_resource, ec2_client, ebs_volume_ids):
     for vol_id in ebs_volume_ids:
         print("================================================================")
         ebs_volume = ec2_resource.Volume(vol_id)
@@ -77,10 +78,15 @@ def _start_tagging_volumes(ec2_resource, ec2_client, ebs_volume_ids):
 
         # Based on the attachment, this is the EC2 instance which we need to extract the curent tags from
         instance_id = ebs_volume.attachments[0].get('InstanceId')
-        print(f"Volume ID [{vol_id}] is attaced to [{instance_id}]")
+        print(f"Volume ID [{vol_id}] is attached to [{instance_id}]")
 
         tags_to_tag = get_instance_tags(ec2_client, instance_id)
-        tags_to_tag
+
+        print(f"Tagging - [{vol_id}]")
+        ec2_client.create_tags(
+            Resources=[vol_id],
+            Tags=tags_to_tag
+        )
 
 
 def get_instance_tags(ec2_client, instance_id):
