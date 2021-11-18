@@ -33,7 +33,7 @@ def main():
     print(" \nBegin tagging EC2 volumes!")
     start_tagging_volumes(ec2_resource, ec2_client, ebs_volume_ids)
 
-    print("Script completed!")
+    print("\nScript completed!")
 
 def get_full_path_to(input_path):
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -74,6 +74,7 @@ def start_tagging_volumes(ec2_resource, ec2_client, ebs_volume_ids):
         if ebs_volume.state == 'available':
             # The volume status is 'available', therefore it is not attached to anything
             print(f"Volume ID [{vol_id}] has no attachments")
+            print("Skipped tagging this volume")
             continue
 
         # Based on the attachment, this is the EC2 instance which we need to extract the curent tags from
@@ -82,11 +83,12 @@ def start_tagging_volumes(ec2_resource, ec2_client, ebs_volume_ids):
 
         tags_to_tag = get_instance_tags(ec2_client, instance_id)
 
-        print(f"Tagging - [{vol_id}]")
+        print("Tagging volume")
         ec2_client.create_tags(
             Resources=[vol_id],
             Tags=tags_to_tag
         )
+        print("Tagging volume completed!")
 
 
 def get_instance_tags(ec2_client, instance_id):
