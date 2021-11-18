@@ -8,7 +8,7 @@ Note: If you already have Boto3 available system wide, then this step can be ski
 ```
 $ virtualenv -p python3 venv
 $ ./venv/bin/python3 -m pip install boto3
-$ source ./bin/activate
+$ source ./venv/bin/activate 
 ```
 
 ## How to Run the Script
@@ -24,7 +24,7 @@ vol-0adb09fd484746be8
 Execute the script. Example:
 
 ```
-$ source ./bin/activate
+$ source ./venv/bin/activate
 (venv) $ python3 tag_ebs_volumes.py --region ap-southeast-2 --file /tmp/volumes.txt --profile alex
 
 ===================================
