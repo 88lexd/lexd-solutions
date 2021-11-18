@@ -38,7 +38,7 @@ Using the following as script input:
 Continue with the script? (yes/no): yes
 
 Connecting into AWS...
-Successfully connected into AWS using - arn:aws:sts::682613435495:assumed-role/LEXD-Admin/LEXD-Admin
+Successfully connected into AWS using - arn:aws:sts::123456789123:assumed-role/LEXD-Admin/LEXD-Admin
 
 Begin tagging EC2 volumes!
 ================================================================
