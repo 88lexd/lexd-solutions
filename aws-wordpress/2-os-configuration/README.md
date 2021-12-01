@@ -7,7 +7,7 @@ Should install the newer version of Ansible (ansible-core)
 $ sudo apt install python3-pip
 
 # Remove any existing ansible install
-$ apt remove ansible
+$ sudo apt remove ansible
 $ pip uninstall ansible
 
 # Install latest ansible using pip (run as non root user, will this install for the current user)
@@ -31,13 +31,13 @@ $ ansible-galaxy collection install kubernetes.core
 Note: Install the collection by using standard account (not root). The collection will be saved to `~/.ansible/collections`
 
 ## How to Run Playbook
-The playbook will take in the inventory file (inventory.txt) and will configure the servers as defined.
+The playbook will take in the inventory file (inventory.ini) and will configure the servers as defined.
 
-This playbook was developed when I had 2x VM running locally. On AWS, we will just be starting off with 1x EC2 instance to keep cost to the minimum. The single node will be the master node.
+This playbook was developed when I had 2x VM running locally. On AWS, I will  be starting off with 1x EC2 instance to keep cost to the minimum. The single node will be the master node.
 
 Update the `inventory.ini` with the server IP and then run:
 
-Note: When prompt, enter the Ansible vault password which was used to encrypt the MySQL password variable.
+Note: When prompt, enter the Ansible vault password which was used to encrypt the MySQL password variable and Lets Encrypt keys.
 
 ```
 # Example:
