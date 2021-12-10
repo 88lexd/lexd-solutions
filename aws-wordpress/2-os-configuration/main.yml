@@ -1,0 +1,25 @@
+---
+# All servers in the inventory should have this base configuration
+- hosts: all
+  gather_facts: yes
+  become: yes
+  tasks:
+  - name: Apply base configuration
+    include_tasks: ansible_tasks/base-config.yml
+
+  - name: Setup AWS CloudWatch Agent
+    include_tasks: ansible_tasks/setup-aws-cw-agent.yml
+
+# Install and configure Gluster nodes
+- hosts: gluster
+  gather_facts: yes
+  become: yes
+  tasks:
+  - setup:
+    register: aa
+
+  - debug:
+      var: aa
+
+  - name: Install and configure GlusterFS
+    include_tasks: ansible_tasks/setup-gluster.yml

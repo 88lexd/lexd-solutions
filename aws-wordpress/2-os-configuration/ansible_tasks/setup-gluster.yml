@@ -1,0 +1,16 @@
+# Install and setup Gluster
+---
+- name: Install glusterfs-server
+  ansible.builtin.apt:
+    name: glusterfs-server
+    state: present
+    update_cache: yes
+
+- name: Enable and restart glusterd.service
+  ansible.builtin.service:
+    name: glusterd.service
+    enabled: yes
+    state: started
+
+# TO DO: Run gluster peer probe against other servers.
+# Challenge here is that Ansible will run the same command on all 3 servers which is not what we want

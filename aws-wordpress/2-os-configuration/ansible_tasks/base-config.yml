@@ -1,0 +1,36 @@
+---
+- name: Set timezone to Australia/Sydney
+  community.general.timezone:
+    name: Australia/Sydney
+
+- name: Configure .vimrc (no indent)
+  ansible.builtin.lineinfile:
+    path: .vimrc  # uses to $HOME/.vimrc
+    regexp: "^set autoindent"
+    line: "set noautoindent"
+    state: present
+    create: yes
+  become_user: "{{ ansible_env.SUDO_USER }}"
+
+- name: Configure .vimrc (set paste)
+  ansible.builtin.lineinfile:
+    path: .vimrc  # uses to $HOME/.vimrc
+    regexp: "^set paste"
+    line: "set paste"
+    state: present
+    create: yes
+  become_user: "{{ ansible_env.SUDO_USER }}"
+
+- name: Install base dependencies
+  ansible.builtin.apt:
+    name:
+      - python3-pip  # require to install Kubernetes python modules which is used by Ansible
+      - jq  # to extract info from kubectl or docker output
+      - net-tools  # to troubleshoot network related issues
+    state: present
+    update_cache: yes
+
+- name: Install kubernetes python library
+  ansible.builtin.pip:
+    name: kubernetes
+  become_user: "{{ ansible_env.SUDO_USER }}"  # Install as non root user!

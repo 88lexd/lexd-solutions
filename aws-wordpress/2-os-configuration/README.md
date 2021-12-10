@@ -36,8 +36,15 @@ $ ansible-galaxy collection install kubernetes.core
 ```
 Note: Install the collection by using standard account (not root). The collection will be saved to `~/.ansible/collections`
 
-## How to Run Playbook
-This playbook will install and configure Kubernetes using kubeadm on 2 nodes.
+## What this Playbook does
+This new playbook uses Ansible roles to perform the following:
 
-It will also setup GlusterFS for shared volume between the nodes. This enables HA (High Availability) so when one node goes down, WordPress can still function seamlessly.
+ 1) Base OS configuration with my personal settings.
+ 2) Install and configure GlusterFS on 3 servers. This will enable HA (High Availability) in Kubernetes.
+ 3) Install and configre Kubernetes using kubeadm.
 
+## How to Run the Playbook
+Local VMs
+```
+$ ansible-playbook -i inventory_local.ini main.yml -u alex --private-key ~/.ssh/id_rsa --ask-vault-pass
+```
