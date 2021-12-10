@@ -1,11 +1,13 @@
 # OS Configuration
 This section contains Ansible playbooks for configuring the underlying EC2 Operating System (Ubuntu 20.04).
 
-## The old MicroK8s Playbook
-**IMPORTANT:** As of 10.12.2021, I am building out a new Kubernetes cluster that is deployed using `kubeadm` and this will be replacing the initial MicroK8s cluster.
+## Important Note
+As of 10.12.2021, I am building out a new Kubernetes cluster to replace the initial MicroK8s deployment. This new playbook will:
+ 1) Use 2 nodes in a cluster instead of 1.
+ 2) Install and configure Kubernetes using `kubeadm` instead of using MicroK8s.
+ 3) Install and configure GlusterFS to provide High Availability for storage across the 2 nodes.
 
-For those coming from my early blog posts, these old files can be referenced in the `./old-microk8s` directory.
-
+For those coming from my early blog posts, these old files can still be referenced in the `./old-microk8s` directory.
 
 ## Install Ansible and Dependencies
 Install Ansible (ansible-core) through pip.
