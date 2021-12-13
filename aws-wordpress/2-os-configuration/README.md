@@ -1,4 +1,4 @@
-# OS Configuration
+# OS Configuration (main.yml)
 This section contains Ansible playbooks for configuring the underlying EC2 Operating System (Ubuntu 20.04).
 
 ## Important Note
@@ -34,7 +34,7 @@ ansible [core 2.12.1]
   libyaml = True
 
 # Install Kubernetes modules
-$ ansible-galaxy collection install kubernetes.core
+$ ansible-galaxy collection install kubernetes.core community.general ansible.posix
 ```
 Note: Install the collection by using standard account (not root). The collection will be saved to `~/.ansible/collections`
 
@@ -49,4 +49,38 @@ This new playbook uses Ansible roles to perform the following:
 Local VMs
 ```
 $ ansible-playbook -i inventory_local.ini main.yml -u alex --private-key ~/.ssh/id_rsa --ask-vault-pass
+```
+
+# Disk Config (gluster_disk_config.yml)
+This playbook is designed to run once during the initial setup. It enables me to quickly setup the dedicated disk on each VM which is used by GlusterFS.
+
+```
+$ ansible-playbook -i inventory_local.ini gluster_disk_config.yml -e "device=/dev/sdc"
+
+PLAY [cluster] ***********************************************************************************************************************************************************************
+
+TASK [Create a new ext4 primary partition] *******************************************************************************************************************************************
+changed: [masternode]
+changed: [workernode1]
+changed: [glusterarb]
+
+TASK [Create a ext4 filesystem on /dev/sdb1 and check disk blocks] *******************************************************************************************************************
+changed: [glusterarb]
+changed: [workernode1]
+changed: [masternode]
+
+TASK [Create directory to mount disk for Gluster] ************************************************************************************************************************************
+ok: [workernode1]
+ok: [glusterarb]
+ok: [masternode]
+
+TASK [Mount disk] ********************************************************************************************************************************************************************
+changed: [masternode]
+changed: [glusterarb]
+changed: [workernode1]
+
+PLAY RECAP ***************************************************************************************************************************************************************************
+glusterarb                 : ok=4    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+masternode                 : ok=4    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+workernode1                : ok=4    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 ```
