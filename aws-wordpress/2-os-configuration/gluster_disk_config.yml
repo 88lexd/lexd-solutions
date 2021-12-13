@@ -22,9 +22,13 @@
       path: /gluster/k8s_volume
       state: directory
 
+  - name: Get disk UUID for mounting
+    ansible.builtin.command: "lsblk {{ device }}1 -no UUID"
+    register: uuid
+
   - name: Mount disk
     ansible.posix.mount:
       path: /gluster/k8s_volume
-      src: "{{ device }}1"
+      src: "UUID={{ uuid.stdout }}"
       fstype: ext4
       state: mounted
