@@ -1,25 +1,86 @@
 ---
-# All servers in the inventory should have this base configuration
-- hosts: all
+######################################################################
+# All servers in the cluster group should have this base configuration
+- hosts: cluster
   gather_facts: yes
   become: yes
   tasks:
+  - name: Define /etc/hosts for local cluster
+    set_fact:
+      etc_hosts: |
+        192.168.0.10 masternode
+        192.168.0.11 workernode1
+        192.168.0.12 glusterarb
+    when: inventory_type == "local"
+
+  - name: Define /etc/hosts for AWS cluster
+    set_fact:
+      etc_hosts: |
+        10.0.10.10 masternode
+        10.0.10.11 workernode1
+        10.0.10.12 glusterarb
+    when: inventory_type == "aws"
+
+  - name: Update /etc/hosts using fact set in etc_hosts
+    ansible.builtin.blockinfile:
+      path: /etc/hosts
+      block: "{{ etc_hosts }}"
   - name: Apply base configuration
     include_tasks: ansible_tasks/base-config.yml
 
   - name: Setup AWS CloudWatch Agent
     include_tasks: ansible_tasks/setup-aws-cw-agent.yml
 
-# Install and configure Gluster nodes
-- hosts: gluster
+  - name: Install and Enable Gluster Server
+    include_tasks: ansible_tasks/setup-gluster.yml
+
+
+###############################################################
+# Configure Gluster. This needs to happen on a single node only
+- hosts: masternode
   gather_facts: yes
   become: yes
   tasks:
-  - setup:
-    register: aa
+  - name: Probe peers
+    shell: |
+      gluster peer probe workernode1
+      gluster peer probe glusterarb
 
-  - debug:
-      var: aa
+  - name: Check if volume already exist
+    shell: gluster volume list | grep -Po '^k8s-volume$' || echo "NONE"
+    register: gluster_volume_status
 
-  - name: Install and configure GlusterFS
-    include_tasks: ansible_tasks/setup-gluster.yml
+  - name: Configure Gluster Volume
+    shell: |
+      gluster volume create k8s-volume replica 2 arbiter 1 transport tcp \
+        masternode:/gluster/k8s_volume \
+        workernode1:/gluster/k8s_volume \
+        glusterarb:/gluster/k8s_volume
+    when: gluster_volume_status.stdout == "NONE"
+
+  - name: Check if volume already started
+    shell: gluster volume info k8s-volume | grep '^Status' | grep Started || echo "NOT_STARTED"
+    register: volume_start_status
+
+  - name: Start the volume
+    shell: gluster volume start k8s-volume
+    when: volume_start_status.stdout == "NOT_STARTED"
+
+
+###############################################################
+# Mount GlusterFS to all nodes
+- hosts: cluster
+  gather_facts: yes
+  become: yes
+  tasks:
+  - name: Create path for GlusterFS to mount
+    file:
+      path: /data
+      state: directory
+
+  - name: Mount GlusterFS
+    ansible.posix.mount:
+      path: /data
+      src: "localhost:/k8s-volume"
+      fstype: glusterfs
+      state: mounted

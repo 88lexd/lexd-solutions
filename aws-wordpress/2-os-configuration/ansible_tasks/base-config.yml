@@ -1,4 +1,8 @@
 ---
+- name: Set OS hostname based on inventory_hostname
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+
 - name: Set timezone to Australia/Sydney
   community.general.timezone:
     name: Australia/Sydney

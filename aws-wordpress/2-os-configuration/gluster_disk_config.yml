@@ -19,7 +19,7 @@
 
   - name: Create directory to mount disk for Gluster
     file:
-      path: /gluster/k8s_volume
+      path: /gluster
       state: directory
 
   - name: Get disk UUID for mounting
@@ -28,7 +28,7 @@
 
   - name: Mount disk
     ansible.posix.mount:
-      path: /gluster/k8s_volume
+      path: /gluster
       src: "UUID={{ uuid.stdout }}"
       fstype: ext4
       state: mounted
