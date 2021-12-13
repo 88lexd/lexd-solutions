@@ -1,0 +1,30 @@
+# Design to run once during initial setup only. e.g.
+# ansible-playbook -i inventory_local.ini gluster_disk_config.yml -e "device=/dev/sdb"
+---
+- hosts: cluster
+  gather_facts: no
+  become: yes
+  tasks:
+  - name: Create a new ext4 primary partition
+    community.general.parted:
+      device: "{{ device }}"
+      number: 1
+      state: present
+      fs_type: ext4
+
+  - name: Create a ext4 filesystem on /dev/sdb1 and check disk blocks
+    community.general.filesystem:
+      fstype: ext4
+      dev: "{{ device }}1"  # Use partition 1
+
+  - name: Create directory to mount disk for Gluster
+    file:
+      path: /gluster/k8s_volume
+      state: directory
+
+  - name: Mount disk
+    ansible.posix.mount:
+      path: /gluster/k8s_volume
+      src: "{{ device }}1"
+      fstype: ext4
+      state: mounted
