@@ -48,7 +48,7 @@ This new playbook uses Ansible roles to perform the following:
 ## How to Run the Playbook
 Local VMs
 ```
-$ ansible-playbook -i inventory_local.ini main.yml -u alex --private-key ~/.ssh/id_rsa --ask-vault-pass
+$ ansible-playbook -i inventory_local.ini main.yml --ask-vault-pass
 ```
 
 # Disk Config (gluster_disk_config.yml)

@@ -1,4 +1,17 @@
+# This playbook will setup GlusterFS and Kubernetes via kubeadm
 ---
+- hosts: all
+  gather_facts: yes
+  become: yes
+  tasks:
+  - block:
+    - name: Check for unsupported distribution
+      debug:
+        msg: "[{{ ansible_distribution }}] is not an acceptable distribution. Only Ubuntu is accepted!"
+    - meta: end_play
+    when: ansible_distribution != "Ubuntu"
+
+
 ######################################################################
 # All servers in the cluster group should have this base configuration
 - hosts: cluster
@@ -8,17 +21,17 @@
   - name: Define /etc/hosts for local cluster
     set_fact:
       etc_hosts: |
-        192.168.0.10 masternode
-        192.168.0.11 workernode1
-        192.168.0.12 glusterarb
+        192.168.0.10 masternode.lexd.local
+        192.168.0.11 workernode1.lexd.local
+        192.168.0.12 glusterarb.lexd.local
     when: inventory_type == "local"
 
   - name: Define /etc/hosts for AWS cluster
     set_fact:
       etc_hosts: |
-        10.0.10.10 masternode
-        10.0.10.11 workernode1
-        10.0.10.12 glusterarb
+        10.0.10.10 masternode.lexd.local
+        10.0.10.11 workernode1.lexd.local
+        10.0.10.12 glusterarb.lexd.local
     when: inventory_type == "aws"
 
   - name: Update /etc/hosts using fact set in etc_hosts
@@ -38,7 +51,7 @@
 ###############################################################
 # Configure Gluster. This needs to happen on a single node only
 - hosts: masternode
-  gather_facts: yes
+  gather_facts: no
   become: yes
   tasks:
   - name: Probe peers
@@ -47,16 +60,16 @@
       gluster peer probe glusterarb
 
   - name: Check if volume already exist
-    shell: gluster volume list | grep -Po '^k8s-volume$' || echo "NONE"
+    shell: gluster volume list | grep -Po '^k8s-volume$' || echo "NOT_EXIST"
     register: gluster_volume_status
 
   - name: Configure Gluster Volume
     shell: |
       gluster volume create k8s-volume replica 2 arbiter 1 transport tcp \
-        masternode:/gluster/k8s_volume \
-        workernode1:/gluster/k8s_volume \
-        glusterarb:/gluster/k8s_volume
-    when: gluster_volume_status.stdout == "NONE"
+        masternode.lexd.local:/gluster/k8s_volume \
+        workernode1.lexd.local:/gluster/k8s_volume \
+        glusterarb.lexd.local:/gluster/k8s_volume
+    when: gluster_volume_status.stdout == "NOT_EXIST"
 
   - name: Check if volume already started
     shell: gluster volume info k8s-volume | grep '^Status' | grep Started || echo "NOT_STARTED"
@@ -67,16 +80,22 @@
     when: volume_start_status.stdout == "NOT_STARTED"
 
 
-###############################################################
+###############################
 # Mount GlusterFS to all nodes
 - hosts: cluster
-  gather_facts: yes
+  gather_facts: no
   become: yes
   tasks:
+  - name: Check if /data exist
+    stat:
+      path: /data
+    register: data_mount_path
+
   - name: Create path for GlusterFS to mount
     file:
       path: /data
       state: directory
+    when: not data_mount_path.stat.exists
 
   - name: Mount GlusterFS
     ansible.posix.mount:
@@ -84,3 +103,39 @@
       src: "localhost:/k8s-volume"
       fstype: glusterfs
       state: mounted
+
+
+#################################################
+# Install Docker and Kubernetes on all k8s nodes
+- hosts: k8s_nodes
+  gather_facts: no
+  become: yes
+  tasks:
+  - name: Include Docker Role
+    include_role:
+      name: roles/docker
+
+  - name: Include Kubernetes-Nodes Role
+    include_role:
+      name: roles/kubernetes/nodes
+
+  - name: "Add current user [{{ ansible_env.SUDO_USER }}] into docker group"
+    ansible.builtin.user:
+      name: "{{ ansible_env.SUDO_USER }}"
+      groups: docker
+      append: yes
+
+  - name: Reboot to ensure Docker is fully functional
+    ansible.builtin.reboot:
+      test_command: docker ps
+
+
+##################################################
+# Create Kubernetes Cluster using the master node
+# - hosts: masternode
+#   gather_facts: no
+#   become: yes
+#   tasks:
+#   - name: Include Kubernetes-Master Role
+#     include_role:
+#       name: roles/kubernetes/master

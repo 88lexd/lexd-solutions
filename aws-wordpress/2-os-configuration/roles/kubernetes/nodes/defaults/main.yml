@@ -1,0 +1,17 @@
+---
+# kubelet version can be X-1 and kubectl version can be X-1 or X+1
+kubernetes_packages:
+  - name: kubeadm
+    version: 1.22.4-00
+  - name: kubectl
+    version: 1.22.4-00
+  - name: kubelet
+    version: 1.22.4-00
+
+
+# File to store the GPG key for when adding the Kubernetes APT repository
+k8s_gpg_keyring_path: /usr/share/keyrings/kubernetes-archive-keyring.gpg
+
+# kubernetes-xenial is currently the latest repo.
+# See: https://apt.kubernetes.io/apt/dists
+k8s_repository: "https://apt.kubernetes.io/ kubernetes-xenial main"

@@ -3,6 +3,13 @@
   ansible.builtin.hostname:
     name: "{{ inventory_hostname }}"
 
+- name: Update /etc/resolv.conf to include lexd.local in search suffix
+  ansible.builtin.lineinfile:
+    path: /etc/resolv.conf
+    regexp: '^search'
+    line: "search lexd.local"
+    state: present
+
 - name: Set timezone to Australia/Sydney
   community.general.timezone:
     name: Australia/Sydney

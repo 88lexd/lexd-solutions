@@ -1,0 +1,8 @@
+---
+- name: Include vars for Lets Encrypt
+  ansible.builtin.include_vars:
+    file: lets_encrypt.yml
+
+- name: Using the following options for kubadm init
+  debug:
+    msg: "{{ kube_init_options | join(' ') }}"
