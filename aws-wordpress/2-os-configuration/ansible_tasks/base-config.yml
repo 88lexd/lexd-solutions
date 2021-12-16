@@ -1,4 +1,8 @@
 ---
+- name:  Include vars for /etc/hosts
+  ansible.builtin.include_vars:
+    file: ../vars/etc_hosts.yml
+
 - name: Update /etc/hosts for local cluster
   ansible.builtin.blockinfile:
     path: /etc/hosts
@@ -22,6 +26,13 @@
     regexp: '^Domains'
     line: "Domains=lexd.local"
     state: present
+  register: resolve_conf
+
+- name: Restart systemd-resolved service
+  ansible.builtin.service:
+    name: systemd-resolved.service
+    state: restarted
+  when: resolve_conf.changed
 
 - name: Set timezone to Australia/Sydney
   community.general.timezone:
@@ -49,6 +60,7 @@
   ansible.builtin.apt:
     name:
       - python3-pip  # require to install Kubernetes python modules which is used by Ansible
+      - python3-jmespath  # for ansible's "| json_query" function
       - jq  # to extract info from kubectl or docker output
       - net-tools  # to troubleshoot network related issues
       - iotop

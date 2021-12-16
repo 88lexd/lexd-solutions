@@ -17,25 +17,30 @@
 - hosts: cluster
   gather_facts: yes
   become: yes
-  vars:
-    # The 2 etc_hosts vars is referenced within the base-config.yml
-    etc_hosts_local: |
-        192.168.0.10 masternode.lexd.local
-        192.168.0.11 workernode1.lexd.local
-        192.168.0.12 glusterarb.lexd.local
-    etc_hosts_aws: |
-        10.0.10.10 masternode.lexd.local
-        10.0.10.11 workernode1.lexd.local
-        10.0.10.12 glusterarb.lexd.local
   tasks:
   - name: Apply base configuration
-    include_tasks: ansible_tasks/base-config.yml
+    include_tasks:
+      file: ansible_tasks/base-config.yml
+      apply:
+        tags: base_config
+    tags:
+      - base_config
 
   - name: Setup AWS CloudWatch Agent
-    include_tasks: ansible_tasks/setup-aws-cw-agent.yml
+    include_tasks:
+      file: ansible_tasks/setup-aws-cw-agent.yml
+      apply:
+        tags: install_cloudwatch_agent
+    tags:
+      - install_cloudwatch_agent
 
   - name: Install and Enable Gluster Server
-    include_tasks: ansible_tasks/setup-gluster.yml
+    include_tasks:
+      file: ansible_tasks/setup-gluster.yml
+      apply:
+        tags: install_setup_gluster
+    tags:
+      - install_setup_gluster
 
 
 ###############################################################
@@ -45,7 +50,12 @@
   become: yes
   tasks:
   - name: Setup Gluster volume via the masternode
-    include_tasks: ansible_tasks/setup-gluster-volume.yml
+    include_tasks:
+      file: ansible_tasks/setup-gluster-volume.yml
+      apply:
+        tags: setup_gluster_volume
+    tags:
+    - setup_gluster_volume
 
 
 ###############################
@@ -55,7 +65,13 @@
   become: yes
   tasks:
   - name: Mount GlusterFS on all nodes in the cluster (2 replica + 1 arbiter)
-    include_tasks: ansible_tasks/mount-gluster-volume.yml
+    include_tasks:
+      file: ansible_tasks/mount-gluster-volume.yml
+      apply:
+        tags: mount_gluster_volume
+    tags:
+      - mount_gluster_volume
+
 
 
 #################################################
@@ -64,20 +80,102 @@
   gather_facts: no
   become: yes
   tasks:
-  - name: Install and Configure Docker
+  - name: Install and Configure Docker on K8s nodes
     include_role:
       name: roles/docker
+      apply:
+        tags: install_docker
+    tags:
+      - install_docker
+
+  - name: Import vars so can be passed into the next include role task
+    ansible.builtin.include_vars:
+      file: vars/kubernetes.yml
+    tags:
+      - install_k8s
 
   - name: Prepare K8s nodes by setting up prerequisites and installing K8s packages
     include_role:
       name: roles/kubernetes/nodes
+      apply:
+        tags: install_k8s
+    tags:
+      - install_k8s
 
-##################################################
-# Create Kubernetes Cluster using the master node
+######################################
+# Create Kubernetes Cluster on Master
 - hosts: masternode
   gather_facts: no
   become: yes
   tasks:
-  - name: Include Kubernetes-Master Role
+  - name: Create Kubernetes Cluster and setup all initial K8s secrets
     include_role:
       name: roles/kubernetes/master
+      apply:
+        tags: create_k8s_cluster
+    tags:
+      - create_k8s_cluster
+
+  - name: Get cluster join command
+    shell: kubeadm token create $(kubeadm token generate) --print-join-command
+    become_user: "{{ ansible_env.SUDO_USER }}"
+    register: cluster_join_command
+    changed_when: False  # Task will return ok instead of changed
+    tags:
+      - create_k8s_cluster
+
+
+##################################
+# Join workernodes to K8s cluster
+- hosts: k8s_worker_nodes
+  gather_facts: no
+  become: yes
+  tasks:
+  - name: Using the following command to join worker nodes to K8s cluster
+    debug:
+      var: hostvars.masternode.cluster_join_command.stdout
+    tags:
+      - create_k8s_cluster
+
+  # TODO: Only join worker node is the worker doesnt already have kubelet in a running state!
+  # e.g.
+  # - name: collect facts about system services
+  #   service_facts:
+  #   register: services_state
+
+  # - name: Debug
+  #   debug:
+  #     var: services_state
+
+  # TODO 2: ALSO REBOOT AFTER DOCKER INSTALL (only on change!)
+
+  # - name: Executing join command
+  #   shell: "{{ hostvars.masternode.cluster_join_command.stdout }}"
+  #   register: aa
+  #   tags:
+  #     - create_k8s_cluster
+
+  # - debug:
+  #     var: aa
+  #   tags:
+  #     - create_k8s_cluster
+
+##############################################################
+# 'glusterarb' acts as a jump server. Setup tools as required
+- hosts: glusterarb
+  gather_facts: no
+  become: yes
+  tasks:
+  - name: Import vars so can be used by the next include_task
+    ansible.builtin.include_vars:
+      file: vars/kubernetes.yml
+    tags:
+      - jumpbox
+
+  - name: Install tools for Jump Server
+    include_tasks:
+      file: ansible_tasks/jumpserver-tools-config.yml
+      apply:
+        tags: jumpbox
+    tags:
+      - jumpbox

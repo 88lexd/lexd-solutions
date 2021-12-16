@@ -1,4 +1,6 @@
 ---
+# IMPORTANT: This var file is used in the kubernetes role and the task to configuring the jump server (gluster arbiter)
+
 # kubelet version can be X-1 and kubectl version can be X-1 or X+1
 kubernetes_packages:
   - name: kubeadm
@@ -7,7 +9,6 @@ kubernetes_packages:
     version: 1.22.4-00
   - name: kubelet
     version: 1.22.4-00
-
 
 # File to store the GPG key for when adding the Kubernetes APT repository
 k8s_gpg_keyring_path: /usr/share/keyrings/kubernetes-archive-keyring.gpg

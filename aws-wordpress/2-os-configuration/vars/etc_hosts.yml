@@ -1,0 +1,10 @@
+---
+# The 2 etc_hosts vars is referenced within the ansible_tasks/base-config.yml
+etc_hosts_local: |
+    192.168.0.10 masternode.lexd.local controlplane.lexd.local
+    192.168.0.11 workernode1.lexd.local
+    192.168.0.12 glusterarb.lexd.local
+etc_hosts_aws: |
+    10.0.10.10 masternode.lexd.local controlplane.lexd.local
+    10.0.10.11 workernode1.lexd.local
+    10.0.10.12 glusterarb.lexd.local

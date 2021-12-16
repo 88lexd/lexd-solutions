@@ -10,9 +10,9 @@ As of 10.12.2021, I am building out a new Kubernetes cluster to replace the init
 For those coming from my early blog posts, these old files can still be referenced in the `./old-microk8s` directory.
 
 ## Install Ansible and Dependencies
-Install Ansible (ansible-core) through pip.
+Install Ansible (ansible-core) through pip. Also install jmespath for "json_query" function.
 ```
-$ sudo apt install python3-pip
+$ sudo apt install python3-pip python3-jmespath
 
 # Remove any existing ansible install
 $ sudo apt remove ansible

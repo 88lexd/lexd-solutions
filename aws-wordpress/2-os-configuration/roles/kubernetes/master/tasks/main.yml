@@ -3,6 +3,55 @@
   ansible.builtin.include_vars:
     file: lets_encrypt.yml
 
+- name: Check if kube-apiserver process is already running
+  shell: |
+    if [[ $(ps -A | grep kube-apiserver) ]]; then
+        ps -Af | grep kube-apiserver | grep -v grep
+    else
+        echo "KUBE_APISERVER_NOT_RUNNING"
+    fi
+  args:
+    executable: /bin/bash
+  register: kube_apiserver_status
+  changed_when: False  # Task will return ok instead of changed
+
+- name: Show current kube-apiserver process status
+  debug:
+    var: kube_apiserver_status.stdout
+
 - name: Using the following options for kubadm init
   debug:
     msg: "{{ kube_init_options | join(' ') }}"
+  when: kube_apiserver_status.stdout == "KUBE_APISERVER_NOT_RUNNING"
+
+- name: Create Kubernetes Cluster using kubeadm init
+  shell: |
+    kubeadm init {{ kube_init_options | join(' ') }}
+  args:
+    executable: /bin/bash
+  when: kube_apiserver_status.stdout == "KUBE_APISERVER_NOT_RUNNING"
+
+- name: Create kubeconfig directory for current user
+  ansible.builtin.file:
+    path: ".kube/"
+    state: directory
+  become_user: "{{ ansible_env.SUDO_USER }}"
+
+- name: Copy /etc/kubernetes/admin.conf to current user profile
+  ansible.builtin.copy:
+    src: /etc/kubernetes/admin.conf
+    dest: ".kube/config"
+    remote_src: yes
+    owner: "{{ ansible_env.SUDO_USER }}"
+    group: "{{ ansible_env.SUDO_USER }}"
+    mode: 0755
+
+# TO DO
+# Setup join worker node to cluster
+# $ kubeadm token create $(kubeadm token generate) --print-join-command
+
+#
+
+  # mkdir -p $HOME/.kube
+  # sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  # sudo chown $(id -u):$(id -g) $HOME/.kube/config
