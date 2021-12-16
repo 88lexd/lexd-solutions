@@ -56,3 +56,9 @@
     name: docker.service
     enabled: yes
     state: started
+
+- name: "Add current user [{{ ansible_env.SUDO_USER }}] into docker group"
+  ansible.builtin.user:
+    name: "{{ ansible_env.SUDO_USER }}"
+    groups: docker
+    append: yes

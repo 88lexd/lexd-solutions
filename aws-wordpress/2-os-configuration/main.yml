@@ -17,27 +17,17 @@
 - hosts: cluster
   gather_facts: yes
   become: yes
-  tasks:
-  - name: Define /etc/hosts for local cluster
-    set_fact:
-      etc_hosts: |
+  vars:
+    # The 2 etc_hosts vars is referenced within the base-config.yml
+    etc_hosts_local: |
         192.168.0.10 masternode.lexd.local
         192.168.0.11 workernode1.lexd.local
         192.168.0.12 glusterarb.lexd.local
-    when: inventory_type == "local"
-
-  - name: Define /etc/hosts for AWS cluster
-    set_fact:
-      etc_hosts: |
+    etc_hosts_aws: |
         10.0.10.10 masternode.lexd.local
         10.0.10.11 workernode1.lexd.local
         10.0.10.12 glusterarb.lexd.local
-    when: inventory_type == "aws"
-
-  - name: Update /etc/hosts using fact set in etc_hosts
-    ansible.builtin.blockinfile:
-      path: /etc/hosts
-      block: "{{ etc_hosts }}"
+  tasks:
   - name: Apply base configuration
     include_tasks: ansible_tasks/base-config.yml
 
@@ -54,32 +44,8 @@
   gather_facts: no
   become: yes
   tasks:
-  - name: Probe peers
-    shell: |
-      gluster peer probe workernode1
-      gluster peer probe glusterarb
-
-  - name: Check if volume already exist
-    shell: gluster volume list | grep -Po '^k8s-volume$' || echo "NOT_EXIST"
-    register: gluster_volume_status
-    changed_when: False  # Task will return ok instead of changed
-
-  - name: Configure Gluster Volume
-    shell: |
-      gluster volume create k8s-volume replica 2 arbiter 1 transport tcp \
-        masternode.lexd.local:/gluster/k8s_volume \
-        workernode1.lexd.local:/gluster/k8s_volume \
-        glusterarb.lexd.local:/gluster/k8s_volume
-    when: gluster_volume_status.stdout == "NOT_EXIST"
-
-  - name: Check if volume already started
-    shell: gluster volume info k8s-volume | grep '^Status' | grep Started || echo "NOT_STARTED"
-    register: volume_start_status
-    changed_when: False  # Task will return ok instead of changed
-
-  - name: Start the volume
-    shell: gluster volume start k8s-volume
-    when: volume_start_status.stdout == "NOT_STARTED"
+  - name: Setup Gluster volume via the masternode
+    include_tasks: ansible_tasks/setup-gluster-volume.yml
 
 
 ###############################
@@ -88,23 +54,8 @@
   gather_facts: no
   become: yes
   tasks:
-  - name: Check if /data exist
-    stat:
-      path: /data
-    register: data_mount_path
-
-  - name: Create path for GlusterFS to mount
-    file:
-      path: /data
-      state: directory
-    when: not data_mount_path.stat.exists
-
-  - name: Mount GlusterFS
-    ansible.posix.mount:
-      path: /data
-      src: "localhost:/k8s-volume"
-      fstype: glusterfs
-      state: mounted
+  - name: Mount GlusterFS on all nodes in the cluster (2 replica + 1 arbiter)
+    include_tasks: ansible_tasks/mount-gluster-volume.yml
 
 
 #################################################
@@ -113,26 +64,20 @@
   gather_facts: no
   become: yes
   tasks:
-  - name: Include Docker Role
+  - name: Install and Configure Docker
     include_role:
       name: roles/docker
 
-  - name: Include Kubernetes-Nodes Role
+  - name: Prepare K8s nodes by setting up prerequisites and installing K8s packages
     include_role:
       name: roles/kubernetes/nodes
 
-  - name: "Add current user [{{ ansible_env.SUDO_USER }}] into docker group"
-    ansible.builtin.user:
-      name: "{{ ansible_env.SUDO_USER }}"
-      groups: docker
-      append: yes
-
 ##################################################
 # Create Kubernetes Cluster using the master node
-# - hosts: masternode
-#   gather_facts: no
-#   become: yes
-#   tasks:
-#   - name: Include Kubernetes-Master Role
-#     include_role:
-#       name: roles/kubernetes/master
+- hosts: masternode
+  gather_facts: no
+  become: yes
+  tasks:
+  - name: Include Kubernetes-Master Role
+    include_role:
+      name: roles/kubernetes/master

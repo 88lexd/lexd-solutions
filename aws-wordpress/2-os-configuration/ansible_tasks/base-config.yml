@@ -1,4 +1,16 @@
 ---
+- name: Update /etc/hosts for local cluster
+  ansible.builtin.blockinfile:
+    path: /etc/hosts
+    block: "{{ etc_hosts_local }}"
+  when: inventory_type == "local"
+
+- name: Update /etc/hosts for AWS cluster
+  ansible.builtin.blockinfile:
+    path: /etc/hosts
+    block: "{{ etc_hosts_aws }}"
+  when: inventory_type == "aws"
+
 - name: Set OS hostname based on inventory_hostname
   ansible.builtin.hostname:
     name: "{{ inventory_hostname }}"
