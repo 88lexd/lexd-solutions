@@ -3,6 +3,7 @@
 - name: Check if OS is hosted on AWS
   shell: curl --max-time 3 http://169.254.169.254/latest/meta-data/instance-id || echo "NON_AWS_OS"
   register: OS_RESULT
+  changed_when: False  # Task will return ok instead of changed
 
 - name: Show OS Result
   debug:

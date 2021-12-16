@@ -23,10 +23,12 @@
 - name: Get Ubuntu codename
   shell: lsb_release --codename --short
   register: ubuntu_codename
+  changed_when: False  # Task will return ok instead of changed
 
 - name: Get OS architecture
   shell: dpkg --print-architecture
   register: os_arch
+  changed_when: False  # Task will return ok instead of changed
 
 - name: Add Docker apt repository
   ansible.builtin.apt_repository:
@@ -34,7 +36,7 @@
     state: present
     filename: docker
 
-- name: Install prerequisite packages
+- name: Install Docker packages
   ansible.builtin.apt:
     name:
       - "docker-ce={{ docker_version }}*"

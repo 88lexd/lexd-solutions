@@ -62,6 +62,7 @@
   - name: Check if volume already exist
     shell: gluster volume list | grep -Po '^k8s-volume$' || echo "NOT_EXIST"
     register: gluster_volume_status
+    changed_when: False  # Task will return ok instead of changed
 
   - name: Configure Gluster Volume
     shell: |
@@ -74,6 +75,7 @@
   - name: Check if volume already started
     shell: gluster volume info k8s-volume | grep '^Status' | grep Started || echo "NOT_STARTED"
     register: volume_start_status
+    changed_when: False  # Task will return ok instead of changed
 
   - name: Start the volume
     shell: gluster volume start k8s-volume
@@ -124,11 +126,6 @@
       name: "{{ ansible_env.SUDO_USER }}"
       groups: docker
       append: yes
-
-  - name: Reboot to ensure Docker is fully functional
-    ansible.builtin.reboot:
-      test_command: docker ps
-
 
 ##################################################
 # Create Kubernetes Cluster using the master node

@@ -3,11 +3,12 @@
   ansible.builtin.hostname:
     name: "{{ inventory_hostname }}"
 
-- name: Update /etc/resolv.conf to include lexd.local in search suffix
+# /etc/resolv.conf is now managed by systemd
+- name: Update /etc/systemd/resolved.conf to include lexd.local in search suffix
   ansible.builtin.lineinfile:
-    path: /etc/resolv.conf
-    regexp: '^search'
-    line: "search lexd.local"
+    path: /etc/systemd/resolved.conf
+    regexp: '^Domains'
+    line: "Domains=lexd.local"
     state: present
 
 - name: Set timezone to Australia/Sydney
@@ -38,6 +39,8 @@
       - python3-pip  # require to install Kubernetes python modules which is used by Ansible
       - jq  # to extract info from kubectl or docker output
       - net-tools  # to troubleshoot network related issues
+      - iotop
+      - iftop
     state: present
     update_cache: yes
 
