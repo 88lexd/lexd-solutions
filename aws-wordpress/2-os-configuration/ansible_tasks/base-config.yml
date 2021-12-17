@@ -1,19 +1,15 @@
 ---
-- name:  Include vars for /etc/hosts
-  ansible.builtin.include_vars:
-    file: ../vars/etc_hosts.yml
+# - name:  Include vars for /etc/hosts
+#   ansible.builtin.include_vars:
+#     file: ../vars/etc_hosts.yml
 
 - name: Update /etc/hosts for local cluster
   ansible.builtin.blockinfile:
     path: /etc/hosts
-    block: "{{ etc_hosts_local }}"
-  when: inventory_type == "local"
-
-- name: Update /etc/hosts for AWS cluster
-  ansible.builtin.blockinfile:
-    path: /etc/hosts
-    block: "{{ etc_hosts_aws }}"
-  when: inventory_type == "aws"
+    block: |
+      {{ hostvars.masternode.ansible_default_ipv4.address }} masternode.lexd.local controlplane.lexd.local
+      {{ hostvars.workernode1.ansible_default_ipv4.address }} workernode1.lexd.local
+      {{ hostvars.glusterarb.ansible_default_ipv4.address }} glusterarb.lexd.local
 
 - name: Set OS hostname based on inventory_hostname
   ansible.builtin.hostname:

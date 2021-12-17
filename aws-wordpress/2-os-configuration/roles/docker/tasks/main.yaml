@@ -44,6 +44,7 @@
       - "containerd.io"
     update_cache: yes
     state: present
+  register: docker_packages_installed
 
 # Ref: https://kubernetes.io/docs/setup/production-environment/container-runtimes/#docker
 - name: Copy Docker daemon config file
@@ -62,3 +63,9 @@
     name: "{{ ansible_env.SUDO_USER }}"
     groups: docker
     append: yes
+
+
+- name: Reboot to ensure Docker is fully installed and funtional
+  ansible.builtin.reboot:
+    test_command: docker ps
+  when: docker_packages_installed.changed

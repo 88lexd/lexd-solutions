@@ -138,16 +138,19 @@
       - create_k8s_cluster
 
   # TODO: Only join worker node is the worker doesnt already have kubelet in a running state!
-  # e.g.
-  # - name: collect facts about system services
-  #   service_facts:
-  #   register: services_state
+  - name: Collect facts about system services on worker nodes
+    service_facts:
+    register: services_state
+    tags:
+      - create_k8s_cluster
 
-  # - name: Debug
-  #   debug:
-  #     var: services_state
-
-  # TODO 2: ALSO REBOOT AFTER DOCKER INSTALL (only on change!)
+  # Use the following when statement to join worker to cluster!
+  - name: Showing worker nodes service states
+    debug:
+      msg: "{{ services_state.ansible_facts.services['kubelet.service'] }}"
+    tags:
+      - create_k8s_cluster
+    when: services_state.ansible_facts.services['kubelet.service'].state == "stopped"
 
   # - name: Executing join command
   #   shell: "{{ hostvars.masternode.cluster_join_command.stdout }}"
