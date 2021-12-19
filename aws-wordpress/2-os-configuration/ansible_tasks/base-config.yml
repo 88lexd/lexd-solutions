@@ -1,8 +1,4 @@
 ---
-# - name:  Include vars for /etc/hosts
-#   ansible.builtin.include_vars:
-#     file: ../vars/etc_hosts.yml
-
 - name: Update /etc/hosts for local cluster
   ansible.builtin.blockinfile:
     path: /etc/hosts
@@ -15,7 +11,7 @@
   ansible.builtin.hostname:
     name: "{{ inventory_hostname }}"
 
-# /etc/resolv.conf is now managed by systemd
+# /etc/resolv.conf is managed by systemd
 - name: Update /etc/systemd/resolved.conf to include lexd.local in search suffix
   ansible.builtin.lineinfile:
     path: /etc/systemd/resolved.conf
@@ -56,7 +52,6 @@
   ansible.builtin.apt:
     name:
       - python3-pip  # require to install Kubernetes python modules which is used by Ansible
-      - python3-jmespath  # for ansible's "| json_query" function
       - jq  # to extract info from kubectl or docker output
       - net-tools  # to troubleshoot network related issues
       - iotop
