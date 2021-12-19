@@ -1,0 +1,17 @@
+---
+- name: Collect facts about system services on worker nodes
+  service_facts:
+  register: services_state
+
+- name: Showing kubelet.service status on worker nodes
+  debug:
+    msg: "{{ services_state.ansible_facts.services['kubelet.service'] }}"
+
+- name: Using the following command to join worker nodes to K8s cluster
+  debug:
+    var: hostvars.masternode.cluster_join_command.stdout
+  when: services_state.ansible_facts.services['kubelet.service'].state == "stopped"
+
+- name: Joining node to cluster (if kubelet is stopped)
+  shell: "{{ hostvars.masternode.cluster_join_command.stdout }}"
+  when: services_state.ansible_facts.services['kubelet.service'].state == "stopped"

@@ -131,37 +131,13 @@
   gather_facts: no
   become: yes
   tasks:
-  - name: Using the following command to join worker nodes to K8s cluster
-    debug:
-      var: hostvars.masternode.cluster_join_command.stdout
+  - name: Join nodes to Kubernetes cluster
+    include_tasks:
+      file: ansible_tasks/k8s-join-nodes-to-cluster.yml
+      apply:
+        tags: create_k8s_cluster
     tags:
-      - create_k8s_cluster
-
-  # TODO: Only join worker node is the worker doesnt already have kubelet in a running state!
-  - name: Collect facts about system services on worker nodes
-    service_facts:
-    register: services_state
-    tags:
-      - create_k8s_cluster
-
-  # Use the following when statement to join worker to cluster!
-  - name: Showing worker nodes service states
-    debug:
-      msg: "{{ services_state.ansible_facts.services['kubelet.service'] }}"
-    tags:
-      - create_k8s_cluster
-    when: services_state.ansible_facts.services['kubelet.service'].state == "stopped"
-
-  # - name: Executing join command
-  #   shell: "{{ hostvars.masternode.cluster_join_command.stdout }}"
-  #   register: aa
-  #   tags:
-  #     - create_k8s_cluster
-
-  # - debug:
-  #     var: aa
-  #   tags:
-  #     - create_k8s_cluster
+    - create_k8s_cluster
 
 ##############################################################
 # 'glusterarb' acts as a jump server. Setup tools as required

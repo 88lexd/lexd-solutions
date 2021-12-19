@@ -45,13 +45,3 @@
     owner: "{{ ansible_env.SUDO_USER }}"
     group: "{{ ansible_env.SUDO_USER }}"
     mode: 0755
-
-# TO DO
-# Setup join worker node to cluster
-# $ kubeadm token create $(kubeadm token generate) --print-join-command
-
-#
-
-  # mkdir -p $HOME/.kube
-  # sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-  # sudo chown $(id -u):$(id -g) $HOME/.kube/config
