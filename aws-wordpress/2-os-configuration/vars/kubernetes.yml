@@ -16,3 +16,7 @@ k8s_gpg_keyring_path: /usr/share/keyrings/kubernetes-archive-keyring.gpg
 # kubernetes-xenial is currently the latest repo.
 # See: https://apt.kubernetes.io/apt/dists
 k8s_repository: "https://apt.kubernetes.io/ kubernetes-xenial main"
+
+
+# Get the latest version of Helm checking this URL: https://github.com/helm/helm/releases
+helm_binary_src: "https://get.helm.sh/helm-v3.7.2-linux-amd64.tar.gz"

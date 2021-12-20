@@ -39,6 +39,16 @@
     name: "{{ kubectl_pkg.name }}"
     selection: hold
 
+- name: Install helm binary
+  ansible.builtin.unarchive:
+    src: "{{ helm_binary_src }}"
+    remote_src: yes
+    dest: /tmp
+
+- name: Move helm to desired destination
+  shell: |
+    mv /tmp/linux-amd64/helm /usr/local/bin/helm
+    rm -rf /tmp/linux-amd64
 
 ############################
 # Jump Server Configuration
