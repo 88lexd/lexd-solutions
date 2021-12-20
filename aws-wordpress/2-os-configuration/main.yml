@@ -73,7 +73,6 @@
     - mount_gluster_volume
 
 
-
 #################################################
 # Install Docker and Kubernetes on all k8s nodes
 - hosts: k8s_nodes
@@ -101,6 +100,7 @@
         tags: install_k8s
     tags:
     - install_k8s
+
 
 ######################################
 # Create Kubernetes Cluster on Master

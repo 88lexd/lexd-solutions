@@ -48,6 +48,28 @@
     create: yes
   become_user: "{{ ansible_env.SUDO_USER }}"
 
+- name: Setup bashrc
+  ansible.builtin.copy:
+    dest: .bashrc.alex  # uses $HOME/.bashrc.alex
+    content: |
+      # Sys variables
+      export HISTSIZE=5000
+      export HISTFILESIZE=5000
+      export PYTHONSTARTUP=~/.pythonrc
+      export EDITOR=vim
+
+      # Force prompt to write history after every command.
+      export PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
+  become_user: "{{ ansible_env.SUDO_USER }}"
+
+- name: Ensure ~/.bashrc sources ~/.bashrc.alex
+  ansible.builtin.lineinfile:
+    path: .bashrc
+    regex: '^source ~/.bashrc.alex'
+    line: 'source ~/.bashrc.alex'
+    state: present
+  become_user: "{{ ansible_env.SUDO_USER }}"
+
 - name: Install base dependencies
   ansible.builtin.apt:
     name:

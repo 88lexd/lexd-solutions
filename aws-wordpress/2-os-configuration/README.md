@@ -42,14 +42,8 @@ Note: Install the collection by using standard account (not root). The collectio
 This new playbook uses Ansible roles to perform the following:
 
  1) Base OS configuration with my personal settings.
- 2) Install and configure GlusterFS on 3 servers. This will enable HA (High Availability) in Kubernetes.
+ 2) Install and configure GlusterFS on 3 servers (2 replica + 1 arbiter). This will enable HA (High Availability) for volumes in Kubernetes.
  3) Install and configre Kubernetes using kubeadm.
-
-## How to Run the Playbook
-Local VMs
-```
-$ ansible-playbook -i inventory_local.ini main.yml --ask-vault-pass
-```
 
 # Disk Config (gluster_disk_config.yml)
 This playbook is designed to run once during the initial setup. It enables me to quickly setup the dedicated disk on each VM which is used by GlusterFS.
@@ -83,4 +77,15 @@ PLAY RECAP *********************************************************************
 glusterarb                 : ok=4    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 masternode                 : ok=4    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 workernode1                : ok=4    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+```
+
+# How to Run the Playbook
+If not yet done already, first initialize the new blank disks for Gluster
+```
+$ ansible-playbook -i inventory_local.ini gluster_disk_config.yml -e "device=/dev/sdb"
+```
+
+Run main playbook to configure GlusterFS, Kubernetes and Jumpbox
+```
+$ ansible-playbook -i inventory_local.ini main.yml --ask-vault-pass
 ```
