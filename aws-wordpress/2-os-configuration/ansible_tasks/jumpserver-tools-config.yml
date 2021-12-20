@@ -10,7 +10,7 @@
   set_fact:
     kubectl_pkg: "{{ kubernetes_packages | json_query(query) }}"
   vars:
-    query: "[?name=='kubectl'] | [0]"
+    query: "[?name=='kubectl'] | [0]"  # This is using JMES query to extract the item where name=kubectl from the 'kubernetes_packages' list.
 
 - name: Selected the following kubeadm package info
   debug:
@@ -42,4 +42,4 @@
 
 ############################
 # Jump Server Configuration
-# TO DO
+# TODO

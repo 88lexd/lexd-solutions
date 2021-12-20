@@ -1,5 +1,8 @@
 # This file contains the encrypted account and private key for lets encrypt.
 ---
+account_key_secret_name: lets-encrypt-account-key
+private_key_secret_name: lets-encrypt-private-key
+
 account_key: !vault |
   $ANSIBLE_VAULT;1.1;AES256
   62366462383664333931323130643936346633326131366234383834363832666163393363386231

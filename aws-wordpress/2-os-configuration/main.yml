@@ -140,6 +140,21 @@
     - create_k8s_cluster
 
 
+##########################################################
+# Additional cluster config such as namesapces and secrets
+- hosts: masternode
+  gather_facts: no
+  become: no  # Not using sudo/root! running as the standard user
+  tasks:
+  - name: Cluster Config - Create namespaces and secrets etc.
+    include_tasks:
+      file: ansible_tasks/k8s-cluster-configs.yml
+      apply:
+        tags: cluster_config
+    tags:
+    - cluster_config
+
+
 ##############################################################
 # 'glusterarb' acts as a jump server. Setup tools as required
 - hosts: glusterarb

@@ -1,0 +1,118 @@
+---
+#####################
+# Read variable file
+- include_vars:
+    name: mysql_vars
+    file: ../vars/mysql.yml
+
+- include_vars:
+    name: lets_encrypt_vars
+    file: ../vars/lets_encrypt.yml
+
+####################
+# Create namespaces
+- name: Create PROD namespace in the cluster
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: prod
+
+- name: Create DEV namespace in the cluster
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: dev
+
+########################
+# Begin MySQL password
+- name: Create secret for the MySQL password in PROD
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: "{{ mysql_vars.mysql_prod.secret_name }}"
+        namespace: prod
+      type: Opaque
+      data:
+        password: "{{ mysql_vars.mysql_prod.password | b64encode }}"
+
+- name: Create secret for the MySQL password in DEV
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: "{{ mysql_vars.mysql_dev.secret_name }}"
+        namespace: dev
+      type: Opaque
+      data:
+        password: "{{ mysql_vars.mysql_dev.password | b64encode }}"
+# End MySQL Password
+
+##########################
+# Begin Lets Encrypt keys
+- name: Create secret for Lets Encrypt ACCOUNT key in DEV
+  kubernetes.core.k8s:
+    state: present
+    force: yes
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: "{{ lets_encrypt_vars.account_key_secret_name }}"
+        namespace: dev
+      type: Opaque
+      data:
+        key: "{{ lets_encrypt_vars.account_key | b64encode }}"
+
+- name: Create secret for Lets Encrypt PRIVATE key in DEV
+  kubernetes.core.k8s:
+    state: present
+    force: yes
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: "{{ lets_encrypt_vars.private_key_secret_name }}"
+        namespace: dev
+      type: Opaque
+      data:
+        key: "{{ lets_encrypt_vars.private_key | b64encode }}"
+
+- name: Create secret for Lets Encrypt ACCOUNT key in PROD
+  kubernetes.core.k8s:
+    state: present
+    force: yes
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: "{{ lets_encrypt_vars.account_key_secret_name }}"
+        namespace: prod
+      type: Opaque
+      data:
+        key: "{{ lets_encrypt_vars.account_key | b64encode }}"
+
+- name: Create secret for Lets Encrypt PRIVATE key in PROD
+  kubernetes.core.k8s:
+    state: present
+    force: yes
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: "{{ lets_encrypt_vars.private_key_secret_name }}"
+        namespace: prod
+      type: Opaque
+      data:
+        key: "{{ lets_encrypt_vars.private_key | b64encode }}"
+# End lets Encrypt keys
