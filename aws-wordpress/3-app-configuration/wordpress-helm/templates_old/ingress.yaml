@@ -1,0 +1,32 @@
+# Create a self sign certificate
+# $ openssl req -newkey rsa:4096 -x509 -sha256 -days 3650 -nodes -out /tmp/selfsigned.crt -keyout /tmp/selfsigned.key
+
+# Create a secret for ingress to consume
+# $ kubectl create secret tls lexdsolutions --key /tmp/selfsigned.key --cert /tmp/selfsigned.crt --namespace=prod; rm -f /tmp/selfsigned.{key,crt}
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wordpress-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  # Use TLS only if the secret variable is defined
+  {{- if .Values.wordpress.ingress_tls_secret_name }}
+  tls:
+  # Must be valid hosts in the secret
+  - hosts:
+     - {{ .Values.wordpress.ingress_url }}
+    secretName: "{{ .Values.wordpress.ingress_tls_secret_name }}"
+  {{- end }}
+  rules:
+  - host: {{ .Values.wordpress.ingress_url }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: wordpress-service  # references [service]metadata.name in 'deployment-wordpress.yaml'
+            port:
+              number: 80
