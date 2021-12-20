@@ -32,7 +32,7 @@
       apply:
         tags: install_cloudwatch_agent
     tags:
-      - install_cloudwatch_agent
+    - install_cloudwatch_agent
 
   - name: Install and Enable Gluster Server
     include_tasks:
@@ -40,7 +40,7 @@
       apply:
         tags: install_setup_gluster
     tags:
-      - install_setup_gluster
+    - install_setup_gluster
 
 
 ###############################################################
@@ -70,7 +70,7 @@
       apply:
         tags: mount_gluster_volume
     tags:
-      - mount_gluster_volume
+    - mount_gluster_volume
 
 
 
@@ -86,13 +86,13 @@
       apply:
         tags: install_docker
     tags:
-      - install_docker
+    - install_docker
 
   - name: Import vars so can be passed into the next include role task
     ansible.builtin.include_vars:
       file: vars/kubernetes.yml
     tags:
-      - install_k8s
+    - install_k8s
 
   - name: Prepare K8s nodes by setting up prerequisites and installing K8s packages
     include_role:
@@ -100,7 +100,7 @@
       apply:
         tags: install_k8s
     tags:
-      - install_k8s
+    - install_k8s
 
 ######################################
 # Create Kubernetes Cluster on Master
@@ -114,7 +114,7 @@
       apply:
         tags: create_k8s_cluster
     tags:
-      - create_k8s_cluster
+    - create_k8s_cluster
 
   - name: Get cluster join command
     shell: kubeadm token create $(kubeadm token generate) --print-join-command
@@ -122,11 +122,11 @@
     register: cluster_join_command
     changed_when: False  # Task will return ok instead of changed
     tags:
-      - create_k8s_cluster
+    - create_k8s_cluster
 
 
 ##################################
-# Join workernodes to K8s cluster
+# Join worker nodes to K8s cluster
 - hosts: k8s_worker_nodes
   gather_facts: no
   become: yes
@@ -139,6 +139,7 @@
     tags:
     - create_k8s_cluster
 
+
 ##############################################################
 # 'glusterarb' acts as a jump server. Setup tools as required
 - hosts: glusterarb
@@ -149,7 +150,7 @@
     ansible.builtin.include_vars:
       file: vars/kubernetes.yml
     tags:
-      - jumpbox
+    - jumpbox
 
   - name: Install tools for Jump Server
     include_tasks:
@@ -157,4 +158,19 @@
       apply:
         tags: jumpbox
     tags:
-      - jumpbox
+    - jumpbox
+
+
+######################################################################
+- hosts: masternode,glusterarb
+  gather_facts: no
+  become: yes
+  tasks:
+  - name: Configure kubeconfig for jumpserver
+    include_tasks:
+      file: ansible_tasks/jumpserver-kubeconfig.yml
+      apply:
+        tags: jumpbox,kubeconfig
+    tags:
+    - jumpbox
+    - kubeconfig

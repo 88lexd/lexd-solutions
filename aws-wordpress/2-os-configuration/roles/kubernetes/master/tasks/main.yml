@@ -44,4 +44,4 @@
     remote_src: yes
     owner: "{{ ansible_env.SUDO_USER }}"
     group: "{{ ansible_env.SUDO_USER }}"
-    mode: 0755
+    mode: 0600
