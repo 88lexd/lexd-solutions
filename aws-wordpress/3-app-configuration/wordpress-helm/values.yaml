@@ -29,3 +29,14 @@ lets_encrypt:
   csr_subject_cn: null  # This is the URL. Each environment will have its own host endpoint through ingress.
 
 time_zone: Australia/Sydney
+
+gluster:
+  node1:
+    ip: null
+    hostname: null
+  node2:
+    ip: null
+    hostname: null
+  arbiter:
+    ip: null
+    hostname: null

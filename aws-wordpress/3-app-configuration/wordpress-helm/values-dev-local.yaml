@@ -15,3 +15,14 @@ mysql:
 
 lets_encrypt:
   csr_subject_cn: dev.lexdsolutions.local
+
+gluster:
+  node1:
+    ip: 192.168.0.10
+    hostname: masternode
+  node2:
+    ip: 192.168.0.11
+    hostname: workernode1
+  arbiter:
+    ip: 192.168.0.11
+    hostname: glusterarb

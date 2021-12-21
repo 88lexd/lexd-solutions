@@ -32,6 +32,11 @@ Note: Namespace is created by Ansible during setup
 $ helm install wordpress-dev . --namespace=dev --values=values-dev.yaml
 ```
 
+## Install Dev Local
+Note: Namespace is created by Ansible during setup
+```
+$ helm install wordpress-dev . --namespace=dev --values=values-dev-local.yaml
+```
 
 # Troubleshooting
 Initial start, we get a database connection error "Error establishing a database connection"

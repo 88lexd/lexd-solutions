@@ -1,0 +1,9 @@
+apiVersion: v2
+name: heketi
+version: 0.1
+description: Run deploy heketi for dynamic storage provisioning through Gluster
+home: https://lexdsolutions.com
+
+maintainers:
+  - name: Alex Dinh
+    email: alex.dinh@lexdsolutions.com

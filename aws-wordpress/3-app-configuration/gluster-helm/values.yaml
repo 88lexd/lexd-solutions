@@ -1,0 +1,11 @@
+---
+gluster:
+  node1:
+    ip: null
+    hostname: masternode
+  node2:
+    ip: null
+    hostname: workernode1
+  arbiter:
+    ip: null
+    hostname: glusterarb

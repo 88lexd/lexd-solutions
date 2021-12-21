@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: glusterfs-cluster
+  labels:
+    storage.k8s.io/name: glusterfs
+  # namespace: gluster
+subsets:
+  - addresses:
+      - ip: {{ .Values.gluster.node1.ip }}
+        hostname: {{ .Values.gluster.node1.hostname }}
+      - ip: {{ .Values.gluster.node2.ip }}
+        hostname: {{ .Values.gluster.node2.hostname }}
+      - ip: {{ .Values.gluster.arbiter.ip }}
+        hostname: {{ .Values.gluster.arbiter.hostname }}
+    ports:
+      - port: 1

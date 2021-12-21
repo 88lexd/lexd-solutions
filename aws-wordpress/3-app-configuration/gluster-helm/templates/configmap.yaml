@@ -1,0 +1,97 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: heketi-config
+data:
+  heketi.json: |
+    {
+      "_port_comment": "Heketi Server Port Number",
+      "port": "8080",
+      "_use_auth": "Enable JWT authorization.",
+      "use_auth": true,
+      "_jwt": "Private keys for access",
+      "jwt": {
+        "_admin": "Admin has access to all APIs",
+        "admin": {
+          "_key_comment": "Set the admin key in the next line",
+          "key": "ADMIN-HARD-SECRET"
+        },
+        "_user": "User only has access to /volumes endpoint",
+        "user": {
+          "_key_comment": "Set the user key in the next line",
+          "key": "USER-HARD-SECRET"
+        }
+      },
+      "_glusterfs_comment": "GlusterFS Configuration",
+      "glusterfs": {
+        "executor": "ssh",
+        "_sshexec_comment": "SSH username and private key file",
+        "sshexec": {
+          "keyfile": "/heketi/heketi-ssh-key",
+          "user": "alex",
+          "sudo": true,
+          "port": "22"
+        },
+        "_db_comment": "Database file name",
+        "db": "/var/lib/heketi/heketi.db",
+        "loglevel" : "debug"
+      }
+    }
+
+  topology.json: |
+    {
+      "clusters": [
+        {
+          "nodes": [
+            {
+              "node": {
+                "hostnames": {
+                  "manage": [
+                    "192.168.0.10"
+                  ],
+                  "storage": [
+                    "192.168.0.10"
+                  ]
+                },
+                "zone": 1
+              },
+              "devices": [
+                "/dev/sdc"
+              ]
+            },
+            {
+              "node": {
+                "hostnames": {
+                  "manage": [
+                    "192.168.0.11"
+                  ],
+                  "storage": [
+                    "192.168.0.11"
+                  ]
+                },
+                "zone": 1
+              },
+              "devices": [
+                "/dev/sdc"
+              ]
+            },
+            {
+              "node": {
+                "hostnames": {
+                  "manage": [
+                    "192.168.0.12"
+                  ],
+                  "storage": [
+                    "192.168.0.12"
+                  ]
+                },
+                "zone": 1
+              },
+              "devices": [
+                "/dev/sdc"
+              ]
+            }
+          ]
+        }
+      ]
+    }
