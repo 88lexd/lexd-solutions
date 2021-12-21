@@ -8,48 +8,6 @@
     state: present
     update_cache: yes
 
-##################################
-# Load Kernel modules for Gluster
-# dm_snapshot
-- name: Load dm_snapshot module
-  community.general.modprobe:
-    name: dm_snapshot
-    state: present
-
-- name: Ensure dm_snapshot module is loaded on startup
-  ansible.builtin.lineinfile:
-    path: /etc/modules-load.d/gluster.conf
-    regexp: '^dm_snapshot'
-    line: dm_snapshot
-    create: yes
-
-# dm_mirror
-- name: Load dm_mirror module
-  community.general.modprobe:
-    name: dm_mirror
-    state: present
-
-- name: Ensure dm_mirror module is loaded on startup
-  ansible.builtin.lineinfile:
-    path: /etc/modules-load.d/gluster.conf
-    regexp: '^dm_mirror'
-    line: dm_mirror
-    create: yes
-
-# dm_thin_pool
-- name: Load dm_thin_pool module
-  community.general.modprobe:
-    name: dm_thin_pool
-    state: present
-
-- name: Ensure dm_thin_pool module is loaded on startup
-  ansible.builtin.lineinfile:
-    path: /etc/modules-load.d/gluster.conf
-    regexp: '^dm_thin_pool'
-    line: dm_thin_pool
-    create: yes
-# End Kernel module load
-
 - name: Enable and restart glusterd.service
   ansible.builtin.service:
     name: glusterd.service

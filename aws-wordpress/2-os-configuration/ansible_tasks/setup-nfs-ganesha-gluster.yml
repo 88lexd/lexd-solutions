@@ -1,0 +1,40 @@
+# nfs-ganesha-gluster is linked to GlusterFS.
+# Pods access NFS which the underlying storage is GlusterFS.
+---
+- name: Install glusterfs-server
+  ansible.builtin.apt:
+    name: nfs-ganesha-gluster
+    state: present
+    update_cache: yes
+
+- name: Check if /etc/ganesha/exports exist
+  stat:
+    path: /etc/ganesha/exports
+  register: ganesha_exports_path
+
+- name: Create path for ganesha export config
+  file:
+    path: /etc/ganesha/exports
+    state: directory
+  when: not ganesha_exports_path.stat.exists
+
+- name: Copy export conf file over to server
+  ansible.builtin.copy:
+    src: ../files/nfs-ganesha-export.conf
+    dest: /etc/ganesha/exports/
+  register: ganesha_export_conf
+
+- name: Ensure ganesha is including the nfs-ganesha-export.conf file
+  ansible.builtin.lineinfile:
+    path: /etc/ganesha/ganesha.conf
+    regex: '^%include "/etc/ganesha/exports/nfs-ganesha-export.conf"'
+    line: '%include "/etc/ganesha/exports/nfs-ganesha-export.conf"'
+    state: present
+  register: ganesha_conf
+
+- name: Enable and restart nfs-ganesha.service
+  ansible.builtin.service:
+    name: nfs-ganesha.service
+    enabled: yes
+    state: restarted
+  when: ganesha_export_conf.changed or ganesha_conf.changed
