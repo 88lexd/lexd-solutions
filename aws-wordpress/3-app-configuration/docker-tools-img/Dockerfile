@@ -9,6 +9,8 @@ ENV TZ=Australia/Sydney
 
 RUN apt-get update && apt-get install -y \
     iputils-ping \
+    # TCP ping. (e.g. hping3 -S -p 80 google.com)
+    hping3 \
     dnsutils \
     netcat \
     curl \
