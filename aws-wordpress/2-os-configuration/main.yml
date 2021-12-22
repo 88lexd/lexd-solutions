@@ -155,8 +155,8 @@
     tags:
     - cluster_config
 
-#######################################
-# Setup floating IP.
+############################
+# Setup NFS with floating IP
 - hosts: cluster
   gather_facts: no
   become: yes
