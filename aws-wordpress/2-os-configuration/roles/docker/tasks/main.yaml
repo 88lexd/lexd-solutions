@@ -4,6 +4,7 @@
 ---
 ###########################
 # Setup Docker repository
+# sudo apt-get update && sudo apt-get install ca-certificates curl gnupg lsb-release
 - name: Install prerequisite packages
   ansible.builtin.apt:
     name:
@@ -14,6 +15,7 @@
     update_cache: yes
     state: present
 
+# curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 - name: Add Docker GPG key
   ansible.builtin.apt_key:
     url: https://download.docker.com/linux/ubuntu/gpg
@@ -30,12 +32,14 @@
   register: os_arch
   changed_when: False  # Task will return ok instead of changed
 
+# echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 - name: Add Docker apt repository
   ansible.builtin.apt_repository:
     repo: "deb [arch={{ os_arch.stdout }} signed-by={{ docker_gpg_keyring_path }}] https://download.docker.com/linux/ubuntu {{ ubuntu_codename.stdout }} stable"
     state: present
     filename: docker
 
+# sudo apt-get update && sudo apt-get install docker-ce docker-ce-cli containerd.io
 - name: Install Docker packages
   ansible.builtin.apt:
     name:
@@ -52,18 +56,19 @@
     src: docker_daemon.j2
     dest: /etc/docker/daemon.json
 
-- name: Enable and restart glusterd.service
+# sudo systemctl enable docker; sudo systemctl daemon-reload ; sudo systemctl restart docker
+- name: Enable and restart docker.service
   ansible.builtin.service:
     name: docker.service
     enabled: yes
     state: started
 
+# sudo usermod -aG docker alex
 - name: "Add current user [{{ ansible_env.SUDO_USER }}] into docker group"
   ansible.builtin.user:
     name: "{{ ansible_env.SUDO_USER }}"
     groups: docker
     append: yes
-
 
 - name: Reboot to ensure Docker is fully installed and funtional
   ansible.builtin.reboot:
