@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     # TCP ping. (e.g. hping3 -S -p 80 google.com)
     hping3 \
     dnsutils \
+    iproute2 \
     netcat \
     curl \
     && rm -rf /var/lib/apt/lists/*
