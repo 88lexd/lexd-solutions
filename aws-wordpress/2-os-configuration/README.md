@@ -88,7 +88,16 @@ If not yet done already, first initialize the new blank disks for Gluster
 $ ansible-playbook -i inventory_local.ini gluster_disk_config.yml -e "device=/dev/sdb"
 ```
 
-Run main playbook to configure GlusterFS, Kubernetes and Jumpbox
+Run main playbook to configure GlusterFS/nfs-ganesha, Kubernetes and the jumpbox
 ```
 $ ansible-playbook -i inventory_local.ini main.yml --ask-vault-pass
+```
+
+# Important Notes
+## Ganesha Depends on Gluster
+When all the nodes are shutdown and powered on again (e.g. my local dev or during a major outage), GlusterFS will not be online for Ganesha to establish the NFS export properly. For this reason I must manually restart the `nfs-ganesha' service on all the nodes.
+
+Use the following Ansible ad-hoc command:
+```
+$ ansible cluster -i inventory_local.ini -b -m service -a 'name=nfs-ganesha.service state=restarted'
 ```

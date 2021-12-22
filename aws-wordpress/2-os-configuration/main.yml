@@ -161,6 +161,14 @@
   gather_facts: no
   become: yes
   tasks:
+  - name: Setup keepalived for Floating IP (NFS Failover)
+    include_tasks:
+      file: ansible_tasks/setup-keepalived.yml
+      apply:
+        tags: cluster_nfs
+    tags:
+    - cluster_nfs
+
   # NFS is used so the k8s cluster can use NFS subdir for dynamic provisioning on GlusterFS for HA
   - name: Setup nfs-ganesha-gluster
     include_tasks:
@@ -170,13 +178,7 @@
     tags:
     - cluster_nfs
 
-  - name: Setup keepalived for Floating IP (NFS Failover)
-    include_tasks:
-      file: ansible_tasks/setup-keepalived.yml
-      apply:
-        tags: cluster_nfs
-    tags:
-    - cluster_nfs
+
 
 ##############################################################
 # 'glusterarb' acts as a jump server. Setup tools as required
