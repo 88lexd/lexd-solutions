@@ -21,6 +21,9 @@ $ pip uninstall ansible
 # Install latest ansible using pip (run as non root user, will this install for the current user)
 $ pip install ansible
 
+# If required, update $PATH to where Ansible is installed.
+$ echo 'export PATH=$PATH:~/.local/bin/' >> ~/.bashrc
+
 # Confirm is for current user only
 $ ansible --version
 ansible [core 2.12.1]
