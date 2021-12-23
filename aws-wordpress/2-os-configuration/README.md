@@ -101,3 +101,7 @@ Use the following Ansible ad-hoc command:
 ```
 $ ansible cluster -i inventory_local.ini -b -m service -a 'name=nfs-ganesha.service state=restarted'
 ```
+
+Also check the following:
+ - /data mounted to GlusterFS - fix using `$ mount /data`)
+ - Pods are running as it depends on NFS - fix by deleting the pods and allow deployment to recreate

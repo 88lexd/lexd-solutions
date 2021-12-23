@@ -16,3 +16,14 @@
     src: "localhost:/k8s-volume"
     fstype: glusterfs
     state: mounted
+  register: mount_result
+
+- name: Apply 777 on the glusterfs volume (run once only - endpoint is the same on all nodes)
+  file:
+    path: /data
+    state: directory
+    owner: root
+    group: root
+    mode: '0777'
+  run_once: yes
+  when: mount_result.changed

@@ -58,21 +58,6 @@
     - setup_gluster_volume
 
 
-###############################
-# Mount GlusterFS to all nodes
-- hosts: cluster
-  gather_facts: no
-  become: yes
-  tasks:
-  - name: Mount GlusterFS on all nodes in the cluster (2 replica + 1 arbiter)
-    include_tasks:
-      file: ansible_tasks/mount-gluster-volume.yml
-      apply:
-        tags: mount_gluster_volume
-    tags:
-    - mount_gluster_volume
-
-
 #################################################
 # Install Docker and Kubernetes on all k8s nodes
 - hosts: k8s_nodes
@@ -155,12 +140,24 @@
     tags:
     - cluster_config
 
+
 ############################
 # Setup NFS with floating IP
 - hosts: cluster
   gather_facts: no
   become: yes
   tasks:
+  - name: Mount GlusterFS on all nodes in the cluster and apply 777 permission.
+    include_tasks:
+      file: ansible_tasks/mount-gluster-volume.yml
+      apply:
+        tags:
+          - cluster_nfs
+          - mount_gluster_volume
+    tags:
+    - cluster_nfs
+    - mount_gluster_volume
+
   - name: Setup keepalived for Floating IP (NFS Failover)
     include_tasks:
       file: ansible_tasks/setup-keepalived.yml
@@ -177,7 +174,6 @@
         tags: cluster_nfs
     tags:
     - cluster_nfs
-
 
 
 ##############################################################
@@ -201,7 +197,8 @@
     - jumpbox
 
 
-######################################################################
+##############################
+# Setup kube config on jumpbox
 - hosts: masternode,glusterarb
   gather_facts: no
   become: yes
@@ -214,3 +211,31 @@
     tags:
     - jumpbox
     - kubeconfig
+
+
+#########################################################
+# Use jumpbox to ingress-nginx and nfs-subdir provisioner
+# This requires Helm and jump server have this installed
+- hosts: glusterarb
+  gather_facts: no
+  become: no  # Run as standard user. Has access to kube/helm
+  tasks:
+  - name: Configure nginx-ingress-controller
+    include_tasks:
+      file: ansible_tasks/setup-nginx-ingress-controller.yml
+      apply:
+        tags: nginx_ingress
+    tags:
+    - nginx_ingress
+
+  - name: Configure nfs-subdir provisioner
+    include_tasks:
+      file: ansible_tasks/setup-nfs-subdir-provisioner.yml
+      apply:
+        tags: nfs_subdir
+    tags:
+    - nfs_subdir
+
+
+
+
