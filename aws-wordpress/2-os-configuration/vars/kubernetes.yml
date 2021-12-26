@@ -20,6 +20,8 @@ kube_init_options:
   - --pod-network-cidr=10.244.0.0/16
   - --service-cidr=10.250.0.0/16  # This is the default CIDR but specifying it anyway
 
+# IMPORTANT! This MUST MATCH the --pod-network-cidr!
+weave_cni_cidr: 10.244.0.0/16
 
 # kubernetes-xenial is currently the latest repo.
 # See: https://apt.kubernetes.io/apt/dists
