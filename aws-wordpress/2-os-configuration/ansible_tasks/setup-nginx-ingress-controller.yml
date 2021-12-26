@@ -1,5 +1,13 @@
 ---
 # Reference: https://github.com/kubernetes/ingress-nginx
+- name: Create ingress  namespace in the cluster
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: ingress
 
 # helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 - name: Add Helm repo for nginx-ingress

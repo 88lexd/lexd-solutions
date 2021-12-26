@@ -1,0 +1,35 @@
+# This playbook will setup a VM with a NFS server. This is to simulate AWS EFS
+# It will create an export with /efs
+# $ ansible-playbook -i inventory_local.ini setup_nfs_server.yml
+---
+- hosts: nfsserver
+  gather_facts: yes
+  become: yes
+  tasks:
+  - name: Install NFS server
+    ansible.builtin.apt:
+      name: nfs-kernel-server
+      state: present
+      update_cache: yes
+
+  - name: Create directory for NFS export called efs
+    ansible.builtin.file:
+      path: "/efs"
+      state: directory
+      mode: 0755
+
+  - name: Create NFS export for Prod
+    lineinfile:
+      path: /etc/exports
+      regexp: '^/efs'
+      line: "/efs {{ nfs_client_cidr }}(rw,sync,no_root_squash)"
+      state: present
+
+  - name: Enable and restart NFS service
+    ansible.builtin.service:
+      name: "{{ item }}"
+      enabled: yes
+      state: restarted
+    with_items:
+      - nfs-server
+      - nfs-idmapd

@@ -12,5 +12,5 @@
     chart_ref: nfs-subdir-external-provisioner/nfs-subdir-external-provisioner
     release_values:
       nfs:
-        server: "{{ floating_ipaddr }}"
-        path: "/k8s-volume"
+        server: "{{ nfs_endpoint }}"
+        path: "/efs"

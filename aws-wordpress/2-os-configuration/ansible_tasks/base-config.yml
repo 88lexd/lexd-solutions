@@ -5,7 +5,6 @@
     block: |
       {{ hostvars.masternode.private_ipaddr }} masternode.lexd.local controlplane.lexd.local
       {{ hostvars.workernode1.private_ipaddr }} workernode1.lexd.local
-      {{ hostvars.glusterarb.private_ipaddr }} glusterarb.lexd.local
 
 - name: Set OS hostname based on inventory_hostname
   ansible.builtin.hostname:

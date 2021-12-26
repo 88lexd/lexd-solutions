@@ -1,8 +1,4 @@
 ---
-- name: Include vars for Lets Encrypt
-  ansible.builtin.include_vars:
-    file: lets_encrypt.yml
-
 - name: Check if kube-apiserver process is already running
   shell: |
     if [[ $(ps -A | grep kube-apiserver) ]]; then
