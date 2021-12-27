@@ -28,6 +28,7 @@ module "ec2_instance" {
   enable_volume_tags     = true
   volume_tags            = var.ec2_instance_tags
   iam_instance_profile    = aws_iam_instance_profile.ec2_iam_instance_profile.name
+  disable_api_termination = false
   tags = var.ec2_instance_tags
 }
 
