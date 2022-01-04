@@ -10,6 +10,12 @@ variable "eip_alloc_id" {
   default = "eipalloc-0a68ead1a441b9730"
 }
 
+variable "jumpbox_sg_id" {
+  description = "Security group that is attached to the jumpbox"
+  type = string
+  default = "sg-0db47122b8885fb8d"
+}
+
 ####################################
 # Begin VPC Settings
 variable "vpc_name" {
