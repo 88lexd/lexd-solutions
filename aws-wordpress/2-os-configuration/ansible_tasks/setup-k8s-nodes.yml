@@ -1,0 +1,98 @@
+# Installation procedure for Kubernetes. Refer to:
+# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
+
+---
+#####################
+# Disable Swap
+- name: Disable swap for current session
+  command: swapoff -a
+
+- name: Disable swap permanently, persist reboots
+  replace:
+    path: /etc/fstab
+    regexp: '^(\s*)([^#\n]+\s+)(\w+\s+)swap(\s+.*)$'
+    replace: '#\1\2\3swap\4'
+    backup: yes
+
+- name: Install prerequisite packages
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+    update_cache: yes
+    state: present
+
+#######################
+# Configure iptables
+- name: Load br_netfilter module
+  community.general.modprobe:
+    name: br_netfilter
+    state: present
+
+- name: Ensure br_netfilter module is loaded on startup
+  ansible.builtin.lineinfile:
+    path: /etc/modules-load.d/k8s.conf
+    regexp: '^br_netfilter'
+    line: br_netfilter
+    create: yes
+
+- name: Allow node to see bridged traffic (IPv4)
+  ansible.builtin.lineinfile:
+    path: /etc/sysctl.d/k8s.conf
+    regexp: '^net\.bridge\.bridge-nf-call-iptables'
+    line: net.bridge.bridge-nf-call-iptables = 1
+    create: yes
+  register: sysctl_k8s_ipv4
+
+- name: Allow node to see bridged traffic (IPv6)
+  ansible.builtin.lineinfile:
+    path: /etc/sysctl.d/k8s.conf
+    regexp: '^net\.bridge\.bridge-nf-call-ip6tables'
+    line: net.bridge.bridge-nf-call-ip6tables = 1
+    create: yes
+  register: sysctl_k8s_ipv6
+
+- name: Reload systctl configuration files
+  shell: sysctl --system
+  when: sysctl_k8s_ipv4.changed or sysctl_k8s_ipv6.changed
+
+##############################
+# Install Kubernetes packages
+- name: Add Kubernetes GPG key
+  ansible.builtin.apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+    keyring: "{{ k8s_gpg_keyring_path }}"
+
+- name: Add Kubernetes APT repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by={{ k8s_gpg_keyring_path }}] {{ k8s_repository }}"
+    state: present
+    filename: kubernetes
+
+# Without this, when I use 'with_items' to install kubeadm, it will also install kubelet and kubectl to a much later version!
+- name: Set fact for Kubernetes packes (allow packages to install in one loop)
+  set_fact:
+    exact_pkg: "{{ item.name }}={{item.version}}"
+  with_items: "{{ kubernetes_packages }}"
+  register: exact_pkg_result
+
+- name: Make a list from the previous fact
+  set_fact:
+    k8s_packages: "{{ exact_pkg_result.results | map(attribute='ansible_facts.exact_pkg') | list }}"
+
+- name: Show previous fact as oneline for the next command
+  debug:
+    msg: "{{ k8s_packages | join(' ') }}"
+
+# There is a bug with 'apt' module where it will install the latest kubelet and kubectl when kubeadm is installed.
+# I need all 3 versions to be the same!
+- name: "Install Kubernetes packages (using apt-get install -y {{ k8s_packages | join(' ') }})"
+  shell: "apt-get update && apt-get install -y {{ k8s_packages | join(' ') }}"
+
+- name: APT hold Kubernetes packages
+  ansible.builtin.dpkg_selections:
+    name: "{{ item.name }}"
+    selection: hold
+  with_items: "{{ kubernetes_packages }}"

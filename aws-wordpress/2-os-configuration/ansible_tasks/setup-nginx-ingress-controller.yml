@@ -1,0 +1,33 @@
+---
+# Reference: https://github.com/kubernetes/ingress-nginx
+- name: Create ingress  namespace in the cluster
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: ingress
+
+# helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+- name: Add Helm repo for nginx-ingress
+  kubernetes.core.helm_repository:
+    name: ingress-nginx
+    repo_url: https://kubernetes.github.io/ingress-nginx
+
+# helm install ingress --namespace ingress --create-namespace \
+#   --set rbac.create=true,controller.kind=DaemonSet,controller.service.type=ClusterIP,controller.hostNetwork=true ingress-nginx/ingress-nginx
+- name: Install nginx-ingress using Helm
+  kubernetes.core.helm:
+    release_name: ingress
+    release_namespace: ingress
+    chart_ref: ingress-nginx/ingress-nginx
+    release_values:
+      rbac:
+        create: "true"
+      controller:
+        kind: DaemonSet
+      service:
+        type: ClusterIP
+      controller:
+        hostNetwork: "true"

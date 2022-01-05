@@ -1,0 +1,167 @@
+---
+- hosts: masternode,workernode
+  gather_facts: yes
+  become: yes
+  vars:
+    # Allow connection from VPC CIDR but using security groups to control which server can access this NFS port
+    k8s_cluster_subnet: "10.0.0.0/16"
+    export_path: "/nfs/k8s"
+    snap_microk8s_channel: "1.21/stable"
+    # Get the latest version of Helm checking this URL: https://github.com/helm/helm/releases
+    helm_binary_src: "https://get.helm.sh/helm-v3.7.0-rc.2-linux-amd64.tar.gz"
+    k8s_mysql_prod_secret_name: mysql-prod
+    k8s_mysql_prod_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          62643637356466343736346165383133383337656630376464306432363034383834323630643162
+          6461346161383939326163636264363164326333373138390a356661396435356163626332616633
+          65316235616635666632613638353865333738373963653635346566643737656533653134396534
+          6236333237373231310a326131373563323737623734313438383038323737313265613465323535
+          3630
+    k8s_mysql_dev_secret_name: mysql-dev
+    k8s_mysql_dev_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          31356565373961653465343235313166613236393830353333306662376531343364306363653434
+          6461333962346665613663663063313539666566336133300a646662313434303937303936323437
+          37393432373234623062343665303137636233376235363864663066323939316534646537303238
+          6136373962353534370a613334613866343565663465646433613638376238663237333864386534
+          31666535343165663364396463636635323139653034356261303838643438333665
+    lets_encrypt:
+      account_key_secret_name: lets-encrypt-account-key
+      private_key_secret_name: lets-encrypt-private-key
+
+  tasks:
+  # Begin by import extra vars for lets encrypt
+  - include_vars:
+      file: vars/lets-encrypt.yml
+      name: lets_encrypt_keys
+
+  - name: Apply base configuration
+    include_tasks: ansible_tasks/base-config.yml
+
+  - name: Setup AWS CloudWatch Agent
+    include_tasks: ansible_tasks/setup-aws-cw-agent.yml
+    tags:
+      - cloudwatch
+
+  - name: Install and configure MicroK8s
+    include_tasks: ansible_tasks/setup-microk8s.yml
+
+  - name: Setup NFS Server on Master Node
+    include_tasks: ansible_tasks/setup-nfs-server.yml
+    when: inventory_hostname == "masternode"
+    tags:
+      - subdir
+
+  - name: Create PROD namespace in the cluster
+    kubernetes.core.k8s:
+      state: present
+      definition:
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: prod
+    become_user: "{{ ansible_env.SUDO_USER }}"  # Use the standard user. This is where the Kubernetes Python module is installed.
+
+  - name: Create DEV namespace in the cluster
+    kubernetes.core.k8s:
+      state: present
+      definition:
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: dev
+    become_user: "{{ ansible_env.SUDO_USER }}"  # Use the standard user. This is where the Kubernetes Python module is installed.
+
+  ########################
+  # Begin MySQL password
+  - name: Create secret for the MySQL password in PROD
+    kubernetes.core.k8s:
+      state: present
+      definition:
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: "{{ k8s_mysql_prod_secret_name }}"
+          namespace: prod
+        type: Opaque
+        data:
+          password: "{{ k8s_mysql_prod_password | b64encode }}"
+    become_user: "{{ ansible_env.SUDO_USER }}"  # Use the standard user. This is where the Kubernetes Python module is installed.
+
+  - name: Create secret for the MySQL password in DEV
+    kubernetes.core.k8s:
+      state: present
+      definition:
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: "{{ k8s_mysql_dev_secret_name }}"
+          namespace: dev
+        type: Opaque
+        data:
+          password: "{{ k8s_mysql_dev_password | b64encode }}"
+    become_user: "{{ ansible_env.SUDO_USER }}"  # Use the standard user. This is where the Kubernetes Python module is installed.
+  # End MySQL Password
+
+  ##########################
+  # Begin Lets Encrypt keys
+  - name: Create secret for Lets Encrypt ACCOUNT key in DEV
+    kubernetes.core.k8s:
+      state: present
+      force: yes
+      definition:
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: "{{ lets_encrypt.account_key_secret_name }}"
+          namespace: dev
+        type: Opaque
+        data:
+          key: "{{ lets_encrypt_keys.account_key | b64encode }}"
+    become_user: "{{ ansible_env.SUDO_USER }}"  # Use the standard user. This is where the Kubernetes Python module is installed.
+
+  - name: Create secret for Lets Encrypt PRIVATE key in DEV
+    kubernetes.core.k8s:
+      state: present
+      force: yes
+      definition:
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: "{{ lets_encrypt.private_key_secret_name }}"
+          namespace: dev
+        type: Opaque
+        data:
+          key: "{{ lets_encrypt_keys.private_key | b64encode }}"
+    become_user: "{{ ansible_env.SUDO_USER }}"  # Use the standard user. This is where the Kubernetes Python module is installed.
+
+  - name: Create secret for Lets Encrypt ACCOUNT key in PROD
+    kubernetes.core.k8s:
+      state: present
+      force: yes
+      definition:
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: "{{ lets_encrypt.account_key_secret_name }}"
+          namespace: prod
+        type: Opaque
+        data:
+          key: "{{ lets_encrypt_keys.account_key | b64encode }}"
+    become_user: "{{ ansible_env.SUDO_USER }}"  # Use the standard user. This is where the Kubernetes Python module is installed.
+
+  - name: Create secret for Lets Encrypt PRIVATE key in PROD
+    kubernetes.core.k8s:
+      state: present
+      force: yes
+      definition:
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: "{{ lets_encrypt.private_key_secret_name }}"
+          namespace: prod
+        type: Opaque
+        data:
+          key: "{{ lets_encrypt_keys.private_key | b64encode }}"
+    become_user: "{{ ansible_env.SUDO_USER }}"  # Use the standard user. This is where the Kubernetes Python module is installed.
+  # End lets Encrypt keys

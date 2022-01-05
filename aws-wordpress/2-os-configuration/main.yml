@@ -1,167 +1,160 @@
+# This playbook will setup GlusterFS and Kubernetes via kubeadm
 ---
-- hosts: masternode,workernode
+- hosts: all
   gather_facts: yes
   become: yes
-  vars:
-    # Allow connection from VPC CIDR but using security groups to control which server can access this NFS port
-    k8s_cluster_subnet: "10.0.0.0/16"
-    export_path: "/nfs/k8s"
-    snap_microk8s_channel: "1.21/stable"
-    # Get the latest version of Helm checking this URL: https://github.com/helm/helm/releases
-    helm_binary_src: "https://get.helm.sh/helm-v3.7.0-rc.2-linux-amd64.tar.gz"
-    k8s_mysql_prod_secret_name: mysql-prod
-    k8s_mysql_prod_password: !vault |
-          $ANSIBLE_VAULT;1.1;AES256
-          62643637356466343736346165383133383337656630376464306432363034383834323630643162
-          6461346161383939326163636264363164326333373138390a356661396435356163626332616633
-          65316235616635666632613638353865333738373963653635346566643737656533653134396534
-          6236333237373231310a326131373563323737623734313438383038323737313265613465323535
-          3630
-    k8s_mysql_dev_secret_name: mysql-dev
-    k8s_mysql_dev_password: !vault |
-          $ANSIBLE_VAULT;1.1;AES256
-          31356565373961653465343235313166613236393830353333306662376531343364306363653434
-          6461333962346665613663663063313539666566336133300a646662313434303937303936323437
-          37393432373234623062343665303137636233376235363864663066323939316534646537303238
-          6136373962353534370a613334613866343565663465646433613638376238663237333864386534
-          31666535343165663364396463636635323139653034356261303838643438333665
-    lets_encrypt:
-      account_key_secret_name: lets-encrypt-account-key
-      private_key_secret_name: lets-encrypt-private-key
-
   tasks:
-  # Begin by import extra vars for lets encrypt
-  - include_vars:
-      file: vars/lets-encrypt.yml
-      name: lets_encrypt_keys
+  - block:
+    - name: Check for unsupported distribution
+      debug:
+        msg: "[{{ ansible_distribution }}] is not an acceptable distribution. Only Ubuntu is accepted!"
+    - meta: end_play
+    when: ansible_distribution != "Ubuntu"
 
+
+######################################################################
+# All servers in the cluster group should have this base configuration
+- hosts: cluster
+  gather_facts: yes
+  become: yes
+  tasks:
   - name: Apply base configuration
-    include_tasks: ansible_tasks/base-config.yml
+    include_tasks:
+      file: ansible_tasks/base-config.yml
+      apply:
+        tags: base_config
+    tags:
+      - base_config
 
   - name: Setup AWS CloudWatch Agent
-    include_tasks: ansible_tasks/setup-aws-cw-agent.yml
+    include_tasks:
+      file: ansible_tasks/setup-aws-cw-agent.yml
+      apply:
+        tags: install_cloudwatch_agent
     tags:
-      - cloudwatch
+    - install_cloudwatch_agent
 
-  - name: Install and configure MicroK8s
-    include_tasks: ansible_tasks/setup-microk8s.yml
-
-  - name: Setup NFS Server on Master Node
-    include_tasks: ansible_tasks/setup-nfs-server.yml
-    when: inventory_hostname == "masternode"
+  - name: Import docker vars so can be passed into the next include role task
+    ansible.builtin.include_vars:
+      file: vars/docker.yml
     tags:
-      - subdir
+    - install_docker
 
-  - name: Create PROD namespace in the cluster
-    kubernetes.core.k8s:
-      state: present
-      definition:
-        apiVersion: v1
-        kind: Namespace
-        metadata:
-          name: prod
-    become_user: "{{ ansible_env.SUDO_USER }}"  # Use the standard user. This is where the Kubernetes Python module is installed.
+  - name: Install and Configure Docker on K8s nodes
+    include_tasks:
+      file: ansible_tasks/setup-docker.yml
+      apply:
+        tags: install_docker
+    tags:
+    - install_docker
 
-  - name: Create DEV namespace in the cluster
-    kubernetes.core.k8s:
-      state: present
-      definition:
-        apiVersion: v1
-        kind: Namespace
-        metadata:
-          name: dev
-    become_user: "{{ ansible_env.SUDO_USER }}"  # Use the standard user. This is where the Kubernetes Python module is installed.
+  - name: Import kubernetes vars so can be passed into the next include role task
+    ansible.builtin.include_vars:
+      file: vars/kubernetes.yml
+    tags:
+    - install_k8s
 
-  ########################
-  # Begin MySQL password
-  - name: Create secret for the MySQL password in PROD
-    kubernetes.core.k8s:
-      state: present
-      definition:
-        apiVersion: v1
-        kind: Secret
-        metadata:
-          name: "{{ k8s_mysql_prod_secret_name }}"
-          namespace: prod
-        type: Opaque
-        data:
-          password: "{{ k8s_mysql_prod_password | b64encode }}"
-    become_user: "{{ ansible_env.SUDO_USER }}"  # Use the standard user. This is where the Kubernetes Python module is installed.
+  - name: Prepare K8s nodes by setting up prerequisites and installing K8s packages
+    include_tasks:
+      file: ansible_tasks/setup-k8s-nodes.yml
+      apply:
+        tags: install_k8s
+    tags:
+    - install_k8s
 
-  - name: Create secret for the MySQL password in DEV
-    kubernetes.core.k8s:
-      state: present
-      definition:
-        apiVersion: v1
-        kind: Secret
-        metadata:
-          name: "{{ k8s_mysql_dev_secret_name }}"
-          namespace: dev
-        type: Opaque
-        data:
-          password: "{{ k8s_mysql_dev_password | b64encode }}"
-    become_user: "{{ ansible_env.SUDO_USER }}"  # Use the standard user. This is where the Kubernetes Python module is installed.
-  # End MySQL Password
 
-  ##########################
-  # Begin Lets Encrypt keys
-  - name: Create secret for Lets Encrypt ACCOUNT key in DEV
-    kubernetes.core.k8s:
-      state: present
-      force: yes
-      definition:
-        apiVersion: v1
-        kind: Secret
-        metadata:
-          name: "{{ lets_encrypt.account_key_secret_name }}"
-          namespace: dev
-        type: Opaque
-        data:
-          key: "{{ lets_encrypt_keys.account_key | b64encode }}"
-    become_user: "{{ ansible_env.SUDO_USER }}"  # Use the standard user. This is where the Kubernetes Python module is installed.
+######################################
+# Create Kubernetes Cluster on Master
+- hosts: masternode
+  gather_facts: no
+  become: yes
+  tasks:
+  - name: Include Lets Encrypt vars for when creating the Kubernetes cluster
+    ansible.builtin.include_vars:
+      file: lets_encrypt.yml
+    tags:
+    - create_k8s_cluster
 
-  - name: Create secret for Lets Encrypt PRIVATE key in DEV
-    kubernetes.core.k8s:
-      state: present
-      force: yes
-      definition:
-        apiVersion: v1
-        kind: Secret
-        metadata:
-          name: "{{ lets_encrypt.private_key_secret_name }}"
-          namespace: dev
-        type: Opaque
-        data:
-          key: "{{ lets_encrypt_keys.private_key | b64encode }}"
-    become_user: "{{ ansible_env.SUDO_USER }}"  # Use the standard user. This is where the Kubernetes Python module is installed.
+  - name: Create Kubernetes Cluster and setup all initial K8s secrets
+    include_tasks:
+      file: ansible_tasks/k8s-master.yml
+      apply:
+        tags: create_k8s_cluster
+    tags:
+    - create_k8s_cluster
 
-  - name: Create secret for Lets Encrypt ACCOUNT key in PROD
-    kubernetes.core.k8s:
-      state: present
-      force: yes
-      definition:
-        apiVersion: v1
-        kind: Secret
-        metadata:
-          name: "{{ lets_encrypt.account_key_secret_name }}"
-          namespace: prod
-        type: Opaque
-        data:
-          key: "{{ lets_encrypt_keys.account_key | b64encode }}"
-    become_user: "{{ ansible_env.SUDO_USER }}"  # Use the standard user. This is where the Kubernetes Python module is installed.
+  - name: Configure kubeconfig for non-root user
+    include_tasks:
+      file: ansible_tasks/nonroot-kubeconfig.yml
+      apply:
+        tags:
+          - create_k8s_cluster
+          - kubeconfig
+    tags:
+      - create_k8s_cluster
+      - kubeconfig
 
-  - name: Create secret for Lets Encrypt PRIVATE key in PROD
-    kubernetes.core.k8s:
-      state: present
-      force: yes
-      definition:
-        apiVersion: v1
-        kind: Secret
-        metadata:
-          name: "{{ lets_encrypt.private_key_secret_name }}"
-          namespace: prod
-        type: Opaque
-        data:
-          key: "{{ lets_encrypt_keys.private_key | b64encode }}"
-    become_user: "{{ ansible_env.SUDO_USER }}"  # Use the standard user. This is where the Kubernetes Python module is installed.
-  # End lets Encrypt keys
+  - name: Get cluster join command
+    shell: kubeadm token create $(kubeadm token generate) --print-join-command
+    become_user: "{{ ansible_env.SUDO_USER }}"
+    register: cluster_join_command
+    changed_when: False  # Task will return ok instead of changed
+    tags:
+    - create_k8s_cluster
+
+
+##################################
+# Join worker nodes to K8s cluster
+- hosts: k8s_workers
+  gather_facts: no
+  become: yes
+  tasks:
+  - name: Join nodes to Kubernetes cluster
+    include_tasks:
+      file: ansible_tasks/k8s-join-nodes-to-cluster.yml
+      apply:
+        tags: create_k8s_cluster
+    tags:
+    - create_k8s_cluster
+
+
+############################
+# Additional cluster configs
+- hosts: masternode
+  gather_facts: no
+  become: yes
+  tasks:
+  - name: Setup Helm binary on the master server
+    include_tasks:
+      file: ansible_tasks/setup-helm.yml
+      apply:
+        tags: helm_install
+    tags:
+    - helm_install
+
+  - name: Cluster Config - Create namespaces and secrets etc.
+    include_tasks:
+      file: ansible_tasks/k8s-cluster-configs.yml
+      apply:
+        tags: cluster_config
+        become: no  # not using sudo/root! run as the standard user!
+    tags:
+    - cluster_config
+
+  - name: Configure nginx-ingress-controller
+    include_tasks:
+      file: ansible_tasks/setup-nginx-ingress-controller.yml
+      apply:
+        tags: nginx_ingress
+        become: no  # Use standard user (it has kubeconfig set)
+    tags:
+    - nginx_ingress
+
+  - name: Configure nfs-subdir provisioner
+    include_tasks:
+      file: ansible_tasks/setup-nfs-subdir-provisioner.yml
+      apply:
+        tags: nfs_subdir
+        become: no  # Use standard user (it has kubeconfig set)
+    tags:
+    - nfs_subdir

@@ -11,6 +11,7 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
 spec:
+  ingressClassName: nginx  # Must specify the ingress controller (no default set)
   # Use TLS only if the secret variable is defined
   {{- if .Values.wordpress.ingress_tls_secret_name }}
   tls:

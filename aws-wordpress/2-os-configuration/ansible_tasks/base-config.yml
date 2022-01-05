@@ -1,4 +1,30 @@
 ---
+- name: Update /etc/hosts for local cluster
+  ansible.builtin.blockinfile:
+    path: /etc/hosts
+    block: |
+      {{ hostvars.masternode.ansible_host }} masternode.lexd.local controlplane.lexd.local
+      {{ hostvars.workernode1.ansible_host }} workernode1.lexd.local
+
+- name: Set OS hostname based on inventory_hostname
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+
+# /etc/resolv.conf is managed by systemd
+- name: Update /etc/systemd/resolved.conf to include lexd.local in search suffix
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/resolved.conf
+    regexp: '^Domains'
+    line: "Domains=lexd.local"
+    state: present
+  register: resolve_conf
+
+- name: Restart systemd-resolved service
+  ansible.builtin.service:
+    name: systemd-resolved.service
+    state: restarted
+  when: resolve_conf.changed
+
 - name: Set timezone to Australia/Sydney
   community.general.timezone:
     name: Australia/Sydney
@@ -21,13 +47,37 @@
     create: yes
   become_user: "{{ ansible_env.SUDO_USER }}"
 
+- name: Setup bashrc
+  ansible.builtin.copy:
+    dest: .bashrc.alex  # uses $HOME/.bashrc.alex
+    content: |
+      # Sys variables
+      export HISTSIZE=5000
+      export HISTFILESIZE=5000
+      export PYTHONSTARTUP=~/.pythonrc
+      export EDITOR=vim
+
+      # Force prompt to write history after every command.
+      export PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
+  become_user: "{{ ansible_env.SUDO_USER }}"
+
+- name: Ensure ~/.bashrc sources ~/.bashrc.alex
+  ansible.builtin.lineinfile:
+    path: .bashrc
+    regex: '^source ~/.bashrc.alex'
+    line: 'source ~/.bashrc.alex'
+    state: present
+  become_user: "{{ ansible_env.SUDO_USER }}"
+
 - name: Install base dependencies
   ansible.builtin.apt:
     name:
-      - snapd  # to install microk8s
       - python3-pip  # require to install Kubernetes python modules which is used by Ansible
       - jq  # to extract info from kubectl or docker output
       - net-tools  # to troubleshoot network related issues
+      - nfs-common  # require on nodes for nfs-subdir to work
+      - iotop
+      - iftop
     state: present
     update_cache: yes
 

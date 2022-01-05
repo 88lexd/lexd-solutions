@@ -1,0 +1,56 @@
+---
+- name: Check if kube-apiserver process is already running
+  shell: |
+    if [[ $(ps -A | grep kube-apiserver) ]]; then
+        ps -Af | grep kube-apiserver | grep -v grep
+    else
+        echo "KUBE_APISERVER_NOT_RUNNING"
+    fi
+  args:
+    executable: /bin/bash
+  register: kube_apiserver_status
+  changed_when: False  # Task will return ok instead of changed
+
+- name: Show current kube-apiserver process status
+  debug:
+    var: kube_apiserver_status.stdout
+
+- name: Using the following options for kubadm init
+  debug:
+    msg: "{{ kube_init_options | join(' ') }}"
+  when: kube_apiserver_status.stdout == "KUBE_APISERVER_NOT_RUNNING"
+
+- name: Create Kubernetes Cluster using kubeadm init
+  shell: "kubeadm init {{ kube_init_options | join(' ') }}"
+  args:
+    executable: /bin/bash
+  when: kube_apiserver_status.stdout == "KUBE_APISERVER_NOT_RUNNING"
+
+- name: Create kubeconfig directory for current user
+  ansible.builtin.file:
+    path: ".kube/"
+    state: directory
+  become_user: "{{ ansible_env.SUDO_USER }}"
+
+- name: Copy /etc/kubernetes/admin.conf to current user profile
+  ansible.builtin.copy:
+    src: /etc/kubernetes/admin.conf
+    dest: ".kube/config"
+    remote_src: yes
+    owner: "{{ ansible_env.SUDO_USER }}"
+    group: "{{ ansible_env.SUDO_USER }}"
+    mode: 0600
+
+- name: Check if there is wavenet is already deployed
+  shell: kubectl get daemonsets.apps -n kube-system -o json | jq -r '.items[].metadata.name' | grep 'weave-net' || echo "NOT_FOUND"
+  register: weave_net_status
+  become_user: "{{ ansible_env.SUDO_USER }}"
+  changed_when: False  # Task will return ok instead of changed
+
+- name: Install Weave CNI
+  shell: |
+    kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')&env.IPALLOC_RANGE={{ weave_cni_cidr }}"
+  args:
+    executable: /bin/bash
+  become_user: "{{ ansible_env.SUDO_USER }}"
+  when: weave_net_status.stdout == "NOT_FOUND"

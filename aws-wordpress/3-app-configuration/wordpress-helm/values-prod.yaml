@@ -2,7 +2,7 @@
 # This YAML file contains the "default" values to build the prod resources
 wordpress:
   deployment_image: wordpress:5.8.1-apache
-  deployment_replicas: 2
+  deployment_replicas: 1
   ingress_url: lexdsolutions.com
   ingress_tls_secret_name: lexdsolutions.com.tls
   container_resources: null  # Allow unlimited resources

@@ -69,13 +69,11 @@ $ terraform plan
 $ terraform apply
 ```
 
-
-# High Level Requirements (TO DO)
+# What this stack creates
 The following will be configured through Terraform
- - [x] VPC
- - [x] Public / Private Subnets
- - [x] Internet Gateway
- - [x] EIP
- - [x] Security Groups
- - [x] 1x EC2 to run MicroK8s (t3a.medium (2vCPU and 4GB RAM))
- - [x] Automated EBS snapsots
+ - VPC
+ - Public / Private Subnets
+ - Internet Gateway
+ - 3x Security Groups (Master node, Worker node & EFS)
+ - 2x EC instances (1x Master and 1x Worker node)
+ - Automated EBS snapsots via DLM Lifecycle

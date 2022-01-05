@@ -4,6 +4,13 @@ This Helm Chart is **created from scratch** to meet my own requirements.
 
 See my blog here to know more: https://lexdsolutions.com/2021/09/deploying-wordpress-and-mysql-on-kubernetes-using-helm-chart/
 
+# Important Update as of December 2021
+Since December 2021, I have started moving away from MicroK8s that uses a NFS backend for persistent storage to using a 3 node K8s cluster that is built using kubeadm.
+
+The new cluster is also configured to use GluserFS to provide High Availability when compared to a single MicroK8s node.
+
+The old Helm templates are now moved into the directory called `templates_old`
+
 # How to Deploy this Helm Chart
 First copy the helm chart over to the remote server (unless local kubectl is configured to connect to remote server)
 
@@ -25,6 +32,11 @@ Note: Namespace is created by Ansible during setup
 $ helm install wordpress-dev . --namespace=dev --values=values-dev.yaml
 ```
 
+## Install Dev Local
+Note: Namespace is created by Ansible during setup
+```
+$ helm install wordpress-dev . --namespace=dev --values=values-dev-local.yaml
+```
 
 # Troubleshooting
 Initial start, we get a database connection error "Error establishing a database connection"
