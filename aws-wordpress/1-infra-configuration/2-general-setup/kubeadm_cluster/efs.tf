@@ -8,6 +8,6 @@ resource "aws_efs_file_system" "k8s_efs" {
 
 resource "aws_efs_mount_target" "k8s_efs_target" {
   file_system_id = aws_efs_file_system.k8s_efs.id
-  subnet_id = module.vpc.private_subnets[0]
+  subnet_id = var.vpc_private_subnets[0]
   security_groups = [aws_security_group.efs_target.id]
 }
