@@ -87,9 +87,21 @@ locals {
       source_sg_id = var.jumpbox_sg_id
     },
     {
-      description  = "Access to master kube-apiserver Endpoint"
+      description  = "Worker to access to kube-apiserver endpoint"
       from_port    = 6443
       to_port      = 6443
+      source_sg_id = aws_security_group.k8s_workernodes.id
+    },
+    {
+      description  = "Jumpbox to access kube-apiserver endpoint"
+      from_port    = 6443
+      to_port      = 6443
+      source_sg_id = var.jumpbox_sg_id
+    },
+    {
+      description  = "Access to weavenet"
+      from_port    = 6783
+      to_port      = 6783
       source_sg_id = aws_security_group.k8s_workernodes.id
     }
   ]
@@ -102,6 +114,12 @@ locals {
       source_sg_id = var.jumpbox_sg_id
     },
     {
+      description  = "Master to access ingress controller service"
+      from_port    = 8443
+      to_port      = 8443
+      source_sg_id = aws_security_group.k8s_master.id
+    },
+    {
       description  = "Access to worker kubelet Endpoint"
       from_port    = 10250
       to_port      = 10250
@@ -111,6 +129,12 @@ locals {
       description  = "Access to worker nodeport services"
       from_port    = 30000
       to_port      = 32767
+      source_sg_id = aws_security_group.k8s_master.id
+    },
+    {
+      description  = "Access to weavenet"
+      from_port    = 6783
+      to_port      = 6783
       source_sg_id = aws_security_group.k8s_master.id
     }
   ]
