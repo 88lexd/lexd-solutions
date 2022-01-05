@@ -101,7 +101,7 @@ locals {
     {
       description  = "Access to weavenet"
       from_port    = 6783
-      to_port      = 6783
+      to_port      = 6784
       source_sg_id = aws_security_group.k8s_workernodes.id
     }
   ]
@@ -112,30 +112,49 @@ locals {
       from_port    = 22
       to_port      = 22
       source_sg_id = var.jumpbox_sg_id
+      source_cidrs = null
     },
     {
       description  = "Master to access ingress controller service"
       from_port    = 8443
       to_port      = 8443
       source_sg_id = aws_security_group.k8s_master.id
+      source_cidrs = null
     },
     {
       description  = "Access to worker kubelet Endpoint"
       from_port    = 10250
       to_port      = 10250
       source_sg_id = aws_security_group.k8s_master.id
+      source_cidrs = null
     },
     {
       description  = "Access to worker nodeport services"
       from_port    = 30000
       to_port      = 32767
       source_sg_id = aws_security_group.k8s_master.id
+      source_cidrs = null
     },
     {
       description  = "Access to weavenet"
       from_port    = 6783
-      to_port      = 6783
+      to_port      = 6784
       source_sg_id = aws_security_group.k8s_master.id
+      source_cidrs = null
+    },
+    {
+      description  = "Allow HTTP traffic to worker nodes"
+      from_port    = 80
+      to_port      = 80
+      source_sg_id = null
+      source_cidrs = ["0.0.0.0/0"]
+    },
+    {
+      description  = "Allow HTTPS traffic to worker nodes"
+      from_port    = 443
+      to_port      = 443
+      source_sg_id = null
+      source_cidrs = ["0.0.0.0/0"]
     }
   ]
 }
@@ -161,7 +180,8 @@ resource "aws_security_group_rule" "k8s_worker_kubelet_ingress" {
   to_port                  = local.k8s_worker_ingress[count.index].to_port
   protocol                 = "tcp"
   security_group_id        = aws_security_group.k8s_workernodes.id
-  source_security_group_id = local.k8s_worker_ingress[count.index].source_sg_id
+  source_security_group_id = local.k8s_worker_ingress[count.index].source_sg_id != null ? local.k8s_worker_ingress[count.index].source_sg_id : null
+  cidr_blocks              = local.k8s_worker_ingress[count.index].source_cidrs != null ? local.k8s_worker_ingress[count.index].source_cidrs : null
 }
 # End Security groups and rules for K8s instances
 #################################################

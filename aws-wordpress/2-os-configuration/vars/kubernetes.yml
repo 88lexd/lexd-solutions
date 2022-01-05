@@ -17,11 +17,11 @@ k8s_gpg_keyring_path: /usr/share/keyrings/kubernetes-archive-keyring.gpg
 kube_init_options:
   - --control-plane-endpoint=controlplane.lexd.local
   - --apiserver-cert-extra-sans=controlplane
-  - --pod-network-cidr=10.244.0.0/16
-  - --service-cidr=10.250.0.0/16  # This is the default CIDR but specifying it anyway
+  - --pod-network-cidr=172.16.0.0/16
+  - --service-cidr=172.17.0.0/16  # This is the default CIDR but specifying it anyway
 
 # IMPORTANT! This MUST MATCH the --pod-network-cidr!
-weave_cni_cidr: 10.244.0.0/16
+weave_cni_cidr: 172.16.0.0/16
 
 # kubernetes-xenial is currently the latest repo.
 # See: https://apt.kubernetes.io/apt/dists

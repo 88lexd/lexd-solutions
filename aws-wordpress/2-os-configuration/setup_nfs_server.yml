@@ -22,7 +22,7 @@
     lineinfile:
       path: /etc/exports
       regexp: '^/efs'
-      line: "/efs {{ nfs_client_cidr }}(rw,sync,no_root_squash)"
+      line: "/efs / {{ nfs_client_cidr }}(rw,sync,no_root_squash)"
       state: present
 
   - name: Enable and restart NFS service

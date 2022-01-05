@@ -47,3 +47,13 @@ This new playbook uses Ansible roles to perform the following:
  1) Base OS configuration with my personal settings.
  2) Install and configure GlusterFS on 3 servers (2 replica + 1 arbiter). This will enable HA (High Availability) for volumes in Kubernetes.
  3) Install and configre Kubernetes using kubeadm.
+
+
+# Troubleshooting
+## CoreDNS issue
+On the first OS configuration. CoreDNS pods uses the default 10.244.0.0/16 CIDR. Since I had configured weavenet to use the 172.16.0.0/16 subnet I had to restart the coredns deployment to fix DNS issues within the cluster.
+
+```
+# Run the following command:
+$ kubectl -n kube-system rollout restart deployment coredns
+```
