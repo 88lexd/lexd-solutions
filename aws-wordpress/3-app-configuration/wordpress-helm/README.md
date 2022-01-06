@@ -1,8 +1,5 @@
 # App Configuration
-
 This Helm Chart is **created from scratch** to meet my own requirements.
-
-See my blog here to know more: https://lexdsolutions.com/2021/09/deploying-wordpress-and-mysql-on-kubernetes-using-helm-chart/
 
 # How to Deploy this Helm Chart
 First copy the helm chart over to the remote server (unless local kubectl is configured to connect to remote server)
