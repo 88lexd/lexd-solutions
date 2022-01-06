@@ -17,7 +17,7 @@ resource "aws_security_group" "efs_target" {
       ipv6_cidr_blocks = null
       prefix_list_ids  = null
       # sg-091d91a3132ebef48 = MicroK8s node! This needs to be removed later
-      security_groups  = [var.jumpbox_sg_id, aws_security_group.k8s_master.id, aws_security_group.k8s_workernodes.id, "sg-091d91a3132ebef48"]
+      security_groups  = [var.jumpbox_sg_id, aws_security_group.k8s_master.id, aws_security_group.k8s_workernodes.id]
       self             = null
     }
   ]

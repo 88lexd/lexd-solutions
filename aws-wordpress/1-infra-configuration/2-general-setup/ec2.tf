@@ -31,10 +31,11 @@ module "ec2_instance" {
   tags = var.ec2_instance_tags
 }
 
-resource "aws_eip_association" "eip_assoc" {
-  instance_id   = module.ec2_instance.id
-  allocation_id = var.eip_alloc_id
-}
+# EIP is now attached to kubeadm_cluster's worker node
+# resource "aws_eip_association" "eip_assoc" {
+#   instance_id   = module.ec2_instance.id
+#   allocation_id = var.eip_alloc_id
+# }
 
 # Let's not create EIP with Terraform as a 'terraform destroy' will remove this production IP with it
 # resource "aws_eip" "ec2-eip" {
