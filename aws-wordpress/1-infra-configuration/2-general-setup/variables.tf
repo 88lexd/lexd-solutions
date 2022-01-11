@@ -4,13 +4,6 @@ variable "aws_region" {
   default = "ap-southeast-2"
 }
 
-# TO BE DEL LATER. Moved into kubeadm_cluster module
-variable "eip_alloc_id" {
-  description = "Allocation ID of an existing EIP"
-  type = string
-  default = "eipalloc-0a68ead1a441b9730"
-}
-
 ####################################
 # Begin VPC Settings
 variable "vpc_name" {
@@ -43,58 +36,6 @@ variable "vpc_public_subnets" {
   default = ["10.0.10.0/24", "10.0.20.0/24", "10.0.30.0/24"]
 }
 # End VPC Settings
-
-
-############################
-# BEGIN EC2 Settings
-
-# TO DELETE
-variable "ec2_instance_name" {
-  description = "Name for the EC2 instance"
-  type = string
-  default = "MasterNode"
-}
-
-# TO DELETE
-variable "ec2_instance_type" {
-  description = "Instance type"
-  type = string
-  default = "t3a.medium"
-}
-
-# TO DELETE
-variable "ec2_instance_tags" {
-  description = "Tags to attach to the EC2 instance"
-  type = object({
-    Snapshot = string
-  })
-  default = {
-    Snapshot = "True"
-  }
-}
-
-# TO BE DEL LATER. Moved into kubeadm_cluster module
-variable "ec2_keypair_name" {
-  description = "Key Pair name (must already exist!)"
-  type = string
-  default = "alex-lexdsolutions"  # This key must already exist! Unfortunately cannot automate this.
-}
-
-# TO BE DEL LATER. Moved into kubeadm_cluster module
-variable "ec2_ami_name" {
-  description = "Name of the AMI to use (wild card to search all but will use most recent)"
-  type = list(string)
-  # default = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]  # Using * will replace my instance when there's a new AMI!
-  default = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20210907"]
-}
-
-# TO BE DEL LATER. Moved into kubeadm_cluster module
-variable "ec2_ami_owner_id" {
-  description = "Owner ID of the AMI"
-  type = list(string)
-  default = ["099720109477"]  # Canonical
-}
-# END EC2 SETTINGS
 
 
 ##############################################
