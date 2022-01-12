@@ -61,7 +61,7 @@ class EC2:
             instance = self.ec2_resource.Instance(self.instance_id)
             print(f"Instance State: {instance.state['Name']}")
             time.sleep(5)
-        print('Instance started successfully!')
+        print(f'Instance started successfully! (public IP: {self.get_public_ip()})')
 
 
     def get_public_ip(self):

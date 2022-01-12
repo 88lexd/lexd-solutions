@@ -98,7 +98,7 @@ Start the instance? (yes/no): yes
 Starting the instance...
 Instance State: pending
 Instance State: running
-Instance started successfully!
+Instance started successfully! (public IP: 52.63.xx.yy)
 
 Update security group? (yes/no): yes
 Updating security group...
