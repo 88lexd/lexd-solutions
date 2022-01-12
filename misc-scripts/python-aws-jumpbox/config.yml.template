@@ -1,0 +1,32 @@
+---
+# The AWS credential to use (uses what's in ~/.aws/credentials)
+aws_profile_name: alex
+
+# The AWS region in which the jumpbox is located
+aws_region: ap-southeast-2
+
+# Instance ID of the jumpbox
+instance_id: i-0a6xxxxx
+
+# Security Group ID which the jumpbox uses
+sg_id: sg-0db47xxxx
+
+# This description is later used for removing the rule
+# Ensure it is unique enough so script will not remove an incorrect rule in the SG
+sg_rule_description: MyDynamicIP
+
+# A list of ingress rules which will be added to the SG
+sg_ingress_rules:
+- protocol: tcp
+  source_cidr: USE_CURRENT_PUBLIC_IP  # Either set an IPv4 CIDR or set the string "USE_CURRENT_PUBLIC_IP" to auto detect
+  from_port: 22
+  to_port: 22
+
+# This enables VS Code to remote SSH to the jumpbox
+# The .ssh/config file location. Script expects "Host aws-jumpbox" to exist in the file. Example:
+# Host aws-jumpbox
+#     HostName w.x.y.z
+#     User ubuntu
+#     IdentityFile "C:\Users\Alex\.ssh\my-key.pem"
+# Note: I am pointing to /mnt/c/ is because I am using WSL on Windows
+ssh_config_file: /mnt/c/Users/Alex/.ssh/config
