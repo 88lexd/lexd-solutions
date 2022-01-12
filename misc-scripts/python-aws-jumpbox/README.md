@@ -125,7 +125,7 @@ $ aws-jumpbox --file config.yml --stop
 ===============================
 AWS Jumpbox Script by Alex Dinh
 ===============================
-Found the instance using id [i-0a674f430ae92d9a2]
+Found the instance using id [i-0a67xxx]
 
 -----------------
 Tags on Instance:
