@@ -103,7 +103,7 @@ class EC2:
 
         print(f"Displaying ingress rules for - {self.security_group_id}")
         for rule in security_group.ip_permissions:
-            print(f"  Protcol: {rule['IpProtocol']} | From Port: {rule['FromPort']} | To Port: {rule['ToPort']} | Source: {rule['IpRanges']}")
+            print(f"  Protocol: {rule['IpProtocol']} | From Port: {rule['FromPort']} | To Port: {rule['ToPort']} | Source: {rule['IpRanges']}")
 
         print("Security group updated successfully!")
 
@@ -114,7 +114,7 @@ class EC2:
         for rule in security_group.ip_permissions:
             for ip_range in rule['IpRanges']:
                 if ip_range.get('Description') == rule_description:
-                    print(f"  Removing -- Protcol: {rule['IpProtocol']} | From Port: {rule['FromPort']} | To Port: {rule['ToPort']} | Source: {ip_range['CidrIp']}")
+                    print(f"  Removing -- Protocol: {rule['IpProtocol']} | From Port: {rule['FromPort']} | To Port: {rule['ToPort']} | Source: {ip_range['CidrIp']}")
                     security_group.revoke_ingress(
                         IpPermissions=[
                             {

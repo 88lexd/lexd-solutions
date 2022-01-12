@@ -106,7 +106,7 @@ Getting current outbound public IP...
   Current External IP: 49.195.xx.yy
 Updating security group ingress rules...
 Displaying ingress rules for - sg-0db4xxx
-  Protcol: tcp | From Port: 22 | To Port: 22 | Source: [{'CidrIp': '49.195.xx.yy/32', 'Description': 'MyDynamicIP'}]
+  Protocol: tcp | From Port: 22 | To Port: 22 | Source: [{'CidrIp': '49.195.xx.yy/32', 'Description': 'MyDynamicIP'}]
 Security group updated successfully!
 
 Update .ssh/config file? (yes/no): yes
@@ -145,7 +145,7 @@ Instance stopped successfully!
 
 Clean security group rule(s)? (yes/no): yes
 Cleaning security group rules with description [MyDynamicIP]...
-  Removing -- Protcol: tcp | From Port: 22 | To Port: 22 | Source: 49.195.xx.yy/32
+  Removing -- Protocol: tcp | From Port: 22 | To Port: 22 | Source: 49.195.xx.yy/32
 Security group cleaning completed!
 
 Script completed!
