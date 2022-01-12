@@ -26,7 +26,7 @@ created virtual environment CPython3.8.10.final.0-64 in 83ms
   activators BashActivator,CShellActivator,FishActivator,PowerShellActivator,PythonActivator,XonshActivator
 Collecting boto3
   Downloading boto3-1.20.33-py3-none-any.whl (131 kB)
-     |████████████████████████████████| 131 kB 1.4 MB/s
+  ...
 Collecting pyyaml
   Using cached PyYAML-6.0-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl (701 kB)
 Processing /home/alex/.cache/pip/wheels/a0/16/9c/5473df82468f958445479c59e784896fa24f4a5fc024b0f501/termcolor-1.1.0-py3-none-any.whl
@@ -36,7 +36,7 @@ Collecting s3transfer<0.6.0,>=0.5.0
   Using cached s3transfer-0.5.0-py3-none-any.whl (79 kB)
 Collecting botocore<1.24.0,>=1.23.33
   Downloading botocore-1.23.33-py3-none-any.whl (8.5 MB)
-     |████████████████████████████████| 8.5 MB 4.5 MB/s
+  ...
 Collecting urllib3<1.27,>=1.25.4
   Using cached urllib3-1.26.8-py2.py3-none-any.whl (138 kB)
 Collecting python-dateutil<3.0.0,>=2.1
@@ -51,9 +51,12 @@ Append the following line to your .bashrc as an alias for easy script trigger
 alias aws-jumpbox='/home/alex/code/git/lexd-solutions/misc-scripts/python-aws-jumpbox/venv/bin/python3 /home/alex/code/git/lexd-solutions/misc-scripts/python-aws-jumpbox/jumpbox.py '
 ```
 
-Secondly, this script will also update the .ssh/config file with the current instance's public IP. The script uses regex to do this. It is important that the .ssh/config file contains the host called 'aws-jumpbox' then follow by the HostName configuration. Example:
+Secondly, for VS Code to use Remote SSH to the jumpbox, this script will also update the .ssh/config file with the current instance's public IP.
+
+The script uses regex to do this. It is important that the .ssh/config file contains the host called 'aws-jumpbox' then follow by the HostName configuration. Example:
 
 ```
+# Note: I am using WSL on Windows
 $ cat /mnt/c/Users/Alex/.ssh/config
 Host aws-jumpbox
     HostName w.x.y.z
@@ -76,7 +79,7 @@ To start the jumpbox, pass in `--start` to the script.
 
 Example:
 ```
-$ aws-jumpbox -f config.yml --start
+$ aws-jumpbox --file config.yml --start
 ===============================
 AWS Jumpbox Script by Alex Dinh
 ===============================
