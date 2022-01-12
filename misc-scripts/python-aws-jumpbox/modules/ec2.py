@@ -72,10 +72,6 @@ class EC2:
     def update_security_group(self, ingress_rules, rule_description):
         security_group = self.ec2_resource.SecurityGroup(self.security_group_id)
 
-        print(f"Displaying current ingress rules for - {self.security_group_id} (only showing rules where 'source' is an IP CIDR)")
-        for rule in security_group.ip_permissions:
-            print(f"  Protcol: {rule['IpProtocol']} | From Port: {rule['FromPort']} | To Port: {rule['ToPort']} | Source: {rule['IpRanges']}")
-
         print("Getting current outbound public IP...")
         external_ip = urllib.request.urlopen('https://ifconfig.me').read().decode('utf8')
 
@@ -104,6 +100,10 @@ class EC2:
                     print(f"  Warning: {ce.response['Error']['Message']}")
                 else:
                     raise
+
+        print(f"Displaying ingress rules for - {self.security_group_id}")
+        for rule in security_group.ip_permissions:
+            print(f"  Protcol: {rule['IpProtocol']} | From Port: {rule['FromPort']} | To Port: {rule['ToPort']} | Source: {rule['IpRanges']}")
 
         print("Security group updated successfully!")
 
