@@ -1,0 +1,49 @@
+# The tasks are based off the installation instructions outlined here:
+# https://github.com/containerd/containerd/blob/main/docs/cri/installation.md
+---
+- name: Install required library for seccomp
+  ansible.builtin.apt:
+    name: libseccomp2
+    update_cache: yes
+    state: present
+
+- name: Check containerd status
+  shell: |
+    if [[ $(ps -A | grep containerd) ]]; then
+        ps -Af | grep containerd | grep -v grep
+    else
+        echo "CONTAINERD_NOT_RUNNING"
+    fi
+  args:
+    executable: /bin/bash
+  register: containerd_status
+  changed_when: False  # Task will return ok instead of changed
+
+- name: Download and extract containerd tarball at root (/) level
+  ansible.builtin.unarchive:
+    src: "{{ containerd_tarball_url }}"
+    remote_src: yes
+    dest: /
+  when: containerd_status.stdout == "CONTAINERD_NOT_RUNNING"
+  register: containerd_unarchived
+
+- name: Remove default CNI config
+  ansible.builtin.file:
+    path: /etc/cni/net.d/10-containerd-net.conflist
+    state: absent
+
+- name: Ensure CRI plugin is not disabled
+  ansible.builtin.lineinfile:
+    path: /etc/containerd/config.toml
+    regexp: '^disabled_plugins'
+    line: disabled_plugins = [""]
+  when: containerd_unarchived.changed
+  register: containerd_config
+
+# sudo systemctl daemon-reload; sudo systemctl start containerd
+- name: Enable and start containerd.service
+  ansible.builtin.service:
+    name: containerd.service
+    enabled: yes
+    state: restarted
+  when: containerd_config.changed
