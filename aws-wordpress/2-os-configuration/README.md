@@ -54,6 +54,11 @@ This new playbook will configure the following:
  9) Install and setup Nginx Ingress Controller
  10) Install and setup NFS-Subdir External Provisioner (this enables dynamic PV provisioning on EFS)
 
+## How to run the playbook:
+Use the following:
+```
+$ ansible-playbook -i inventory_aws.ini main.yml --ask-vault-pass
+```
 
 # Troubleshooting
 ## CoreDNS issue
