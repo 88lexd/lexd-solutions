@@ -1,5 +1,5 @@
 # Important Note
-As of Jan 2022, I've created a new Kubernetes cluster to replace the initial MicroK8s deployment. This new playbook will:
+As of Jan 2022, I've created a new Kubernetes cluster to replace the initial MicroK8s deployment.
 
 In this new setup, I am using 2 nodes (1x Master / 1x Worker) in a cluster instead of 1 MicroK8s node.
 
