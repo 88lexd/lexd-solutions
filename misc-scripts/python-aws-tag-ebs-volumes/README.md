@@ -1,6 +1,8 @@
 # Tag EBS Volumes
 Script to tag EBS volumes by using the tag information from the EC2 instance which it is attached to.
 
+Learn more about this script by reading my blog post here: https://lexdsolutions.com/2021/11/aws-tagging-ebs-volumes-by-using-the-attached-instance-tags/
+
 ## Install and Activate Boto3 in a Virtual Environment
 First install boto3 module if not yet already installed.
 
