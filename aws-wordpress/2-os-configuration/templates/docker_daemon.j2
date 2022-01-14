@@ -1,6 +1,0 @@
-{
-  "exec-opts": ["native.cgroupdriver=systemd"],
-  "log-driver": "{{ docker_daemon.log_driver }}",
-  "log-opts": {{ docker_daemon.log_ops | to_nice_json }},
-  "storage-driver": "{{ docker_daemon.storage_driver }}"
-}

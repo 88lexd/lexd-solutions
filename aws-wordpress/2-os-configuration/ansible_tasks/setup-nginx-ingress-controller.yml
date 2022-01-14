@@ -27,7 +27,6 @@
         create: "true"
       controller:
         kind: DaemonSet
+        hostNetwork: "true"
       service:
         type: ClusterIP
-      controller:
-        hostNetwork: "true"
