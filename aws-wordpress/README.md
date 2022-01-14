@@ -6,30 +6,23 @@ From day 1, everything is built using IaC (infrastructure as code). The followin
  - Amazon Web Service (AWS)
  - EC2 (Ubuntu)
  - S3 and DynamoDB for Terraform state and locking
- - Kubernetes (MicroK8s)
+ - Kubernetes
  - CloudFormation (base-setup)
  - Terraform (provision infrastructure to support the application)
  - Ansible (configure the OS and setup MicroK8s)
  - LetsEncrypt (TLS certificate for Ingress)
 
- ## Design Decisions
-The initial design is to keep this at the lowest cost possible. Once traffic picks up then the next phase will be to scale out.
-
-Reason to use MicroK8s is so I can be more of a consumer of Kubernetes and not so much on the administration side to begin with.
-
-More details about the design decisions and the future phases of this project will be oulined in my future blogs.
-
 # Folder Structure
 ## 1-infra-configuration
-Contains the code for configuring the AWS infrastructure. Tools include:
+Contains the code for configuring the AWS infrastructure. Tools used include:
  - AWS CloudFormation
  - Terraform
 
 ## 2-os-configuration
-Contains the code for configuring the EC2 instances with Microk8s and other custom settings on the OS. Tools include:
+Contains the code for configuring the EC2 instances with Kubernetes and other custom settings on the OS. Tools used include:
 
  - Ansible
 
 ## 3-app-configuration
-Contains the Helm chart for installing and spinning up resources on Kubernetes for the WordPress site. Tools include:
+Contains the Helm chart for installing and spinning up resources on Kubernetes for the WordPress site. Tools used include:
  - Kubernetes Helm Chart
