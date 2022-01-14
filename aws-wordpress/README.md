@@ -9,7 +9,7 @@ From day 1, everything is built using IaC (infrastructure as code). The followin
  - Kubernetes
  - CloudFormation (base-setup)
  - Terraform (provision infrastructure to support the application)
- - Ansible (configure the OS and setup MicroK8s)
+ - Ansible (configure the OS and setup Kubernetes)
  - LetsEncrypt (TLS certificate for Ingress)
 
 # Folder Structure
