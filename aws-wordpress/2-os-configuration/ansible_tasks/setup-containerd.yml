@@ -41,13 +41,20 @@
     state: absent
   when: containerd_status.stdout == "CONTAINERD_NOT_RUNNING"
 
-# - name: Ensure CRI plugin is not disabled
-#   ansible.builtin.lineinfile:
-#     path: /etc/containerd/config.toml
-#     regexp: '^disabled_plugins'
-#     line: disabled_plugins = [""]
-#   when: containerd_unarchived.changed
-#   register: containerd_config
+- name: Check if /etc/containerd/config.toml exists
+  ansible.builtin.stat:
+    path: /etc/containerd/config.toml
+  register: containerd_config_toml
+
+- name: Create /etc/containerd/ directory
+  ansible.builtin.file:
+    path: /etc/containerd
+    state: directory
+  when: not containerd_config_toml.stat.exists
+
+- name: Generate default /etc/containterd/config.toml file
+  shell: containerd config default | tee /etc/containerd/config.toml
+  when: not containerd_config_toml.stat.exists
 
 - name: Run daemon-reload
   ansible.builtin.systemd:
