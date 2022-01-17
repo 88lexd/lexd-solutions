@@ -45,7 +45,7 @@ This new playbook will configure the following:
 
  1) Apply base OS configuration with my personal settings on all nodes
  2) Install and Setup CloudWatch agent on all nodes
- 3) Install and configure Docker Container Runtime on all nodes
+ 3) Install and configure Containerd as the Container Runtime on all nodes
  4) Prepare nodes for Kubernetes install (e.g. disabling swap, configuring br_netfilter etc.)
  5) Install Kubernetes packages on all nodes (e.g. kubeadm, kubectl, kubelet)
  6) Create Kubernetes cluster by using kubeadm
