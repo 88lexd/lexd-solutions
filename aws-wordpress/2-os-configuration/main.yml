@@ -34,19 +34,33 @@
     tags:
     - install_cloudwatch_agent
 
-  - name: Import docker vars so can be passed into the next include role task
-    ansible.builtin.include_vars:
-      file: vars/docker.yml
-    tags:
-    - install_docker
+  # - name: Import docker vars so can be passed into the next include role task
+  #   ansible.builtin.include_vars:
+  #     file: vars/docker.yml
+  #   tags:
+  #   - install_docker
 
-  - name: Install and Configure Docker on K8s nodes
-    include_tasks:
-      file: ansible_tasks/setup-docker.yml
-      apply:
-        tags: install_docker
+  # - name: Install and Configure Docker on K8s nodes
+  #   include_tasks:
+  #     file: ansible_tasks/setup-docker.yml
+  #     apply:
+  #       tags: install_docker
+  #   tags:
+  #   - install_docker
+
+  - name: Import containerd vars so can be passed into the next include_task
+    ansible.builtin.include_vars:
+      file: vars/containerd.yml
     tags:
-    - install_docker
+    - containerd
+
+  - name: Install and Configure containerd on K8s nodes
+    include_tasks:
+      file: ansible_tasks/setup-containerd.yml
+      apply:
+        tags: containerd
+    tags:
+    - containerd
 
   - name: Import kubernetes vars so can be passed into the next include role task
     ansible.builtin.include_vars:
@@ -61,6 +75,7 @@
         tags: install_k8s
     tags:
     - install_k8s
+    - containerd  # There are 2 tasks in here that is related to containerd
 
 
 ######################################

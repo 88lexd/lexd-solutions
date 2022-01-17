@@ -13,4 +13,4 @@
     release_values:
       nfs:
         server: "{{ nfs_endpoint }}"
-        path: "/"
+        path: "{{ nfs_path }}"
