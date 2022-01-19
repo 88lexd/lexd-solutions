@@ -92,7 +92,6 @@ variable "dlm_target_tags" {
     Snapshot = string
   })
   default = {
-    Snapshot = "true"
     Snapshot = "True"
   }
 }
