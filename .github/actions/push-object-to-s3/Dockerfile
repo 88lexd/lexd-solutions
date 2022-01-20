@@ -6,7 +6,9 @@ ENV AWSCLI_PKG='https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip'
 RUN yum install -y unzip
 
 RUN curl "${AWSCLI_PKG}" -o awscliv2.zip
-RUN unzip -f awscliv2.zip && ./aws/install
+RUN unzip awscliv2.zip && \
+    ./aws/install && \
+    rm -rf awscliv2.zip ./aws/install
 
 COPY entrypoint.sh /entrypoint.sh
 
