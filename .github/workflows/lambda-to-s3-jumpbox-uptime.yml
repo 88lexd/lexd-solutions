@@ -30,13 +30,14 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Zip main.py in src/
-        run: zip lambda-jumpbox-uptime.zip main.py
-
+        run: |
+          zip lambda-jumpbox-uptime.zip main.py
+          pwd
+          ls -l lambda-jumpbox-uptime.zip
 
       - name: Custom docker container action to push object to S3
         uses: ./.github/actions/push-object-to-s3 # Uses an action in the root directory
         with:
-          path: lambda-jumpbox-uptime.zip
           aws_access_key_id: ${{ secrets.DOCKER_HUB_USERNAME }}
           aws_secret_access_key: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
           aws_region: ap-southeast-2
