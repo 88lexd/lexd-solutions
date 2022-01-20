@@ -16,7 +16,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  zip-source:
+  build:
     runs-on: ubuntu-latest
     steps:
       # To use this repository's private action,
@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Zip main.py in src to /tmp
-        run: zip /tmp/lambda-jumpbox-uptime.zip ./aws-wordpress/3-app-configuration/lambda-jumpbox-uptime/src/main.py
+        run: zip lambda-jumpbox-uptime.zip ./aws-wordpress/3-app-configuration/lambda-jumpbox-uptime/src/main.py
 
       - name: Custom docker container action to push object to S3
         uses: ./.github/actions/push-object-to-s3 # Uses an action in the root directory
@@ -34,6 +34,6 @@ jobs:
           aws_secret_access_key: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
           aws_region: ap-southeast-2
           aws_s3_bucket_name:
-          source_file: /tmp/lambda-jumpbox-uptime.zip
+          source_file: lambda-jumpbox-uptime.zip
           destination_path: /
           destination_file_name: lambda-jumpbox-uptime.zip
