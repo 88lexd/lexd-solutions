@@ -1,0 +1,44 @@
+# This workflow will upload the code for the lambda-jumpbox-uptime to the S3 bucket called "lexd-solutions-lambdas"
+
+name: CI for Lambda to S3 for Jumpbox Uptime
+
+on:
+  push:
+    branches: [ main, lambdaJumpboxUptime]
+    paths:
+    - 'aws-wordpress/3-app-configuration/lambda-jumpbox-uptime/src'
+  pull_request:
+    branches: [ main, lambdaJumpboxUptime]
+    paths:
+    - 'aws-wordpress/3-app-configuration/lambda-jumpbox-uptime/src'
+
+  # Allows workflow to run manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./aws-wordpress/3-app-configuration/lambda-jumpbox-uptime/src
+
+    steps:
+      # To use this repository's private action,
+      # you must check out the repository
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Zip main.py in src/
+        run: zip lambda-jumpbox-uptime.zip main.py
+
+      - name: Custom docker container action to push object to S3
+        uses: ./actions/push-object-to-s3 # Uses an action in the root directory
+        with:
+          aws_access_key_id: ${{ secrets.DOCKER_HUB_USERNAME }}
+          aws_secret_access_key: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+          aws_region: ap-southeast-2
+          aws_s3_bucket_name:
+          source_file: lambda-jumpbox-uptime.zip
+          destination_path: /
+          destination_file_name: lambda-jumpbox-uptime.zip
