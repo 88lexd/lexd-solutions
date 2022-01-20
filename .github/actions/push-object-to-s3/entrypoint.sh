@@ -2,6 +2,10 @@
 
 set -e
 
+pwd
+ls -l
+ls -l /tmp
+
 PROFILE_NAME="push-obj-s3"
 
 # GitHub Actions will prefix env vars with INPUT_ and make them uppercase

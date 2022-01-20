@@ -27,24 +27,6 @@ jobs:
       - name: Zip main.py in src to /tmp
         run: zip /tmp/lambda-jumpbox-uptime.zip ./aws-wordpress/3-app-configuration/lambda-jumpbox-uptime/src/main.py
 
-      - name: Save zip artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: lambda-jumpbox-uptime
-          path: /tmp/lambda-jumpbox-uptime.zip
-
-  upload-source-to-s3:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Retrieve zip artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: lambda-jumpbox-uptime
-          path: /tmp/lambda-jumpbox-uptime.zip
-
       - name: Custom docker container action to push object to S3
         uses: ./.github/actions/push-object-to-s3 # Uses an action in the root directory
         with:
