@@ -24,16 +24,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Zip main.py in src to /tmp
-        run: zip lambda-jumpbox-uptime.zip ./aws-wordpress/3-app-configuration/lambda-jumpbox-uptime/src/main.py
+      - name: zip main.py in src/ to current workspace dir
+        run: |
+          mkdir artifact
+          zip ./artifact/lambda-jumpbox-uptime.zip ./aws-wordpress/3-app-configuration/lambda-jumpbox-uptime/src/main.py
 
       - name: Custom docker container action to push object to S3
-        uses: ./.github/actions/push-object-to-s3 # Uses an action in the root directory
+        uses: ./.github/actions/push-object-to-s3
         with:
           aws_access_key_id: ${{ secrets.DOCKER_HUB_USERNAME }}
           aws_secret_access_key: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
           aws_region: ap-southeast-2
-          aws_s3_bucket_name:
-          source_file: lambda-jumpbox-uptime.zip
+          aws_s3_bucket_name: lexd-solutions-lambdas
+          source_file: ./artifact/lambda-jumpbox-uptime.zip
           destination_path: /
           destination_file_name: lambda-jumpbox-uptime.zip

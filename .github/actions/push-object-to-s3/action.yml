@@ -18,7 +18,7 @@ inputs:
     description: AWS S3 Bucket Name where the dist file is uploaded
     required: true
   source_file:
-    description: Path of the single file (./myFunction.zip)
+    description: Path of the single file (myFunction.zip)
     required: true
   destination_path:
     description: Full path to store the object (e.g. /functionA/, or put / to place it in the bucket root dir)
