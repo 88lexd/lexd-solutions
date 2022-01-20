@@ -4,11 +4,6 @@ set -e
 
 PROFILE_NAME="push-obj-s3"
 
-# REMOVE THIS LATER
-INPUT_AWS_ACCESS_KEY_ID="AKIAZ53XONRTZT54HBXN"
-INPUT_AWS_SECRET_ACCESS_KEY="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"
-INPUT_AWS_REGION="ap-southeast-2"
-
 # GitHub Actions will prefix env vars with INPUT_ and make them uppercase
 aws configure set aws_access_key_id ${INPUT_AWS_ACCESS_KEY_ID} --profile ${PROFILE_NAME}
 aws configure set aws_secret_access_key ${INPUT_AWS_SECRET_ACCESS_KEY} --profile ${PROFILE_NAME}
