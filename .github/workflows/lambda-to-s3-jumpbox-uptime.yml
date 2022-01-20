@@ -4,11 +4,11 @@ name: CI for Lambda to S3 for Jumpbox Uptime
 
 on:
   push:
-    branches: [ main, lambdaJumpboxUptime]
+    branches: [ main]
     paths:
     - 'aws-wordpress/3-app-configuration/lambda-jumpbox-uptime/src'
   pull_request:
-    branches: [ main, lambdaJumpboxUptime]
+    branches: [ main]
     paths:
     - 'aws-wordpress/3-app-configuration/lambda-jumpbox-uptime/src'
 
@@ -33,7 +33,7 @@ jobs:
         run: zip lambda-jumpbox-uptime.zip main.py
 
       - name: Custom docker container action to push object to S3
-        uses: ./actions/push-object-to-s3 # Uses an action in the root directory
+        uses: ./.github/actions/push-object-to-s3 # Uses an action in the root directory
         with:
           aws_access_key_id: ${{ secrets.DOCKER_HUB_USERNAME }}
           aws_secret_access_key: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
