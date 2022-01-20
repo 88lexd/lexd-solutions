@@ -32,8 +32,8 @@ jobs:
       - name: Custom docker container action to push object to S3
         uses: ./.github/actions/push-object-to-s3
         with:
-          aws_access_key_id: ${{ secrets.DOCKER_HUB_USERNAME }}
-          aws_secret_access_key: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+          aws_access_key_id: ${{ secrets.AWS_LAMBDA_S3_ACCESS_KEY }}
+          aws_secret_access_key: ${{ secrets.AWS_LAMBDA_S3_SECRET_KEY }}
           aws_region: ap-southeast-2
           aws_s3_bucket_name: lexd-solutions-lambdas
           source_file: ./artifact/lambda-jumpbox-uptime.zip
