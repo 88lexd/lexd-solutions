@@ -1,0 +1,28 @@
+# This action is designed for uploading Lambda code to S3 as a single ZIP file
+name: "Push object to S3"
+description: "Push SINGLE object to s3"
+runs:
+  using: docker
+  image: Dockerfile
+inputs:
+  aws_access_key_id:
+    description: AWS Access Key Id
+    required: true
+  aws_secret_access_key:
+    description: AWS Access Key Secret
+    required: true
+  aws_region:
+    description: AWS Region
+    required: true
+  aws_s3_bucket_name:
+    description: AWS S3 Bucket Name where the dist file is uploaded
+    required: true
+  source_file:
+    description: Path of the single file (./myFunction.zip)
+    required: true
+  destination_path:
+    description: Full path to store the object (e.g. /functionA/, or put / to place it in the bucket root dir)
+    required: true
+  destination_file_name:
+    description: Name for the destination file on S3 (e.g. myFunction.zip)
+    required: true

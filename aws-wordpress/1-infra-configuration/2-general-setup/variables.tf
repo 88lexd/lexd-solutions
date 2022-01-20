@@ -92,8 +92,17 @@ variable "dlm_target_tags" {
     Snapshot = string
   })
   default = {
-    Snapshot = "true"
     Snapshot = "True"
   }
 }
 # END Data Lifecycle Manager (DLM) Settings
+
+########################
+# Begin Lambda Function
+variable "lambda_s3_bucket_name" {
+  description = "Name for the S3 bucket to store Lambda zip files. This is where GitHub Actions will drop the archives"
+  type = string
+  default = "lexd-solutions-lambdas"
+}
+
+# End Lambda Function
