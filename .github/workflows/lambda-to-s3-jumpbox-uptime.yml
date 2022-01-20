@@ -4,9 +4,11 @@ name: CI for Lambda to S3 for Jumpbox Uptime
 
 on:
   push:
+    branches: [ main ]
     paths:
     - 'aws-wordpress/3-app-configuration/lambda-jumpbox-uptime/src/**'
   pull_request:
+    branches: [ main ]
     paths:
     - 'aws-wordpress/3-app-configuration/lambda-jumpbox-uptime/src/**'
 
