@@ -21,7 +21,7 @@ inputs:
     description: Path of the single file (myFunction.zip)
     required: true
   destination_path:
-    description: Full path to store the object (e.g. /functionA/, or put / to place it in the bucket root dir)
+    description: Full path to store the object (e.g. /functionA/ (for a directory; MUST END IN '/' !!), or put '/'' to upload tothe bucket root dir)
     required: true
   destination_file_name:
     description: Name for the destination file on S3 (e.g. myFunction.zip)
