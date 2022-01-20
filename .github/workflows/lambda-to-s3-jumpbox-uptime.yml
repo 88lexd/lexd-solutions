@@ -19,10 +19,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: ./aws-wordpress/3-app-configuration/lambda-jumpbox-uptime/src
-
     steps:
       # To use this repository's private action,
       # you must check out the repository
