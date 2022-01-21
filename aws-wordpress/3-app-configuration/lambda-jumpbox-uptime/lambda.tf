@@ -1,18 +1,62 @@
-# module "lambda_function_container_image" {
-#   source = "terraform-aws-modules/lambda/aws"
+resource "aws_iam_role" "iam_for_lambda" {
+  name = "iam_for_lambda"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      }
+    }
+  ]
+}
+EOF
+}
 
-#   function_name = var.lambda_func_name
-#   description = var.lambda_func_description
+resource "aws_lambda_function" "lambda_function" {
+  function_name = var.lambda_func_name
+  description   = var.lambda_func_description
+  role          = aws_iam_role.iam_for_lambda.arn
+  handler       = "main.handler"
 
-#   create_package = false
+  s3_bucket = "lexd-solutions-lambdas"
+  s3_key = "lambda-jumpbox-uptime.zip"
 
-#   image_uri = var.lambda_ecr_image_uri
-#   package_type = "Image"
+  runtime = "python3.8"
 
-#   cloudwatch_logs_retention_in_days = var.lambda_cw_logs_retention
+  publish = true
 
-#   environment_variables = var.lambda_environment_variables
+  environment {
+    variables = {
+      UPTIME_THRESHOLD = "6"
+      NOTIFICATION_THRESHOLD = "3"
+      SNS_TOPIC_ARN = "arn:aws:sns:ap-southeast-2:682613435495:General-Notification-Topic"
+      INSTANCE_ID = "i-0a674f430ae92d9a2"  # Jumpbox
+    }
+  }
 
-#   attach_policy_json = true
-#   policy_json = jsonencode(var.lambda_policy_json)
-# }
+  depends_on = [
+    aws_iam_role_policy_attachment.lambda_logs,
+    aws_cloudwatch_log_group.log_group,
+  ]
+}
+
+resource "aws_cloudwatch_log_group" "log_group" {
+  name              = "/aws/lambda/${var.lambda_func_name}"
+  retention_in_days = var.lambda_cw_logs_retention
+}
+
+resource "aws_iam_policy" "lambda_logging" {
+  name        = "lambda_logging"
+  path        = "/"
+  description = "IAM policy for logging from a lambda"
+  policy = var.lambda_policy_json
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_logs" {
+  role       = aws_iam_role.iam_for_lambda.name
+  policy_arn = aws_iam_policy.lambda_logging.arn
+}
