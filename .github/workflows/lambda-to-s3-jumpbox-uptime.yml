@@ -26,8 +26,10 @@ jobs:
 
       - name: zip main.py in src/ to current workspace dir
         run: |
+          CURRENT_DIR=$(pwd)
           mkdir artifact
-          zip ./artifact/lambda-jumpbox-uptime.zip ./aws-wordpress/3-app-configuration/lambda-jumpbox-uptime/src/main.py
+          cd ./aws-wordpress/3-app-configuration/lambda-jumpbox-uptime/src/
+          zip "${CURRENT_DIR}/artifact/lambda-jumpbox-uptime.zip" main.py
 
       - name: Custom docker container action to push object to S3
         uses: ./.github/actions/push-object-to-s3
