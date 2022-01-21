@@ -53,7 +53,7 @@ variable "lambda_policy_json" {
     {
       "Effect": "Allow",
       "Action": [ "ec2:DescribeInstances" ],
-      "Resource": "arn:aws:ec2:ap-southeast-2:682613435495:instance/*"
+      "Resource": "*"
     },
     {
       "Effect": "Allow",
