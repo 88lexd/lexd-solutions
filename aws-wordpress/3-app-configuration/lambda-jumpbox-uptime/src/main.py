@@ -18,7 +18,7 @@ def handler(event, context):
 
     if instance.state['Name'] == 'stopped':
         print('OK: Instance is stopped! nothing else to do. Script will now exit')
-        exit(0)
+        return {}
     else:
         print("Instance is not in a stopped state. Continuing with the script...")
 
@@ -60,3 +60,4 @@ Instance uptime ({last_launch_duration_hours}hrs) exceeded threshold ({notificat
         print("Is within threshold")
 
     print("Script completed!")
+    return {}
