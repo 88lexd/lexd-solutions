@@ -28,12 +28,11 @@ def handler(event, context):
     last_launch_duration_hours = divmod(duration_in_seconds, 3600)[0]
 
     if last_launch_duration_hours > uptime_threshold:
-        _message = f"""-- Executing Stop Instance Action --
-Uptime Threshold: {uptime_threshold} hours
-Notification Threshold: {notification_threshold} hours
-
-Instance uptime ({last_launch_duration_hours}hrs) exceeded uptime threshold ({uptime_threshold}hrs)!"
-Script is now stopping the instance!'"""
+        _message = "-- Executing Stop Instance Action --"
+        _message += f"\nUptime Threshold: {uptime_threshold} hours"
+        _message += f"\nNotification Threshold: {notification_threshold} hours"
+        _message += f"\n\nInstance uptime ({last_launch_duration_hours}hrs) exceeded uptime threshold ({uptime_threshold}hrs)!"
+        _message += "\nScript is now stopping the instance!'"
 
         print(_message)
 
@@ -45,11 +44,11 @@ Script is now stopping the instance!'"""
             Message=_message)
 
     elif last_launch_duration_hours > notification_threshold:
-        _message = f"""-- Notification Only --
-Uptime Threshold: {uptime_threshold} hours
-Notification Threshold: {notification_threshold} hours
+        _message = f"-- Notification Only --"
+        _message += f"\nUptime Threshold: {uptime_threshold} hours"
+        _message += f"\nNotification Threshold: {notification_threshold} hours"
+        _message += f"\n\nInstance uptime ({last_launch_duration_hours}hrs) exceeded threshold ({notification_threshold}hrs)!"
 
-Instance uptime ({last_launch_duration_hours}hrs) exceeded threshold ({notification_threshold}hrs)!"""
         print(_message)
 
         print('Publishing SNS notification...')
