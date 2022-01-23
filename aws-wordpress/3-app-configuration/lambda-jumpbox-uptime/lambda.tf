@@ -16,26 +16,25 @@ resource "aws_iam_role" "iam_for_lambda" {
 EOF
 }
 
+data "aws_s3_bucket_object" "lambda_zip" {
+  bucket  = var.s3_bucket_name
+  key     = var.s3_lambda_zip
+}
+
 resource "aws_lambda_function" "lambda_function" {
   function_name = var.lambda_func_name
   description   = var.lambda_func_description
   role          = aws_iam_role.iam_for_lambda.arn
   handler       = "main.handler"
 
-  s3_bucket = "lexd-solutions-lambdas"
-  s3_key = "lambda-jumpbox-uptime.zip"
+  s3_bucket         = data.aws_s3_bucket_object.lambda_zip.bucket
+  s3_key            = data.aws_s3_bucket_object.lambda_zip.key
+  s3_object_version = data.aws_s3_bucket_object.lambda_zip.version_id
 
   runtime = "python3.8"
 
-  publish = true
-
   environment {
-    variables = {
-      UPTIME_THRESHOLD = "6"
-      NOTIFICATION_THRESHOLD = "3"
-      SNS_TOPIC_ARN = "arn:aws:sns:ap-southeast-2:682613435495:General-Notification-Topic"
-      INSTANCE_ID = "i-0a674f430ae92d9a2"  # Jumpbox
-    }
+    variables = var.lambda_environment_variables
   }
 
   depends_on = [

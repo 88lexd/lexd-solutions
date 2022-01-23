@@ -6,15 +6,31 @@ variable "aws_region" {
 
 #######################
 # Lambda Function Vars
+variable "s3_bucket_name" {
+  description = "The name of the S3 bucket that contains the fuction code"
+  type = string
+  default = "lexd-solutions-lambdas"
+}
+
+variable "s3_lambda_zip" {
+  description = "The object (zip) where the Lambda code is stored"
+  type = string
+  default = "lambda-jumpbox-uptime.zip"
+}
+
 variable "lambda_environment_variables" {
   description = "The environmental variables used by the Lambda function"
   type = object({
-    NOTIFICATION_THRESHOLD_HOURS = number
-    STOP_INSTANCE_THRESHOLD_HOURS = number
+    UPTIME_THRESHOLD = number
+    NOTIFICATION_THRESHOLD = number
+    SNS_TOPIC_ARN = string
+    INSTANCE_ID = string
   })
   default = {
-    NOTIFICATION_THRESHOLD_HOURS = 2
-    STOP_INSTANCE_THRESHOLD_HOURS = 6
+    UPTIME_THRESHOLD = 12
+    NOTIFICATION_THRESHOLD = 6
+    SNS_TOPIC_ARN = "arn:aws:sns:ap-southeast-2:682613435495:General-Notification-Topic"
+    INSTANCE_ID = "i-0a674f430ae92d9a2"  # Jumpbox
   }
 }
 
