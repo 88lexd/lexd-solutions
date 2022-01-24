@@ -28,6 +28,8 @@ When I make changes to `main.py` in the ./src directory, GitHub Actions will det
 ## Deploy using Terraform
 Once the code is pushed to S3 via GitHub Actions, use the terraform template to deploy the resources.
 
+**Note**: The Lambda Terraform resource uses the S3 object version_id, what this means is if there is a new object that is pushed by GitHub Actions, Terraform will detect this and will update the Lambda function.
+
 ```
 $ terraform init
 $ terraform apply
