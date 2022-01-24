@@ -82,6 +82,11 @@ variable "lambda_policy_json" {
       "Effect": "Allow",
       "Action": [ "ec2:StopInstances" ],
       "Resource": "arn:aws:ec2:ap-southeast-2:682613435495:instance/i-0a674f430ae92d9a2"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [ "sns:Publish" ],
+      "Resource": "arn:aws:sns:ap-southeast-2:682613435495:General-Notification-Topic"
     }
   ]
 }
