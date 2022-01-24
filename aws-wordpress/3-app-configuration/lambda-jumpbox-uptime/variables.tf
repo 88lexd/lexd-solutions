@@ -4,8 +4,8 @@ variable "aws_region" {
   default = "ap-southeast-2"
 }
 
-#######################
-# Lambda Function Vars
+############################
+# Start Lambda Function Vars
 variable "s3_bucket_name" {
   description = "The name of the S3 bucket that contains the fuction code"
   type = string
@@ -61,9 +61,7 @@ variable "lambda_policy_json" {
   "Statement": [
      {
       "Effect": "Allow",
-      "Action": [
-        "logs:CreateLogGroup*"
-      ],
+      "Action": [ "logs:CreateLogGroup*" ],
       "Resource": "arn:aws:logs:ap-southeast-2:682613435495:*"
     },
     {
@@ -81,3 +79,18 @@ variable "lambda_policy_json" {
 EOF
 }
 # End Lambda Function Vars
+
+####################################
+# Start CloudWatch/EventBridge Vars
+variable "cw_event_name" {
+  description = "The name for the CloudWatch/EventBridge name (name is used in the lambda_policy_json)"
+  type = string
+  default = "jumpbox-uptime-cron"
+}
+
+variable "cw_event_schedule" {
+  description = "The cron schedule for the CW event"
+  type = string
+  default = "rate(1 hour)"
+}
+# End CloudWatch/EventBridge Vars
