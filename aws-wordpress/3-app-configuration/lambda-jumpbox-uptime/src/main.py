@@ -60,7 +60,13 @@ def handler(event, context):
             Subject="Jumpbox exceeded notification threshold",
             Message="Test message")
     else:
-        logging.info("Is within threshold")
+        _message = f"-- Is Within Threshold --"
+        _message += f"\nUptime Threshold: {uptime_threshold} hours"
+        _message += f"\nNotification Threshold: {notification_threshold} hours"
+        _message += f"\n\nInstance uptime ({last_launch_duration_hours}hrs)"
+        _message += f"\nNothing else to do!"
+
+        logging.info(_message)
 
     logging.info("Script completed!")
     return {}
