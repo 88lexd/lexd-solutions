@@ -67,9 +67,15 @@ def handler(event, context):
 
 
 def set_logging(log_level):
+    root = logging.getLogger()
+    if root.handlers:
+        for handler in root.handlers:
+            root.removeHandler(handler)
+
     logging.basicConfig(format='%(asctime)s %(levelname)s %(filename)s[%(lineno)d]: %(message)s',
                         datefmt='%d/%m/%Y %I:%M:%S %p',
                         stream=sys.stdout,
                         level=getattr(logging, log_level.upper()))
+
     logging.getLogger('requests').setLevel(logging.WARNING)
     logging.getLogger("urllib3").setLevel(logging.WARNING)
