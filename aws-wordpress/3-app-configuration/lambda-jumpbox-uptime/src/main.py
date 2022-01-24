@@ -29,7 +29,7 @@ def handler(event, context):
     # Extract timezone info so datetime.now() can match this object for comparision
     timezone = instance.launch_time.tzinfo
     duration_in_seconds = (datetime.now(timezone) - instance.launch_time).total_seconds()
-    last_launch_duration_hours = divmod(duration_in_seconds, 3600)[0]
+    last_launch_duration_hours = round(duration_in_seconds / 3600, 2)
 
     if last_launch_duration_hours > uptime_threshold:
         _message = "-- Executing Stop Instance Action --"
