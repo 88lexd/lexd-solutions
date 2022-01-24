@@ -27,8 +27,9 @@ variable "lambda_environment_variables" {
     INSTANCE_ID = string
   })
   default = {
+    # Threshold (int) is in hours
     UPTIME_THRESHOLD = 12
-    NOTIFICATION_THRESHOLD = 6
+    NOTIFICATION_THRESHOLD = 3
     SNS_TOPIC_ARN = "arn:aws:sns:ap-southeast-2:682613435495:General-Notification-Topic"
     INSTANCE_ID = "i-0a674f430ae92d9a2"  # Jumpbox
   }
