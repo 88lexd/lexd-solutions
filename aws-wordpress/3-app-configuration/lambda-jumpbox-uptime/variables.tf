@@ -61,8 +61,16 @@ variable "lambda_policy_json" {
   "Statement": [
      {
       "Effect": "Allow",
-      "Action": [ "logs:CreateLogGroup*" ],
-      "Resource": "arn:aws:logs:ap-southeast-2:682613435495:*"
+      "Action": [ "logs:CreateLogGroup" ],
+      "Resource": [ "arn:aws:logs:ap-southeast-2:682613435495:*" ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": [ "arn:aws:logs:ap-southeast-2:682613435495:log-group:*:*" ]
     },
     {
       "Effect": "Allow",

@@ -22,15 +22,20 @@ resource "aws_lambda_function" "lambda_function" {
   }
 
   depends_on = [
-    aws_iam_role_policy_attachment.lambda_logs,
+    aws_iam_role_policy_attachment.lambda_policy_attach,
     aws_cloudwatch_log_group.log_group,
   ]
 }
 
 resource "aws_cloudwatch_event_rule" "lambda_trigger_event_rule" {
-    name = var.cw_event_name
-    schedule_expression = var.cw_event_schedule
-    depends_on = [ aws_lambda_function.lambda_function ]
+  name = var.cw_event_name
+  schedule_expression = var.cw_event_schedule
+  depends_on = [ aws_lambda_function.lambda_function ]
+}
+
+resource "aws_cloudwatch_event_target" "lambda_trigger_event_target" {
+  arn  = aws_lambda_function.lambda_function.arn
+  rule = aws_cloudwatch_event_rule.lambda_trigger_event_rule.id
 }
 # End Lambda function and CloudWatch Trigger
 
@@ -66,12 +71,12 @@ resource "aws_iam_policy" "lambda_logging" {
   policy = var.lambda_policy_json
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_logs" {
+resource "aws_iam_role_policy_attachment" "lambda_policy_attach" {
   role       = aws_iam_role.iam_for_lambda.name
   policy_arn = aws_iam_policy.lambda_logging.arn
 }
 
-resource "aws_lambda_permission" "allow_cloudwatch" {
+resource "aws_lambda_permission" "cloudwatch_invoke_lambda" {
   statement_id  = "AllowExecutionFromCloudWatch"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.lambda_function.function_name
