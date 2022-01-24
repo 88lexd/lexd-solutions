@@ -58,7 +58,7 @@ def handler(event, context):
         logging.info('Publishing SNS notification...')
         sns_client.publish(TopicArn=sns_topic_arn,
             Subject="Jumpbox exceeded notification threshold",
-            Message="Test message")
+            Message=_message)
     else:
         _message = f"-- Is Within Threshold --"
         _message += f"\nUptime Threshold: {uptime_threshold} hours"
