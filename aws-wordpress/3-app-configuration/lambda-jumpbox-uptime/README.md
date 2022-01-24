@@ -11,49 +11,29 @@ If you want to know more about this script, you can find it here: https://github
 The problem I have with this is if I ever forget to run the stop command, my instance will remain in a running state and time = money.
 
 ## My Options
-I could use the CloudWatch agent to push the instance uptime to CloudWatch and create an alarm if the uptime is greater than my threshold then send out a notification, however this doesn't seem like any fun and I can't apply this easily using IaC (Infrastructure as Code).
-
-This is why I decided to go with a Lambda function instead and have this being created through Terraform.
+I could use the CloudWatch agent to push the instance uptime to CloudWatch and create an alarm if the uptime is greater than my threshold then send out a notification, however I rather prefer to write my own Lambda function as I can re-use this piece of code othe other projects later on.
 
 ## How it works
 CloudWatch will trigger my Lambda function every hour and will do the following:
  - If the jumpbox instance is running for more than the "NOTIFICATION_THRESHOLD", then send out a notification via SNS.
  - If the jumpbox instance is running for more than the "UPTIME_THRESHOLD", then **stop** the instance and send out a notification via SNS.
 
-# Development Notes
-## Build and push container image to ECR
-Use the following to build image and push to AWS ECR
-```
-$ docker build . -t 682613435495.dkr.ecr.ap-southeast-2.amazonaws.com/jumpbox_uptime:latest
+# How This is Deployed
+## Custom GitHub Container Action
+When I make changes to `main.py` in the ./src directory, GitHub Actions will detect this and will execute the [lambda-to-s3-jumpbox-uptime](https://github.com/88lexd/lexd-solutions/blob/main/.github/workflows/lambda-to-s3-jumpbox-uptime.yml) workflow which will:
 
-# Note: Must be us-east-1, otherwise it won't work.
-$ aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin 682613435495.dkr.ecr.ap-southeast-2.amazonaws.com
+1) Zip up the main.py
+2) Use the custom Docker container action to push the artifact up to S3
 
-$ docker push 682613435495.dkr.ecr.ap-southeast-2.amazonaws.com/jumpbox_uptime:latest
-
-# Image URI will be: 682613435495.dkr.ecr.ap-southeast-2.amazonaws.com/jumpbox_uptime:latest
-```
-
-
-## Testing locally
-As I am  using a container image on ECR, this is how I can test the Lambda function locally via docker.
+## Deploy using Terraform
+Once the code is pushed to S3 via GitHub Actions, use the terraform template to deploy the resources.
 
 ```
-# note:  192.168.0.5 is my local VM that is running Docker
-$ docker build . -t lambdalocaltest
-$ docker run -p 9000:8080 --rm lambdalocaltest
-
-$ curl -XPOST "http://192.168.0.5:9000/2015-03-31/functions/function/invocations" -d '{"name": "alex"}'
+$ terraform init
+$ terraform apply
 ```
 
-After hitting the endpoint via curl, I can see the STDOUT on docker.
-Example:
-```
-$ docker run -p 9000:8080 --rm lambdalocaltest
-18 Jan 2022 03:45:38,236 [INFO] (rapid) exec '/var/runtime/bootstrap' (cwd=/var/task, handler=)
-START RequestId: 58288cf1-4d7f-41cd-bd45-7af545867f75 Version: $LATEST
-Hello AWS!
-event = {'name': 'alex'}
-END RequestId: 58288cf1-4d7f-41cd-bd45-7af545867f75
-REPORT RequestId: 58288cf1-4d7f-41cd-bd45-7af545867f75  Duration: 0.75 ms       Billed Duration: 1 ms   Memory Size: 3008 MB    Max Memory Used: 3008 MB
-```
+The Terraform template will configure the following resources:
+ - Lambda Function using the S3 object
+ - IAM roles and policies for the Lambda function
+ - CloudWatch/EventBridge rules to trigger the Lambda function hourly
