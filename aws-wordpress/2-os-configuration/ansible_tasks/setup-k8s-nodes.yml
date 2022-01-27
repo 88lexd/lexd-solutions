@@ -23,8 +23,8 @@
     update_cache: yes
     state: present
   register: prereq_pkgs_result
-  retries: 3
-  delay: 5
+  retries: 5
+  delay: 15
   until: prereq_pkgs_result is not failed
 
 #######################
