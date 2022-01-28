@@ -173,3 +173,13 @@
         become: no  # Use standard user (it has kubeconfig set)
     tags:
     - nfs_subdir
+
+  - name: Configure metrics-server for Kubernetes cluster
+    include_tasks:
+      file: ansible_tasks/setup-metrics-server.yml
+      apply:
+        tags: metrics-server
+        become: no  # Use standard user (it has kubeconfig set)
+    tags:
+    - metrics-server
+
