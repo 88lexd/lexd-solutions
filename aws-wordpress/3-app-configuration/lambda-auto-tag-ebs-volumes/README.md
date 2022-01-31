@@ -41,7 +41,13 @@ For any issues during deployment, I find that cleaning the stack and redeploying
 $ terraform apply -destroy
 ```
 
-## Testing Locally
+## Dev Notes
+### Auto Deploy to S3 for Terraform/Lambda
+When changes are made to `./src/**`, GitHub workflow will be triggered and will zip the main.py then upload it to S3.
+
+Reference: https://github.com/88lexd/lexd-solutions/blob/main/.github/workflows/lambda-to-s3-auto-tag-ebs.yml
+
+### Local Testing
 The easiest way to work with CloudWatch/EventBridge with CloudTrail is to first go into CloudTrail and view the "event record" from there. This way you know what is expected when it is passed in as the 'detail' object from CloudWatch into Lambda.
 
 From here, we can simulate our own local event object to test the function locally before loading it onto AWS.
