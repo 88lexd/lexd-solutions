@@ -42,7 +42,7 @@ resource "aws_cloudwatch_event_target" "lambda_trigger_event_target" {
 ####################################################
 # Start Permissions
 resource "aws_iam_role" "iam_for_lambda" {
-  name = "iam_for_lambda"
+  name = "iam_jumpbox_uptime_lambda"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
