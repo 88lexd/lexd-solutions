@@ -1,0 +1,43 @@
+# This workflow will upload the code for the lambda-auto-tag-ebs-volumes to the S3 bucket called "lexd-solutions-lambdas"
+
+name: CI for Lambda to S3 for Auto Taging EBS
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+    - 'aws-wordpress/3-app-configuration/lambda-auto-tag-ebs-volumes/src/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+    - 'aws-wordpress/3-app-configuration/lambda-auto-tag-ebs-volumes/src/**'
+
+  # Allows workflow to run manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # To use this repository's private action,
+      # you must check out the repository
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: zip main.py in src/ to current workspace dir
+        run: |
+          CURRENT_DIR=$(pwd)
+          mkdir artifact
+          cd ./aws-wordpress/3-app-configuration/lambda-auto-tag-ebs-volumes/src/
+          zip "${CURRENT_DIR}/artifact/lambda-auto-tag-ebs-volumes.zip" main.py
+
+      - name: Custom docker container action to push object to S3
+        uses: ./.github/actions/push-object-to-s3
+        with:
+          aws_access_key_id: ${{ secrets.AWS_LAMBDA_S3_ACCESS_KEY }}
+          aws_secret_access_key: ${{ secrets.AWS_LAMBDA_S3_SECRET_KEY }}
+          aws_region: ap-southeast-2
+          aws_s3_bucket_name: lexd-solutions-lambdas
+          source_file: ./artifact/lambda-auto-tag-ebs-volumes.zip
+          destination_path: /
+          destination_file_name: lambda-auto-tag-ebs-volumes.zip
