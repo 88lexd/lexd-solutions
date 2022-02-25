@@ -20,7 +20,7 @@ def main():
 
     # Check for profile expiry only
     if opts.expiry:
-        check_credental_expiry(opts.profile)
+        check_credential_expiry(opts.profile)
         exit(0)
 
     if not opts.cred_file or not opts.roles_file:
@@ -161,7 +161,7 @@ def save_credentials(response, cred):
     cfgfile.close()
 
 
-def check_credental_expiry(profile):
+def check_credential_expiry(profile):
     aws_credentials_file = f"{os.getenv('HOME')}/.aws/credentials"
     CfgParser = configparser.ConfigParser()
     CfgParser.read(aws_credentials_file)
