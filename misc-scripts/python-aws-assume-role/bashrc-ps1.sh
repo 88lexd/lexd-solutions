@@ -25,6 +25,5 @@ role_expiration() {
     fi
 }
 
-# First save original PS1 to variable for easy rollback ($ export PS1=$PS1_ORIGINAL)
-export PS1_ORIGINAL=$PS1
-export PS1="\e[1;33m\`role_expiration\`\e[m\[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "
+# Prepend AWS profile expiry info into existing bash prompt
+export PS1="\e[1;33m\`role_expiration\`\e[m${PS1}"
