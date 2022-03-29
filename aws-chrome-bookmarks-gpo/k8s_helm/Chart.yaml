@@ -1,0 +1,9 @@
+apiVersion: v2
+name: chrome-bookmark-gpo
+version: 0.1
+description: A simple site to create the JSON document for managing Chrome Bookmarks via GPO
+home: https://cb-gpo.lexdsolutions.com
+
+maintainers:
+  - name: Alex Dinh
+    email: alex.dinh@lexdsolutions.com

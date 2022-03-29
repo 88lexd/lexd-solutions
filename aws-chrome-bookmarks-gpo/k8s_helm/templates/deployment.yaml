@@ -1,0 +1,19 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chrome-bookmarks-gpo-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chrome-bookmarks-gpo-pod
+  template:
+    metadata:
+      labels:
+        app: chrome-bookmarks-gpo-pod
+    spec:
+      containers:
+      - image: 88lexd/chrome-bookmarks-gpo:latest
+        imagePullPolicy: Always
+        name: chrome-bookmarks-gpo

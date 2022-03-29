@@ -1,0 +1,11 @@
+---
+# This YAML file contains the values to build the dev (on local VM) resources
+chrome_bookmarks_gpo:
+  deployment_image: wordpress:5.8.1-apache
+  deployment_replicas: 1
+  ingress_url: cb-gpo.dev.lexdsolutions.local
+  # ingress_tls_secret_name: null
+  # container_resources: null
+
+# lets_encrypt:
+#   csr_subject_cn: dev.lexdsolutions.local

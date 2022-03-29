@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wordpress-ingress
+spec:
+  ingressClassName: nginx  # Must specify the ingress controller (no default set)
+  rules:
+  - host: {{ .Values.chrome_bookmarks_gpo.ingress_url }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: chrome-bookmarks-gpo-service
+            port:
+              number: 80

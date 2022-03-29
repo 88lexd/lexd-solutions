@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chrome-bookmarks-gpo-service
+  labels:
+    app: chrome-bookmarks-gpo
+spec:
+  type: ClusterIP  # This is the default but is a good practice to define it.
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  selector:
+    app: chrome-bookmarks-gpo-pod

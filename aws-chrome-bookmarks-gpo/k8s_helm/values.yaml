@@ -1,0 +1,6 @@
+---
+# This YAML file contains the "schema" for the values to build the prod resources
+cb_gpo:
+  deployment_image: null
+  deployment_replicas: null
+  ingress_url: null
