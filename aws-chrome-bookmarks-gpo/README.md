@@ -66,18 +66,18 @@ persistentVolume:
 The `launch.json` file in VS code should contain the following:
 ```
 {
-      "name": "Python: Okteto Attach",
-      "type": "python",
-      "request": "attach",
-      "port": 5678,
-      "host": "localhost",
-      "pathMappings": [
-        {
-          "localRoot": "${fileDirname}",  // <=== will expand on this later
-          "remoteRoot": "/app"
-        }
-      ]
-    }
+    "name": "Python: Okteto Attach",
+    "type": "python",
+    "request": "attach",
+    "port": 5678,
+    "host": "localhost",
+    "pathMappings": [
+      {
+        "localRoot": "${fileDirname}",  // <=== will expand on this later
+        "remoteRoot": "/app"
+      }
+    ]
+}
 ```
 
 ## Launch Okteto
