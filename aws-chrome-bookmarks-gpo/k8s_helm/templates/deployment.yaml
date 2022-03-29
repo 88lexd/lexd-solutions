@@ -14,6 +14,6 @@ spec:
         app: chrome-bookmarks-gpo-pod
     spec:
       containers:
-      - image: 88lexd/chrome-bookmarks-gpo:latest
+      - image: {{ .Values.chrome_bookmarks_gpo.deployment_image }}
         imagePullPolicy: Always
         name: chrome-bookmarks-gpo

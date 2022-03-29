@@ -1,0 +1,19 @@
+---
+name: chrome-bookmarks-gpo-deployment
+
+image: 88lexd/chrome-bookmarks-gpo:latest
+
+command: bash
+
+sync:
+- ./app:/app
+
+forward:
+- 5678:5678
+
+# Okteto will create a Persistent Volume Claim (PVC) and attach it to the development pod.
+# As I am using the "nfs-subdir-external-provisioner" and is not set as the "default storage class", I must specify it here in the config.
+persistentVolume:
+  enabled: true
+  storageClass: nfs-client  # This is the storage class name (kubectl get sc)
+  size: 5Gi
