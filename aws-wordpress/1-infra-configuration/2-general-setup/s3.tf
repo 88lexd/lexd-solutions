@@ -6,7 +6,7 @@ resource "aws_s3_bucket" "lambda_s3_bucket" {
     enabled = true
   }
 
-    lifecycle_rule {
+  lifecycle_rule {
     enabled = true
 
     abort_incomplete_multipart_upload_days = 1
