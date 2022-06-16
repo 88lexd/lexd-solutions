@@ -31,8 +31,24 @@ Successfully installed ipaddress-1.0.23 netaddr-0.8.0
 ```
 
 ## How to run
+Create a file containing subnets. Example:
 ```
-$ python3 supernet.py --file subnets.txt
+$ cat subnets.txt
+10.156.216.0/21
+10.156.212.0/22
+10.60.0.0/16
+10.61.0.0/16
+10.50.1.0/24
+10.70.2.0/24
+192.168.0.0/24
+192.168.1.0/24
+192.168.2.0/24
+192.168.3.0/24
+```
+
+Run the python script to summarize networks.
+```
+$ ./venv/bin/python3 supernet.py --file subnets.txt
 ================================
 Supernetting Script by Alex Dinh
 ================================
