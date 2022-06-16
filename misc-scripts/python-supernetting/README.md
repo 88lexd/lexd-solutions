@@ -29,3 +29,34 @@ Collecting ipaddress
 Installing collected packages: netaddr, ipaddress
 Successfully installed ipaddress-1.0.23 netaddr-0.8.0
 ```
+
+## How to run
+```
+$ python3 supernet.py --file subnets.txt
+================================
+Supernetting Script by Alex Dinh
+================================
+Reading from - /home/alex/code/git/lexd-solutions/misc-scripts/python-supernetting/subnets.txt
+Begin supernetting...
+
+10.50.1.0/24 - (first host: 10.50.1.1 | last host: 10.50.1.254) -- cannot be supernetted
+10.60.0.0/16 - (first host: 10.60.0.1 | last host: 10.60.255.254) -- is supernetted
+10.61.0.0/16 - (first host: 10.61.0.1 | last host: 10.61.255.254) -- is supernetted
+10.70.2.0/24 - (first host: 10.70.2.1 | last host: 10.70.2.254) -- cannot be supernetted
+10.156.212.0/22 - (first host: 10.156.212.1 | last host: 10.156.215.254) -- cannot be supernetted
+10.156.216.0/21 - (first host: 10.156.216.1 | last host: 10.156.223.254) -- cannot be supernetted
+192.168.0.0/24 - (first host: 192.168.0.1 | last host: 192.168.0.254) -- is supernetted
+192.168.1.0/24 - (first host: 192.168.1.1 | last host: 192.168.1.254) -- is supernetted
+192.168.2.0/24 - (first host: 192.168.2.1 | last host: 192.168.2.254) -- is supernetted
+192.168.3.0/24 - (first host: 192.168.3.1 | last host: 192.168.3.254) -- is supernetted
+
+========================
+New Supernetted Subnets:
+========================
+10.50.1.0/24 - (first host: 10.50.1.1 | last host: 10.50.1.254)
+10.60.0.0/15 - (first host: 10.60.0.1 | last host: 10.61.255.254)
+10.70.2.0/24 - (first host: 10.70.2.1 | last host: 10.70.2.254)
+10.156.212.0/22 - (first host: 10.156.212.1 | last host: 10.156.215.254)
+10.156.216.0/21 - (first host: 10.156.216.1 | last host: 10.156.223.254)
+192.168.0.0/22 - (first host: 192.168.0.1 | last host: 192.168.3.254)
+```

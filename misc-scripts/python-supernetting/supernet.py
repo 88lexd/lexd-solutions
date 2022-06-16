@@ -27,20 +27,24 @@ def main():
     print("Begin supernetting...\n")
     result = list()
     for subnets in grouped_subnets:
-        supernets = get_supernet(subnets)
+        supernets = cidr_merge(subnets)
         result.extend(supernets)
 
         for subnet in subnets:
-            if str(subnet) in supernets:
-                print(f"{str(subnet)} cannot be supernetted")
+            first_host = str(subnet[1])
+            last_host = str(subnet[-2])
+            if subnet in supernets:
+                print(f"{str(subnet)} - (first host: {first_host} | last host: {last_host}) -- cannot be supernetted")
             else:
-                print(f"{str(subnet)} is supernetted")
+                print(f"{str(subnet)} - (first host: {first_host} | last host: {last_host}) -- is supernetted")
 
     print("\n========================")
     print("New Supernetted Subnets:")
     print("========================")
     for subnet in result:
-        print(subnet)
+        first_host = str(subnet[1])
+        last_host = str(subnet[-2])
+        print(f"{str(subnet)} - (first host: {first_host} | last host: {last_host})")
 
 
 def get_full_path_to(input_path):
@@ -55,12 +59,6 @@ def get_full_path_to(input_path):
         return input_path
     else:
         raise FileNotFoundError
-
-
-def get_supernet(cidrs):
-    # Expects a list of IPNetwork objects
-    result = [str(cidr) for cidr in cidr_merge(cidrs)]
-    return result
 
 
 def sort(subnets):
