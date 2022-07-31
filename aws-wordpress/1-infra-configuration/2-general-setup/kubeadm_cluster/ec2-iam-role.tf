@@ -1,5 +1,4 @@
 # This provides the EC2 instance permissions to do certain actions on AWS (e.g. CloudWatch)
-
 resource "aws_iam_role" "kubeadm_ec2_role" {
   name = var.iam_role_name_for_ec2
 
