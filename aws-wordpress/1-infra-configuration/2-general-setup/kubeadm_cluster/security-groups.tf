@@ -3,24 +3,9 @@ resource "aws_security_group" "efs_target" {
   description = "Allow NFS traffic into EFS"
   vpc_id      = var.vpc_id
 
-  tags = {
-    Name = "EFS-NFS Target"
-  }
+  tags = { Name = "EFS-NFS Target" }
 
-  ingress = [
-    {
-      description      = "Allow HTTP"
-      from_port        = 2049
-      to_port          = 2049
-      protocol         = "tcp"
-      cidr_blocks      = null
-      ipv6_cidr_blocks = null
-      prefix_list_ids  = null
-      # sg-091d91a3132ebef48 = MicroK8s node! This needs to be removed later
-      security_groups = [var.jumpbox_sg_id, aws_security_group.k8s_master.id, aws_security_group.k8s_workernodes.id]
-      self            = null
-    }
-  ]
+  ingress = [local.sg_efs_ingress]
 }
 
 ##############################################
