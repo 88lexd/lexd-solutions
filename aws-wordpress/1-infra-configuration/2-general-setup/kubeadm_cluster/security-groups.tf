@@ -155,6 +155,13 @@ locals {
       to_port      = 443
       source_sg_id = null
       source_cidrs = ["0.0.0.0/0"]
+    },
+    ngrok_nat = {
+      description  = "Allow K8s NAT to Ngrok via service and endpoints"
+      from_port    = 30000
+      to_port      = 30000
+      source_sg_id = null
+      source_cidrs = ["0.0.0.0/0"]
     }
   }
 }
