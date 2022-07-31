@@ -8,8 +8,7 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  namespace: {{ .Release.Namespace }}
-  name: rl-tls-secret-handler
+  name: rl-ngrok-monitor
 rules:
 - apiGroups: [""]
   resources: ["*"]
@@ -20,38 +19,36 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: rlb-tls-secret-handler
-  namespace: {{ .Release.Namespace }}
+  name: rlb-ngrok-monitor
 roleRef:
   kind: Role
   apiGroup: rbac.authorization.k8s.io
-  name: rl-tls-secret-handler
+  name: rl-ngrok-monitor
 subjects:
 - kind: ServiceAccount
   name: svc-ngrok-monitor
-  namespace: {{ .Release.Namespace }}
 
 
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: lets-encrypt-deployment
+  name: ngrok-monitor-deployment
 spec:
-  replicas: 0
+  replicas: 1
   selector:
     matchLabels:
-      app: lets-encrypt-cron-pod
+      app: ngrok-monitor-cron-pod
   template:
     metadata:
       labels:
-        app: lets-encrypt-cron-pod
+        app: ngrok-monitor-cron-pod
     spec:
       serviceAccountName: svc-ngrok-monitor
       automountServiceAccountToken: true
       containers:
-      - image: python:3
+      - image: 88lexd/ngrok-bot
         # imagePullPolicy: Always
-        name: lets-encrypt-cron
+        name: ngrok-monitor-cron
         command: ["python3"]
-        args: ["/app/main.py", "--cluster-config"]
+        args: ["/app/main.py"]
