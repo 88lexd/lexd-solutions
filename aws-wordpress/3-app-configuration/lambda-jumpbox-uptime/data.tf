@@ -28,7 +28,7 @@ locals {
             "logs:CreateLogStream",
             "logs:PutLogEvents"
           ],
-          "Resource" : ["arn:aws:logs:ap-southeast-2:${data.aws_caller_identity.current.id}:log-group:*:*"]
+          Resource = ["arn:aws:logs:ap-southeast-2:${data.aws_caller_identity.current.id}:log-group:*:*"]
         },
         {
           Effect   = "Allow",
