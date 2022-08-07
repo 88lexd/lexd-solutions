@@ -1,10 +1,5 @@
 ###############################################
 # Start Lambda function and CloudWatch Trigger
-data "aws_s3_bucket_object" "lambda_zip" {
-  bucket = var.s3_bucket_name
-  key    = var.s3_lambda_zip
-}
-
 resource "aws_lambda_function" "lambda_function" {
   function_name = var.lambda_func_name
   description   = var.lambda_func_description
@@ -18,7 +13,12 @@ resource "aws_lambda_function" "lambda_function" {
   runtime = "python3.8"
 
   environment {
-    variables = var.lambda_environment_variables
+    variables = merge(
+      {
+        INSTANCE_ID   = data.aws_instance.jumpbox.id
+        SNS_TOPIC_ARN = "arn:aws:sns:ap-southeast-2:682613435495:General-Notification-Topic"
+      },
+    var.lambda_environment_variables, )
   }
 
   depends_on = [
@@ -68,7 +68,7 @@ resource "aws_iam_policy" "lambda_logging" {
   name        = "lambda_logging"
   path        = "/"
   description = "IAM policy for logging from a lambda"
-  policy      = var.lambda_policy_json
+  policy      = local.lambda_policy_json
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_policy_attach" {
@@ -81,6 +81,6 @@ resource "aws_lambda_permission" "cloudwatch_invoke_lambda" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.lambda_function.function_name
   principal     = "events.amazonaws.com"
-  source_arn    = format("arn:aws:events:ap-southeast-2:682613435495:rule/%s", var.cw_event_name)
+  source_arn    = format("arn:aws:events:ap-southeast-2:%s:rule/%s", data.aws_caller_identity.current.id, var.cw_event_name)
 }
 # End Permissions
