@@ -1,8 +1,8 @@
 ###############################################
 # Start Lambda function and CloudWatch Trigger
 data "aws_s3_bucket_object" "lambda_zip" {
-  bucket  = var.s3_bucket_name
-  key     = var.s3_lambda_zip
+  bucket = var.s3_bucket_name
+  key    = var.s3_lambda_zip
 }
 
 resource "aws_lambda_function" "lambda_function" {
@@ -28,9 +28,9 @@ resource "aws_lambda_function" "lambda_function" {
 }
 
 resource "aws_cloudwatch_event_rule" "lambda_trigger_event_rule" {
-  name = var.cw_event_name
+  name                = var.cw_event_name
   schedule_expression = var.cw_event_schedule
-  depends_on = [ aws_lambda_function.lambda_function ]
+  depends_on          = [aws_lambda_function.lambda_function]
 }
 
 resource "aws_cloudwatch_event_target" "lambda_trigger_event_target" {
@@ -42,7 +42,7 @@ resource "aws_cloudwatch_event_target" "lambda_trigger_event_target" {
 ####################################################
 # Start Permissions
 resource "aws_iam_role" "iam_for_lambda" {
-  name = "iam_jumpbox_uptime_lambda"
+  name               = "iam_jumpbox_uptime_lambda"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -68,7 +68,7 @@ resource "aws_iam_policy" "lambda_logging" {
   name        = "lambda_logging"
   path        = "/"
   description = "IAM policy for logging from a lambda"
-  policy = var.lambda_policy_json
+  policy      = var.lambda_policy_json
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_policy_attach" {
