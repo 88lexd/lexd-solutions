@@ -47,39 +47,6 @@ variable "lambda_cw_logs_retention" {
   type        = number
   default     = 7
 }
-
-variable "lambda_policy_json" {
-  description = "The JSON policy document for the Lambda function"
-  type        = string
-  default     = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-     {
-      "Effect": "Allow",
-      "Action": [ "logs:CreateLogGroup" ],
-      "Resource": [ "arn:aws:logs:ap-southeast-2:682613435495:*" ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "logs:CreateLogStream",
-        "logs:PutLogEvents"
-      ],
-      "Resource": [ "arn:aws:logs:ap-southeast-2:682613435495:log-group:*:*" ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "ec2:DescribeTags",
-        "ec2:CreateTags"
-      ],
-      "Resource": "*"
-    }
-  ]
-}
-EOF
-}
 # End Lambda Function Vars
 
 ####################################

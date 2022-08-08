@@ -87,6 +87,6 @@ resource "aws_lambda_permission" "cloudwatch_invoke_lambda" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.lambda_function.function_name
   principal     = "events.amazonaws.com"
-  source_arn    = format("arn:aws:events:ap-southeast-2:682613435495:rule/%s", var.cw_event_name)
+  source_arn    = format("arn:aws:events:ap-southeast-2:%s:rule/%s", data.aws_caller_identity.current.id, var.cw_event_name)
 }
 # End Permissions
