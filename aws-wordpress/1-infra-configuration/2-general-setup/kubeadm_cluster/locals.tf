@@ -41,14 +41,13 @@ locals {
   }
 
   sg_efs_ingress = {
-    description      = "Allow HTTP"
+    description      = "Allow NFS from jumpbox, master and worker"
     from_port        = 2049
     to_port          = 2049
     protocol         = "tcp"
     cidr_blocks      = null
     ipv6_cidr_blocks = null
     prefix_list_ids  = null
-    # sg-091d91a3132ebef48 = MicroK8s node! This needs to be removed later
     security_groups = [var.jumpbox_sg_id, aws_security_group.k8s_master.id, aws_security_group.k8s_workernodes.id]
     self            = null
   }
