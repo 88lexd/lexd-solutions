@@ -38,7 +38,7 @@ $ kubectl exec -it -n prod wordpress-c8d679979-5q6g2 -- bash
 $ cat /var/www/html/wp-config.php | grep "WORDPRESS_DEBUG"
 define( 'WP_DEBUG', !!getenv_docker('WORDPRESS_DEBUG', '') );
 
-# No vi in container. Ekubedit the file from NFS server: Set the line above to:
+# No vi in container. Edit the file from NFS server: Set the line above to:
 $ sudo vi /nfs/k8s/prod-wordpress-pvc-pvc-39f03258-1d13-40bc-bd44-a795a6eb32f6/wp-config.php
 
 define( 'WP_DEBUG', true );
