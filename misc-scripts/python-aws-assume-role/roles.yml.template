@@ -4,6 +4,7 @@
 - name: My Admin Role
   aws_account_id: 12345
   role_name: My-Admin-Role
+  duration_seconds: 7200  # defaults to 3600 seconds if not specified
 
 # The script supports connecting to another AWS account.
 # As long as the target account role allows you to assume into that role.

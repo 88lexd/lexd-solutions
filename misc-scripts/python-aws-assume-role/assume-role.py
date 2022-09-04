@@ -101,6 +101,7 @@ def get_choice_index(choice):
 
 
 def assume_role(cred, role):
+    duration = role.get('duration_seconds', 3600)  # role duration will be set to 1hr (3600 seconds if not specified)
     iam_mfa_serial = cred['user_arn'].replace(":user/", ":mfa/")
     role_arn = f"arn:aws:iam::{role['aws_account_id']}:role/{role['role_name']}"
     aws_iam_token = input(f"\nEnter MFA token code for [ {cred['user_arn']} ]: ")
@@ -119,7 +120,7 @@ def assume_role(cred, role):
           RoleSessionName=role['role_name'],
           SerialNumber=iam_mfa_serial,
           TokenCode=aws_iam_token,
-          # DurationSeconds=7200  # 2 hours to match role config. Default is 1hr otherwise
+          DurationSeconds=int(duration)
       ).get('Credentials')
     except ClientError as ce:
         print(ce.result)
