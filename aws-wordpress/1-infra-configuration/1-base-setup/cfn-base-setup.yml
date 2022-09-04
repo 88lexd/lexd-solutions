@@ -130,7 +130,7 @@ Resources:
               - iam:ResyncMFADevice
             Resource: arn:aws:iam::*:user/${aws:username}
 
-  # Allow user to AssumeRol
+  # Allow user to AssumeRole to LEXD-Admin and Sandbox-Admin
   AssumeRolePolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
@@ -143,6 +143,7 @@ Resources:
               - sts:AssumeRole
             Resource:
               - !Sub "arn:aws:iam::${AWS::AccountId}:role/LEXD-Admin"
+              - "arn:aws:iam::309949054966:role/Sandbox-Admin"
 
   # Admin role requires MFA
   LexdAdminRole:
