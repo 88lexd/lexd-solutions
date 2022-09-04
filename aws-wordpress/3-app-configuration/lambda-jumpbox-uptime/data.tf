@@ -12,7 +12,19 @@ data "aws_instance" "jumpbox" {
   }
 }
 
+data "aws_sns_topic" "general_notification_topic" {
+  name = "General-Notification-Topic"
+}
+
 locals {
+  lambda_environment = merge(
+    {
+      INSTANCE_ID   = data.aws_instance.jumpbox.id
+      SNS_TOPIC_ARN = data.aws_sns_topic.general_notification_topic.arn
+    },
+    var.lambda_environment_variables
+  )
+
   lambda_policy_json = jsonencode(
     {
       Version = "2012-10-17",
@@ -43,7 +55,7 @@ locals {
         {
           Effect   = "Allow",
           Action   = ["sns:Publish"],
-          Resource = "arn:aws:sns:ap-southeast-2:${data.aws_caller_identity.current.id}:General-Notification-Topic"
+          Resource = data.aws_sns_topic.general_notification_topic.arn
         }
       ]
     }
