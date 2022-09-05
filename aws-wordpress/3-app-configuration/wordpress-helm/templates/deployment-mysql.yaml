@@ -1,22 +1,37 @@
 # This PVC can dynamically create a PV thanks to the "nfs-subdir-external-provisioner" installed via the Ansible playbook (setup-nfs-server.yml)
 # The "nfs-subdir-external-provisioner" by default is set to delete but will rename the folder with "archived-" as the prefex.
 # e.g. /nfs/k8s/folder1 TO /nfs/k8s/archived-folder1
+
+########################################
+# No longer using EFS due to limited IO
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: "mysql-pvc"
+#   labels:
+#     app: mysql
+# spec:
+#   # nfs-client class is created by the dynamic provisioner. Check name by running $ kubectl get sc
+#   storageClassName: nfs-client
+#   accessModes:
+#     - ReadWriteMany
+#   resources:
+#     requests:
+#       storage: 1Mi  # This can be any value as it is a required field. The PV will consume whatever the NFS export presents it.
+
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: "mysql-pvc"
-  labels:
-    app: mysql
+  name: mysql-local-pvc
 spec:
-  # nfs-client class is created by the dynamic provisioner. Check name by running $ kubectl get sc
-  storageClassName: nfs-client
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
+  storageClassName: local-path
   resources:
     requests:
-      storage: 1Mi  # This can be any value as it is a required field. The PV will consume whatever the NFS export presents it.
-
+      storage: 1Mi  # this is ignored
 
 ---
 apiVersion: v1
@@ -79,4 +94,4 @@ spec:
       volumes:
       - name: mysql-volume
         persistentVolumeClaim:
-          claimName: mysql-pvc
+          claimName: mysql-local-pvc
