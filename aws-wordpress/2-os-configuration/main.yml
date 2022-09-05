@@ -67,6 +67,7 @@
       file: vars/kubernetes.yml
     tags:
     - install_k8s
+    - local_path_provisioner
 
   - name: Prepare K8s nodes by setting up prerequisites and installing K8s packages
     include_tasks:
@@ -173,6 +174,15 @@
         become: no  # Use standard user (it has kubeconfig set)
     tags:
     - nfs_subdir
+
+  - name: Configure local-path provisioner
+    include_tasks:
+      file: ansible_tasks/setup-local-path-provisioner.yml
+      apply:
+        tags: local_path_provisioner
+        become: no  # Use standard user (it has kubeconfig set)
+    tags:
+    - local_path_provisioner
 
   - name: Configure metrics-server for Kubernetes cluster
     include_tasks:

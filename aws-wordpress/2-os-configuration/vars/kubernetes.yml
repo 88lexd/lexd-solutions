@@ -30,3 +30,6 @@ k8s_repository: "https://apt.kubernetes.io/ kubernetes-xenial main"
 
 # Get the latest version of Helm checking this URL: https://github.com/helm/helm/releases
 helm_binary_src: "https://get.helm.sh/helm-v3.7.2-linux-amd64.tar.gz"
+
+# Local Path Provisioner version
+local_path_provisioner_version: v0.0.22

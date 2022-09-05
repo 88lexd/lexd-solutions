@@ -1,0 +1,15 @@
+---
+# Reference: https://github.com/rancher/local-path-provisioner
+- name: Check if there is local-path-provisioner is already deployed
+  shell: kubectl get deployments -A -o json | jq -r '.items[].metadata.name' | grep 'local-path-provisioner' || echo "NOT_FOUND"
+  register: loacl_path_provisioner_result
+  become_user: "{{ ansible_env.SUDO_USER }}"
+  changed_when: False  # Task will return ok instead of changed
+
+- name: Install local path provisioner
+  shell: |
+    kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/{{ local_path_provisioner_version }}/deploy/local-path-storage.yaml
+  args:
+    executable: /bin/bash
+  become_user: "{{ ansible_env.SUDO_USER }}"
+  when: loacl_path_provisioner_result.stdout == "NOT_FOUND"
