@@ -1,0 +1,56 @@
+# The tasks are based off the instructions outlined here:
+# https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Container-Insights-setup-logs-FluentBit.html
+---
+- name: Create PROD namespace in the cluster
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: amazon-cloudwatch
+        labels:
+          name: amazon-cloudwatch
+
+- name: Check ConfigMap for fluent-bit already exist
+  shell: kubectl get configmap -n amazon-cloudwatch | grep fluent-bit-cluster-info || echo "NOT_FOUND"
+  register: fluentbit_status
+  become_user: "{{ ansible_env.SUDO_USER }}"
+  changed_when: False  # Task will return ok instead of changed
+
+- name: Create ConfigMap for Fluentbit
+  shell: |
+    ClusterName={{ fluentbit_cluster_name }}
+    RegionName={{ fluentbit_region }}
+    FluentBitHttpPort='2020'
+    FluentBitReadFromHead='Off'
+    [[ ${FluentBitReadFromHead} = 'On' ]] && FluentBitReadFromTail='Off'|| FluentBitReadFromTail='On'
+    [[ -z ${FluentBitHttpPort} ]] && FluentBitHttpServer='Off' || FluentBitHttpServer='On'
+    kubectl create configmap -n amazon-cloudwatch fluent-bit-cluster-info \
+    --from-literal=cluster.name=${ClusterName} \
+    --from-literal=http.server=${FluentBitHttpServer} \
+    --from-literal=http.port=${FluentBitHttpPort} \
+    --from-literal=read.head=${FluentBitReadFromHead} \
+    --from-literal=read.tail=${FluentBitReadFromTail} \
+    --from-literal=logs.region=${RegionName}
+  become_user: "{{ ansible_env.SUDO_USER }}"
+  when: fluentbit_status.stdout == "NOT_FOUND"
+
+- name: Create temporary directory to store the fluent-bit k8s manifest
+  ansible.builtin.tempfile:
+    state: directory
+    suffix: fluent_bit_template
+  become_user: "{{ ansible_env.SUDO_USER }}"
+  register: fluentbit_temp_dir
+
+- name: "Template a file - {{ fluentbit_temp_dir.path }}/fluentbit.yml"
+  ansible.builtin.template:
+    src: ../files/fluentbit.yml.j2
+    dest: "{{ fluentbit_temp_dir.path }}/fluentbit.yml"
+  become_user: "{{ ansible_env.SUDO_USER }}"
+  register: fluentbit_final_yml
+
+# Couldn't use kubernetes.core.k8s module to apply the manifest.. throwing random errors..
+- name: Deployment fluent-bit
+  shell: "kubectl apply -f {{ fluentbit_final_yml.dest }}"
+  become_user: "{{ ansible_env.SUDO_USER }}"

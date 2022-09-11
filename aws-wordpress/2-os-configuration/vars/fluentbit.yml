@@ -1,0 +1,7 @@
+---
+fluentbit_cluster_name: kubernetes  # this is the default name
+fluentbit_region: ap-southeast-2
+
+# Vars to use within the ../files/fluentbit.yml.j2 template file
+# The container path for fluentbit to filter out logs (comma seperated)
+fluentbit_template_app_path: "/var/log/containers/wordpress*.log, /var/log/containers/mysql-wordpress*.log"
