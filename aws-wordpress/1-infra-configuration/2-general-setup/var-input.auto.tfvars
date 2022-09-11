@@ -42,3 +42,7 @@ ec2_ami_name     = "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-202109
 ec2_ami_owner_id = "099720109477" # Canonical
 
 iam_role_name_for_ec2 = "kubeadm_ec2_role"
+
+# CloudWatch log retention period (in days)
+cw_log_k8s_dataplane_retention   = 7
+cw_log_k8s_application_retention = 14

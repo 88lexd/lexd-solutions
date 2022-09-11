@@ -78,3 +78,17 @@ variable "vpc_private_subnets" {
 variable "vpc_public_subnets" {
   type = list(string)
 }
+# END Additional vars
+
+###########################
+# CloudWatch Log Group vars
+variable "cw_log_k8s_dataplane_retention" {
+  description = "The number of days to keep the dataplane logs in CloudWatch"
+  type        = number
+}
+
+variable "cw_log_k8s_application_retention" {
+  description = "The number of days to keep the application logs in CloudWatch"
+  type        = number
+}
+# END CloudWatch Log Group vars

@@ -24,4 +24,7 @@ module "kubeadm_cluster" {
   vpc_azs             = var.vpc_azs
   vpc_private_subnets = module.vpc.private_subnets
   vpc_public_subnets  = module.vpc.public_subnets
+
+  cw_log_k8s_dataplane_retention   = var.cw_log_k8s_dataplane_retention
+  cw_log_k8s_application_retention = var.cw_log_k8s_application_retention
 }

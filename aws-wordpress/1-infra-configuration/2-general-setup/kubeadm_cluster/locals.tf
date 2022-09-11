@@ -48,8 +48,8 @@ locals {
     cidr_blocks      = null
     ipv6_cidr_blocks = null
     prefix_list_ids  = null
-    security_groups = [var.jumpbox_sg_id, aws_security_group.k8s_master.id, aws_security_group.k8s_workernodes.id]
-    self            = null
+    security_groups  = [var.jumpbox_sg_id, aws_security_group.k8s_master.id, aws_security_group.k8s_workernodes.id]
+    self             = null
   }
 
   sg_k8s_master_ingress = {
