@@ -92,12 +92,17 @@ variable "dlm_target_tags" {
 
 
 ########################
-# Begin Lambda Function
+# Begin S3 buckets
 variable "lambda_s3_bucket_name" {
   description = "Name for the S3 bucket to store Lambda zip files. This is where GitHub Actions will drop the archives"
   type        = string
 }
-# End Lambda Function
+
+variable "codedeploy_s3_bucket_name" {
+  description = "Name for the S3 bucket to store codedeploy artifacts. This is where GitHub Actions will drop the archives"
+  type        = string
+}
+# End S3 buckets
 
 
 #################################

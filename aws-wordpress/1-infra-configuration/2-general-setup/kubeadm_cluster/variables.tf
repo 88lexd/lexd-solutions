@@ -78,6 +78,11 @@ variable "vpc_private_subnets" {
 variable "vpc_public_subnets" {
   type = list(string)
 }
+
+variable "codedeploy_bucket_arn" {
+  description = "The ARN of the CodeDeploy S3 bucket. It is used to grant access to the EC2 IAM role"
+  type        = string
+}
 # END Additional vars
 
 ###########################

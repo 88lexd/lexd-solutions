@@ -12,8 +12,8 @@ dlm_schedule_time     = ["16:30"] # 24 hour clock in UTC (equivalent to 2AM in S
 dlm_retain_count      = 7
 dlm_copy_tags         = true
 
-lambda_s3_bucket_name = "lexd-solutions-lambdas"
-
+lambda_s3_bucket_name     = "lexd-solutions-lambdas"
+codedeploy_s3_bucket_name = "lexd-solutions-codedeploy"
 
 ##############
 # K8s Cluster

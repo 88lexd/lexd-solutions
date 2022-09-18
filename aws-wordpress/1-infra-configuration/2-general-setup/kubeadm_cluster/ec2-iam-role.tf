@@ -18,6 +18,27 @@ resource "aws_iam_role" "kubeadm_ec2_role" {
     ]
   })
 
+  inline_policy {
+    name = "codedeploy-s3-access"
+
+    policy = jsonencode({
+      Version = "2012-10-17"
+      Statement = [
+        {
+          Effect = "Allow"
+          Action = [
+            "s3:ListBucket",
+            "s3:GetObject*"
+          ]
+          Resource = [
+            "${var.codedeploy_bucket_arn}",
+            "${var.codedeploy_bucket_arn}/*"
+          ]
+        },
+      ]
+    })
+  }
+
   managed_policy_arns = ["arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"]
 }
 

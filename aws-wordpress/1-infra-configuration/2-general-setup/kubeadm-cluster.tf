@@ -27,4 +27,6 @@ module "kubeadm_cluster" {
 
   cw_log_k8s_dataplane_retention   = var.cw_log_k8s_dataplane_retention
   cw_log_k8s_application_retention = var.cw_log_k8s_application_retention
+
+  codedeploy_bucket_arn = aws_s3_bucket.codedeploy_s3_bucket.arn
 }
