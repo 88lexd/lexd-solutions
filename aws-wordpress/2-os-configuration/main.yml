@@ -34,6 +34,14 @@
     tags:
     - install_cloudwatch_agent
 
+  - name: Setup AWS CodeDeploy Agent
+    include_tasks:
+      file: ansible_tasks/setup-aws-codedeploy-agent.yml
+      apply:
+        tags: install_codedeploy_agent
+    tags:
+    - install_codedeploy_agent
+
   # - name: Import docker vars so can be passed into the next include role task
   #   ansible.builtin.include_vars:
   #     file: vars/docker.yml
