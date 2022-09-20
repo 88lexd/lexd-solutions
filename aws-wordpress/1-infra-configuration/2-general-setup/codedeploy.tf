@@ -35,7 +35,7 @@ resource "aws_codedeploy_deployment_group" "henry_todo_deploy_group" {
     ec2_tag_filter {
       type  = "KEY_AND_VALUE"
       key   = "Name"
-      value = "K8s Master"
+      value = var.ec2_k8smaster_instance_name
     }
   }
 }
