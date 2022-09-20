@@ -5,7 +5,7 @@ resource "aws_iam_user" "github_ci_to_s3" {
 }
 
 resource "aws_iam_user_policy" "github_ci_to_s3_policy" {
-  name = "base-setup-github-ci-to-s3"
+  name = "general-setup-github-ci-to-s3"
   user = aws_iam_user.github_ci_to_s3.name
 
   policy = <<EOF
@@ -19,7 +19,9 @@ resource "aws_iam_user_policy" "github_ci_to_s3_policy" {
       "Effect": "Allow",
       "Resource": [
         "${aws_s3_bucket.lambda_s3_bucket.arn}",
-        "${aws_s3_bucket.lambda_s3_bucket.arn}/*"
+        "${aws_s3_bucket.lambda_s3_bucket.arn}/*",
+        "${aws_s3_bucket.codedeploy_s3_bucket.arn}",
+        "${aws_s3_bucket.codedeploy_s3_bucket.arn}/*"
       ]
     }
   ]
