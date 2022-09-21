@@ -20,6 +20,6 @@ data "aws_sns_topic" "cw_alarm_topic" {
 
 data "archive_file" "codedeploy_lambda_zip" {
   type        = "zip"
-  source_file = "${path.module}/scripts/codedeploy_lambda.py"
+  source_file = "${path.module}/lambdas/codedeploy_lambda.py"
   output_path = "${path.module}/codedeploy_lambda.zip"
 }
