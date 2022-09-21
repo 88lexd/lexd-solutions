@@ -21,7 +21,8 @@ resource "aws_s3_bucket" "lambda_s3_bucket" {
   }
 }
 
-
+##################
+# Code Deploy S3
 resource "aws_s3_bucket" "codedeploy_s3_bucket" {
   bucket = var.codedeploy_s3_bucket_name
   acl    = "private"
@@ -44,6 +45,17 @@ resource "aws_s3_bucket" "codedeploy_s3_bucket" {
     }
   }
 }
+
+resource "aws_s3_bucket_notification" "codedeploy_s3_notification" {
+  bucket = aws_s3_bucket.codedeploy_s3_bucket.id
+
+  lambda_function {
+    lambda_function_arn = aws_lambda_function.codedeploy_lambda.arn
+    events              = ["s3:ObjectCreated:*"]
+    filter_suffix       = ".zip"
+  }
+}
+# END CodeDeploy S3
 
 locals {
   all_buckets = {
