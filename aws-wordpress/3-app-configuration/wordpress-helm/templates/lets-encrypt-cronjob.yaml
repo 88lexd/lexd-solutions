@@ -36,4 +36,5 @@ spec:
           volumes:
           - name: wordpress-volume
             persistentVolumeClaim:
-              claimName: wordpress-pvc  # Referencing "[PersistentVolumeClaim].metadata.name" in deployment-wordpress.yaml
+              claimName: wordpress-local-pvc  # workaround while using local provisioner instead of EFS
+              # claimName: wordpress-pvc  # Referencing "[PersistentVolumeClaim].metadata.name" in deployment-wordpress.yaml
