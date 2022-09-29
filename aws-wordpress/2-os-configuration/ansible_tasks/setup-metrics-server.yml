@@ -1,5 +1,5 @@
 # Reference: https://github.com/kubernetes-sigs/metrics-server/tree/master/charts/metrics-server
-- name: Add Helm repo for nfs-subdir-external-provisioner
+- name: Add Helm repo for metrics-server
   kubernetes.core.helm_repository:
     name: metrics-server
     repo_url: https://kubernetes-sigs.github.io/metrics-server/

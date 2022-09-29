@@ -1,7 +1,7 @@
 # The tasks are based off the instructions outlined here:
 # https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Container-Insights-setup-logs-FluentBit.html
 ---
-- name: Create PROD namespace in the cluster
+- name: Create amazon-cloudwatch namespace in the cluster
   kubernetes.core.k8s:
     state: present
     definition:
