@@ -23,3 +23,11 @@ data "archive_file" "codedeploy_lambda_zip" {
   source_file = "${path.module}/lambdas/codedeploy_lambda.py"
   output_path = "${path.module}/codedeploy_lambda.zip"
 }
+
+data "tls_certificate" "github_actions" {
+  url = var.github_actions_url
+}
+
+data "aws_iam_openid_connect_provider" "github_actions" {
+  url = var.github_actions_url
+}

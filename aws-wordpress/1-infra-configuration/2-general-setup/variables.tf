@@ -161,6 +161,7 @@ variable "iam_role_name_for_ec2" {
   description = "The name of the IAM role that is attached to the EC2 instance"
   type        = string
 }
+# End Vars for kubeadm_cluster module
 
 ###########################
 # CloudWatch Log Group vars
@@ -174,3 +175,17 @@ variable "cw_log_k8s_application_retention" {
   type        = number
 }
 # END CloudWatch Log Group vars
+
+################
+# GitHub Actions
+variable "github_actions_url" {
+  description = "The GitHub Actions URL for OIDC"
+  type        = string
+}
+
+variable "github_source_repo" {
+  description = "The source repo for OIDC using format <accountname>/<repo_name>"
+  type        = string
+}
+
+# END GitHub Actions

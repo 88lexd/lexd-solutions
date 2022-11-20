@@ -46,3 +46,7 @@ iam_role_name_for_ec2 = "kubeadm_ec2_role"
 # CloudWatch log retention period (in days)
 cw_log_k8s_dataplane_retention   = 7
 cw_log_k8s_application_retention = 14
+
+# GitHub Actions
+github_actions_url = "https://token.actions.githubusercontent.com"
+github_source_repo = "88lexd/lexd-solutions"
