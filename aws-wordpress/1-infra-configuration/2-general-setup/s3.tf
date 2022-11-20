@@ -1,18 +1,35 @@
+############
+# Lambda S3
 resource "aws_s3_bucket" "lambda_s3_bucket" {
   bucket = var.lambda_s3_bucket_name
+}
+
+resource "aws_s3_bucket_acl" "lambda_s3_bucket_acl" {
+  bucket = aws_s3_bucket.lambda_s3_bucket.id
   acl    = "private"
+}
 
-  versioning {
-    enabled = true
+resource "aws_s3_bucket_versioning" "lambda_s3_bucket_config_versioning" {
+  bucket = aws_s3_bucket.lambda_s3_bucket.id
+
+  versioning_configuration {
+    status = "Enabled"
   }
+}
 
-  lifecycle_rule {
-    enabled = true
+resource "aws_s3_bucket_lifecycle_configuration" "lambda_s3_bucket_config" {
+  bucket = aws_s3_bucket.lambda_s3_bucket.id
 
-    abort_incomplete_multipart_upload_days = 1
+  rule {
+    id     = "lifecycle-1"
+    status = "Enabled"
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 1
+    }
 
     noncurrent_version_expiration {
-      days = 3
+      noncurrent_days = 3
     }
 
     expiration {
@@ -20,24 +37,40 @@ resource "aws_s3_bucket" "lambda_s3_bucket" {
     }
   }
 }
+# END Lambda S3
 
 ##################
 # Code Deploy S3
 resource "aws_s3_bucket" "codedeploy_s3_bucket" {
   bucket = var.codedeploy_s3_bucket_name
+}
+
+resource "aws_s3_bucket_acl" "codedeploy_s3_bucket_acl" {
+  bucket = aws_s3_bucket.codedeploy_s3_bucket.id
   acl    = "private"
+}
 
-  versioning {
-    enabled = true
+resource "aws_s3_bucket_versioning" "codedeploy_s3_bucket_versioning" {
+  bucket = aws_s3_bucket.codedeploy_s3_bucket.id
+
+  versioning_configuration {
+    status = "Enabled"
   }
+}
 
-  lifecycle_rule {
-    enabled = true
+resource "aws_s3_bucket_lifecycle_configuration" "codedeploy_s3_bucket_config" {
+  bucket = aws_s3_bucket.codedeploy_s3_bucket.id
 
-    abort_incomplete_multipart_upload_days = 1
+  rule {
+    id     = "lifecycle-1"
+    status = "Enabled"
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 1
+    }
 
     noncurrent_version_expiration {
-      days = 3
+      noncurrent_days = 3
     }
 
     expiration {
