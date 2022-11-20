@@ -1,11 +1,9 @@
 ######################
 # IAM OIDC with GitHub
 resource "aws_iam_openid_connect_provider" "github_oidc" {
-  url = var.github_actions_url
-
   # See: https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services#adding-the-identity-provider-to-aws
-  client_id_list = ["sts.amazonaws.com"]
-
+  url             = var.github_actions_url
+  client_id_list  = ["sts.amazonaws.com"]
   thumbprint_list = [data.tls_certificate.github_actions.certificates[0].sha1_fingerprint]
 }
 
@@ -38,7 +36,7 @@ resource "aws_iam_role" "github_oidc_role" {
         Action = "sts:AssumeRoleWithWebIdentity"
         Effect = "Allow"
         Principal = {
-          "Federated" : "${data.aws_iam_openid_connect_provider.github_actions.arn}"
+          "Federated" : "${aws_iam_openid_connect_provider.github_oidc.arn}"
         }
         Condition = {
           "StringLike" : {
