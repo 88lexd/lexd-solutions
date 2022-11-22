@@ -1,5 +1,5 @@
 ---
 user_arn: arn:aws:iam::<12345>:user/<username>
-region: ap-southeast-2
+default_region: ap-southeast-2  # if no region specified for a role in roles.yml, it will use this region
 aws_access_key_id: <your aws access key>
 aws_secret_access_key: <your aws secret key>

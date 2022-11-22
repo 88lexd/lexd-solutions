@@ -15,7 +15,6 @@ def main():
     print("===================================")
 
     parser = get_parser()
-    global opts
     opts = parser.parse_args()
 
     # Check for profile expiry only
@@ -46,18 +45,19 @@ def main():
     role = roles[choice_index]
 
     response = assume_role(cred, role)
-    save_credentials(response, cred)
+    save_credentials(response, cred, role)
 
     print("\nYour new AWS credentials will now work with awscli. e.g.")
-    print(f"$ aws ec2 describe-instances --profile {opts.profile}")
+    print(f"$ export AWS_PROFILE={role['profile_name']}")
+    print(f"$ aws ec2 describe-instances")
 
 
 def get_parser():
     parser = argparse.ArgumentParser(description="Assume role in AWS.")
-    parser.add_argument("-p", "--profile", required=True, help="The profile name to save the token")
     parser.add_argument("-c", "--cred-file", help="File containing the AWS credential")
     parser.add_argument("-r", "--roles-file", help="File containing the roles for script to assume-role")
     parser.add_argument("-e", "--expiry", action="store_true", help="Check when a profile expires")
+    parser.add_argument("-p", "--profile", help="The profile name to check for expiration")
     return parser
 
 
@@ -91,7 +91,7 @@ def generate_menu_options(roles):
     menu_list.append("[0] Exit")  # Allow graceful exit from menu, without having to use CTRL+C
 
     for index, role in enumerate(roles, start=1):
-        menu_list.append(f"[{index}] {role['name']} ({role['role_name']}@{role['aws_account_id']})")
+        menu_list.append(f"[{index}] {role['display_name']} ({role['role_name']}@{role['aws_account_id']}) | (profile: {role['profile_name']})")
     return menu_list
 
 
@@ -111,7 +111,7 @@ def assume_role(cred, role):
     sts_client = boto3.Session(
         aws_access_key_id=cred['aws_access_key_id'],
         aws_secret_access_key=cred['aws_secret_access_key'],
-        region_name=cred['region']
+        region_name=cred['default_region']
     ).client('sts')
 
     try:
@@ -131,9 +131,7 @@ def assume_role(cred, role):
     return result
 
 
-def save_credentials(response, cred):
-    global opts
-
+def save_credentials(response, cred, role):
     # Saving to $HOME/.aws/credentials file
     aws_credentials_file = f"{os.getenv('HOME')}/.aws/credentials"
     print(f"Updating {aws_credentials_file} file...")
@@ -141,21 +139,21 @@ def save_credentials(response, cred):
     CfgParser = configparser.ConfigParser()
     CfgParser.read(aws_credentials_file)
 
-    profile_name = opts.profile
+    profile_name = role['profile_name']
 
     if profile_name in CfgParser.sections():
         CfgParser.set(profile_name, 'aws_access_key_id', response['AccessKeyId'])
         CfgParser.set(profile_name, 'aws_secret_access_key', response['SecretAccessKey'])
         CfgParser.set(profile_name, 'aws_session_token', response['SessionToken'])
         CfgParser.set(profile_name, 'expiration', str(response['Expiration'].timestamp()))
-        CfgParser.set(profile_name, 'region', cred['region'])
+        CfgParser.set(profile_name, 'region', role.get('region', cred['default_region']))
     else:
         CfgParser.add_section(profile_name)
         CfgParser.set(profile_name, 'aws_access_key_id', response['AccessKeyId'])
         CfgParser.set(profile_name, 'aws_secret_access_key', response['SecretAccessKey'])
         CfgParser.set(profile_name, 'aws_session_token', response['SessionToken'])
         CfgParser.set(profile_name, 'expiration', str(response['Expiration'].timestamp()))
-        CfgParser.set(profile_name, 'region', cred['region'])
+        CfgParser.set(profile_name, 'region', role.get('region', cred['default_region']))
 
     cfgfile = open(aws_credentials_file, 'w')
     CfgParser.write(cfgfile)
@@ -173,6 +171,7 @@ def check_credential_expiry(profile):
         print(f"The AWS profile {profile} has {minutes_remaining} minutes remaining")
     else:
         print(f"The AWS profile {profile} has expired {minutes_remaining * -1} minutes ago")
+
 
 if __name__ == "__main__":
     main()

@@ -1,13 +1,17 @@
 ---
-# The name is for the description used the script menu
+# display_name is for the description used the script menu
+# profile_name is for the aws profile name used in aws credentials file
 # role_name is case sensitive!
-- name: My Admin Role
+- display_name: My Admin Role
+  profile_name: lexd-admin
   aws_account_id: 12345
   role_name: My-Admin-Role
-  duration_seconds: 7200  # defaults to 3600 seconds if not specified
+  duration_seconds: 7200  # optional: defaults to 3600 seconds if not specified
 
 # The script supports connecting to another AWS account.
 # As long as the target account role allows you to assume into that role.
-- name: My NonAdmin Role
+- display_name: My NonAdmin Role
+  profile_name: lexd-nonadmin
   aws_account_id: 56789
   role_name: My-Admin-Role
+  region: ap-southeast-1  # optional: if not set, it will use default_region from cred.yml

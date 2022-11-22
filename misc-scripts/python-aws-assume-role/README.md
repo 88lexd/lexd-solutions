@@ -49,10 +49,10 @@ You can also assume into a role to a completely different AWS account. More abou
 - Make a copy of `cred.yml.template` and call it `cred.yml`. You can put this file anywhere you like.
 
 - Populate the `cred.yml` file with your standard IAM user details. Example:
-  ```
+  ```yaml
   ---
   user_arn: arn:aws:iam::<12345>:user/<username>
-  region: ap-southeast-2
+  default_region: ap-southeast-2
   aws_access_key_id: <your aws access key>
   aws_secret_access_key: <your aws secret key>
   ```
@@ -60,36 +60,40 @@ You can also assume into a role to a completely different AWS account. More abou
 - Make a copy of `role.yml.template` and call it `roles.yml`. You can put this file anywhere you like.
 
 - Populate the `roles.yml` file with the possible roles which you have access to assume into.
-  ```
+  ```yaml
   ---
-  # The name is for the description used the script menu
+  # display_name is for the description used the script menu
+  # profile_name is for the aws profile name used in aws credentials file
   # role_name is case sensitive!
-  - name: My Admin Role
+  - display_name: My Admin Role
+    profile_name: lexd-admin
     aws_account_id: 12345
     role_name: My-Admin-Role
+    duration_seconds: 7200  # optional: defaults to 3600 seconds if not specified
 
   # The script supports connecting to another AWS account.
   # As long as the target account role allows you to assume into that role.
-  - name: My NonAdmin Role
+  - display_name: My NonAdmin Role
+    profile_name: lexd-nonadmin
     aws_account_id: 56789
     role_name: My-Admin-Role
+    region: ap-southeast-1  # optional: if not set, it will use default_region from cred.yml
   ```
   **Important Note**: The role_name is case sensitive!
 
-
 - Execute the script by passing in the config files
   ```
-  $ assume-role --cred-file ~/cred.yml --roles-file ~/roles.yml --profile alex
+  $ assume-role --cred-file ~/cred.yml --roles-file ~/roles.yml
   or
-  $ assume-role --c ~/cred.yml -r ~/roles.yml -p alex
+  $ assume-role --c ~/cred.yml -r ~/roles.yml
 
   ===================================
   AWS Assume Role Script by Alex Dinh
   ===================================
   Choose a role to assume into:
     [0] Exit
-  > [1] My Admin Role (My-Admin@12345)
-    [2] My NonAdmin Role (My-NonAdmin@56789)
+  > [1] My Admin Role (My-Admin@12345) | (profile: my-admin)
+    [2] My NonAdmin Role (My-NonAdmin@56789) | (profile: non-admin)
 
   Enter MFA token code for [ arn:aws:iam::12345:user/myusername ]: 123456
 
@@ -98,22 +102,23 @@ You can also assume into a role to a completely different AWS account. More abou
   Updating /home/alex/.aws/credentials file...
 
   Your new AWS credentials will now work with awscli. e.g.
-  $ aws ec2 describe-instances --profile alex
+  $ export AWS_PROFILE=my-admin
+  $ aws ec2 describe-instances
   ```
 
 - Can now run awscli commands by specifying the profile you created
   ```
-  $ aws ec2 describe-instances --profile alex | jq '.Reservations[].Instances[].InstanceId'
+  $ aws ec2 describe-instances --profile my-admin | jq '.Reservations[].Instances[].InstanceId'
   "i-02bfd9dafcfxxxxxx"
   ```
 
 - To check STS token expiry run the following:
   ```
-  $ assume-role --profile alex --expiry
+  $ assume-role --profile my-admin --expiry
   or
-  $ assume-role --p alex -e
+  $ assume-role --p my-admin -e
   ===================================
   AWS Assume Role Script by Alex Dinh
   ===================================
-  The AWS profile alex has 59 minutes remaining
+  The AWS profile my-admin has 59 minutes remaining
   ```
