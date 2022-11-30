@@ -13,6 +13,8 @@ jobs:
     - name: Generate a comma seperated list of paths for Terraform docs action
       id: generate_dir_list
       run: |
+        pwd
+        ls -l
         python3 <<EOL
         import json
         with open('terraform-docs-paths.json', 'r') as f:
