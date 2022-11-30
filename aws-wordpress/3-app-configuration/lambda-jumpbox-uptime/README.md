@@ -39,3 +39,57 @@ The Terraform template will configure the following resources:
  - Lambda Function using the S3 object
  - IAM roles and policies for the Lambda function
  - CloudWatch/EventBridge rules to trigger the Lambda function hourly
+
+<!-- BEGIN_TF_DOCS -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 3.66.0 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 3.66.0 |
+
+## Modules
+
+No modules.
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [aws_cloudwatch_event_rule.lambda_trigger_event_rule](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_event_rule) | resource |
+| [aws_cloudwatch_event_target.lambda_trigger_event_target](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_event_target) | resource |
+| [aws_cloudwatch_log_group.log_group](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
+| [aws_iam_policy.lambda_logging](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
+| [aws_iam_role.iam_for_lambda](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_iam_role_policy_attachment.lambda_policy_attach](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_lambda_function.lambda_function](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lambda_function) | resource |
+| [aws_lambda_permission.cloudwatch_invoke_lambda](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lambda_permission) | resource |
+| [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
+| [aws_instance.jumpbox](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/instance) | data source |
+| [aws_s3_bucket_object.lambda_zip](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/s3_bucket_object) | data source |
+| [aws_sns_topic.general_notification_topic](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/sns_topic) | data source |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | AWS region to create these resources | `string` | n/a | yes |
+| <a name="input_cw_event_name"></a> [cw\_event\_name](#input\_cw\_event\_name) | The name for the CloudWatch/EventBridge name (name is used in the lambda\_policy\_json) | `string` | n/a | yes |
+| <a name="input_cw_event_schedule"></a> [cw\_event\_schedule](#input\_cw\_event\_schedule) | The cron schedule for the CW event | `string` | n/a | yes |
+| <a name="input_jumpbox_instance_name"></a> [jumpbox\_instance\_name](#input\_jumpbox\_instance\_name) | The name tag of the jumpbox instance | `string` | n/a | yes |
+| <a name="input_lambda_cw_logs_retention"></a> [lambda\_cw\_logs\_retention](#input\_lambda\_cw\_logs\_retention) | CloudWatch logs retention in days for the Lambda function | `number` | n/a | yes |
+| <a name="input_lambda_environment_variables"></a> [lambda\_environment\_variables](#input\_lambda\_environment\_variables) | The environmental variables used by the Lambda function. Threshold is in hours | <pre>object({<br>    UPTIME_THRESHOLD       = number<br>    NOTIFICATION_THRESHOLD = number<br>  })</pre> | n/a | yes |
+| <a name="input_lambda_func_description"></a> [lambda\_func\_description](#input\_lambda\_func\_description) | Description for the Lambda function | `string` | n/a | yes |
+| <a name="input_lambda_func_name"></a> [lambda\_func\_name](#input\_lambda\_func\_name) | Name of the Lambda function | `string` | n/a | yes |
+| <a name="input_s3_bucket_name"></a> [s3\_bucket\_name](#input\_s3\_bucket\_name) | The name of the S3 bucket that contains the fuction code | `string` | n/a | yes |
+| <a name="input_s3_lambda_zip"></a> [s3\_lambda\_zip](#input\_s3\_lambda\_zip) | The object (zip) where the Lambda code is stored | `string` | n/a | yes |
+
+## Outputs
+
+No outputs.
+<!-- END_TF_DOCS -->
