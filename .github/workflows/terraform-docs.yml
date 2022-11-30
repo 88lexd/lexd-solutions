@@ -19,7 +19,7 @@ jobs:
         import json
         with open('terraform-docs-paths.json', 'r') as f:
             tf_dirs = (','.join(json.load(f)))
-            print(f"output=${tf_dirs}")
+            print(f"output={tf_dirs}")
         EOL
 
     - name: Render terraform docs and push changes back to PR branch
