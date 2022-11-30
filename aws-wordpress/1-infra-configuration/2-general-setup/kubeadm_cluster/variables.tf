@@ -60,22 +60,27 @@ variable "iam_role_name_for_ec2" {
 ##################
 # Additional vars
 variable "aws_region" {
+  description = "AWS region"
   type = string
 }
 
 variable "vpc_id" {
+  description = "VPC ID"
   type = string
 }
 
 variable "vpc_azs" {
+  description = "List of AZs"
   type = list(string)
 }
 
 variable "vpc_private_subnets" {
+  description = "List of private subnets"
   type = list(string)
 }
 
 variable "vpc_public_subnets" {
+  description = "List of public subnets"
   type = list(string)
 }
 
