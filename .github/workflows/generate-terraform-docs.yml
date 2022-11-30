@@ -1,0 +1,30 @@
+name: Generate terraform docs on PR
+on:
+  - pull_request
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.pull_request.head.ref }}
+
+    - name: Generate a comma seperated list of paths for Terraform docs action
+      id: generate_dir_list
+      run: |
+        pwd
+        ls -l
+        python3 <<EOL >>$GITHUB_OUTPUT
+        import json
+        with open('terraform-docs-paths.json', 'r') as f:
+            tf_dirs = (','.join(json.load(f)))
+            print(f"dirs={tf_dirs}")
+        EOL
+    - name: Render terraform docs and push changes back to PR branch
+      uses: terraform-docs/gh-actions@v1.0.0
+      with:
+        working-dir: ${{ steps.generate_dir_list.outputs.dirs }}
+        output-file: README.md
+        output-method: inject
+        git-push: "true"
