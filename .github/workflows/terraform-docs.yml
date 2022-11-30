@@ -20,7 +20,7 @@ jobs:
         with open('terraform-docs-paths.json', 'r') as f:
             tf_dirs = (','.join(json.load(f)))
             print(f"dirs={tf_dirs}")
-        EOL
+        EOL >> $GITHUB_OUTPUT
 
     - name: Render terraform docs and push changes back to PR branch
       uses: terraform-docs/gh-actions@v1.0.0
