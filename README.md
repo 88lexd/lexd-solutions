@@ -15,3 +15,29 @@ This directory contains the resources which supports the WordPress blog
 
 ## misc-scripts
 This directory contains misc scripts which I personally use to make my life alot easier.
+
+<!-- BEGIN_TF_DOCS -->
+## Requirements
+
+No requirements.
+
+## Providers
+
+No providers.
+
+## Modules
+
+No modules.
+
+## Resources
+
+No resources.
+
+## Inputs
+
+No inputs.
+
+## Outputs
+
+No outputs.
+<!-- END_TF_DOCS -->
