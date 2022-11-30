@@ -27,3 +27,4 @@ jobs:
         working-dir: ${{ steps.generate_dir_list.outputs.dirs }}
         output-file: README.md
         output-method: inject
+        git-push: "true"
