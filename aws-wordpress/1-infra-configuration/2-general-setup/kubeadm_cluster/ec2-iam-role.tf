@@ -39,7 +39,10 @@ resource "aws_iam_role" "kubeadm_ec2_role" {
     })
   }
 
-  managed_policy_arns = ["arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"]
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy",
+    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  ]
 }
 
 # To link a role to an EC2, an instance profile must be created
