@@ -1,25 +1,59 @@
-module "ec2_instance" {
-  for_each = local.ec2_instances
+resource "aws_instance" "instances" {
+  for_each = local.instances
 
-  source  = "terraform-aws-modules/ec2-instance/aws"
-  version = "3.1.0"
+  iam_instance_profile = each.value.iam_instance_profile_name
 
-  name = each.value.name
+  launch_template {
+    id = aws_launch_template.ec2_templates[each.key].id
+    version = each.value.launch_template_version
+  }
 
-  ami                     = each.value.ami
-  instance_type           = each.value.instance_type
-  key_name                = var.ec2_keypair_name
-  vpc_security_group_ids  = each.value.security_group_ids
-  subnet_id               = each.value.subnet_id
-  enable_volume_tags      = true
-  volume_tags             = each.value.volume_tags
-  iam_instance_profile    = each.value.iam_instance_profile
-  disable_api_termination = false
-  tags                    = each.value.tags
+  tags = merge(each.value.tags, {
+    Name = each.value.name
+  })
 }
 
-# Not using ELB.. therefore only move EIP manually once new worker node is functional!
-# resource "aws_eip_association" "eip_assoc" {
-#   instance_id   = module.ec2_instance[1].id
-#   allocation_id = var.eip_alloc_id
-# }
+
+resource "aws_launch_template" "ec2_templates" {
+  for_each = local.instances
+
+  name = "${each.key}_launch_template"
+
+  image_id               = each.value.ami
+  instance_type          = each.value.instance_type
+  update_default_version = false
+  key_name               = var.ec2_keypair_name
+
+  block_device_mappings {
+    device_name = "/dev/sda1"
+    ebs {
+      delete_on_termination = true
+      volume_type           = "gp3"
+    }
+  }
+
+  network_interfaces {
+    network_interface_id = each.value.eni_id
+  }
+
+  iam_instance_profile {
+    name = each.value.iam_instance_profile_name
+  }
+
+  placement {
+    availability_zone = each.value.availability_zone
+  }
+
+  tag_specifications {
+    resource_type = "volume"
+    tags = merge(each.value.tags, {
+      Name = each.value.name
+    })
+  }
+
+  metadata_options {
+    http_endpoint          = "enabled"
+    http_tokens            = "required"
+    instance_metadata_tags = "enabled"
+  }
+}

@@ -2,27 +2,29 @@
 locals {
   ############
   # Instances
-  ec2_instances = {
+  instances = {
     k8s_master = {
-      name                 = var.ec2_k8smaster_instance_name
-      ami                  = data.aws_ami.ubuntu.id
-      instance_type        = var.ec2_k8smaster_instance_type
-      security_group_ids   = [aws_security_group.k8s_master.id]
-      subnet_id            = var.vpc_public_subnets[0]
-      volume_tags          = merge(var.ec2_k8smaster_instance_tags)
-      iam_instance_profile = aws_iam_instance_profile.ec2_iam_instance_profile.name
-      tags                 = merge(var.ec2_k8smaster_instance_tags)
+      # ami                     = data.aws_ami.ubuntu.id
+      ami                       = "ami-07fae64f6fc778612" # Manual AMI created prior to recreating the instances. For first instance creation before I delete the AMI
+      name                      = var.ec2_k8smaster_instance_name
+      instance_type             = var.ec2_k8smaster_instance_type
+      eni_id                    = aws_network_interface.k8s_master.id
+      availability_zone         = var.vpc_azs[0]
+      iam_instance_profile_name = aws_iam_instance_profile.ec2_iam_instance_profile.name
+      tags                      = merge(var.ec2_k8smaster_instance_tags)
+      launch_template_version   = "$Default" # hard code template version to prevent "force replacement" by terraform
     }
 
     k8s_worker1 = {
-      name                 = var.ec2_k8sworker_instance_name
-      ami                  = data.aws_ami.ubuntu.id
-      instance_type        = var.ec2_k8sworker_instance_type
-      security_group_ids   = [aws_security_group.k8s_workernodes.id]
-      subnet_id            = var.vpc_public_subnets[0]
-      volume_tags          = merge(var.ec2_k8sworker_instance_tags)
-      iam_instance_profile = aws_iam_instance_profile.ec2_iam_instance_profile.name
-      tags                 = merge(var.ec2_k8sworker_instance_tags)
+      # ami                     = data.aws_ami.ubuntu.id
+      ami                       = "ami-0dda7e5433506ec85" # Manual AMI created prior to recreating the instances. For first instance creation before I delete the AMI
+      name                      = var.ec2_k8sworker_instance_name
+      instance_type             = var.ec2_k8sworker_instance_type
+      eni_id                    = aws_network_interface.k8s_worker_1.id
+      availability_zone         = var.vpc_azs[0]
+      iam_instance_profile_name = aws_iam_instance_profile.ec2_iam_instance_profile.name
+      tags                      = merge(var.ec2_k8sworker_instance_tags)
+      launch_template_version   = 4 # hard code template version to prevent "force replacement" by terraform
     }
   }
 
