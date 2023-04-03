@@ -5,12 +5,22 @@ data "aws_instance" "k8s_master" {
     name   = "tag:Name"
     values = [var.ec2_k8smaster_instance_name]
   }
+
+  filter {
+    name   = "instance-state-name"
+    values = ["running"]
+  }
 }
 
 data "aws_instance" "k8s_worker" {
   filter {
     name   = "tag:Name"
     values = [var.ec2_k8sworker_instance_name]
+  }
+
+  filter {
+    name   = "instance-state-name"
+    values = ["running"]
   }
 }
 
