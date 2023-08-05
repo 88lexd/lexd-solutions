@@ -82,4 +82,8 @@ Name:   lexdsolutions.com
 Address: 2606:4700:3037::6815:335a
 ```
 
-Modify local `hostfile` to point `lexdsolutions => 104.21.51.90`
+Modify local `hostfile` with the following records for testing:
+```
+104.21.51.90 lexdsolutions.com
+104.21.51.90 www.lexdsolutions.com
+```
