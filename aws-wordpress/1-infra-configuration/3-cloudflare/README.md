@@ -17,9 +17,9 @@ The Terraform state is stored in AWS S3 alongside with my other IaC.
 Note: When I first played with this Cloudflare provider, I was using a local state, but once I added the `backend.tf`, I had to run the following command to migrate my state over to S3. The following commands were used:
 
 ```shell
-# First auth AWS
-# My custom assume role script, see:: https://lexdsolutions.com/2021/09/how-to-assume-role-on-aws-and-using-python/)
-$ assume-role --c cred.yml -r roles.yml -p alex
+# First auth into AWS
+# See: https://github.com/88lexd/lexd-solutions/tree/main/misc-scripts/python-aws-assume-role)
+$ assume-role --c cred.yml -r roles.yml
 
 $ export AWS_PROFILE=lexd-admin
 
