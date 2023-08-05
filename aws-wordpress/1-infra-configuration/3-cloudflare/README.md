@@ -3,11 +3,29 @@ Cloudflare is used to front my website by providing CDN, WAF and DDoS protection
 
 This directory contains the Terraform IaC to define the Cloudflare configuration.
 
-## Authentication
+## Configuration
+### Cloudflare
 The Cloudflare API key is used to authenticate into my account. Local environmental variable is used:
 ```
 echo 'export CLOUDFLARE_API_KEY="123"' >> ~/.bashrc.alex
 echo 'export CLOUDFLARE_EMAIL="myemail@domain.com"' >> ~/.bashrc.alex
+```
+
+### Terraform Backend
+The Terraform state is stored in AWS S3 alongside with my other IaC.
+
+Note: When I first played with this Cloudflare provider, I was using a local state, but once I added the `backend.tf`, I had to run the following command to migrate my state over to S3. The following commands were used:
+
+```shell
+# First auth AWS
+# My custom assume role script, see:: https://lexdsolutions.com/2021/09/how-to-assume-role-on-aws-and-using-python/)
+$ assume-role --c cred.yml -r roles.yml -p alex
+
+$ export AWS_PROFILE=lexd-admin
+
+# Migrate state over to S3
+$ terraform init -migrate-state
+$ terraform plan
 ```
 
 ## Prerequisites
