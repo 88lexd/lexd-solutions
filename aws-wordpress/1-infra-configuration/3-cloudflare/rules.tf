@@ -8,6 +8,21 @@ resource "cloudflare_ruleset" "waf" {
   # The order is as specified in this resource (top down)
   # Free plan can create up to 5 custom rules
   rules {
+    description = "Allow LinkedInBot"
+    expression  = "(http.user_agent contains \"LinkedInBot\")"
+    action      = "skip"
+    action_parameters {
+      ruleset = "current"
+    }
+    logging {
+      enabled = true
+    }
+    enabled = true
+  }
+
+  # LinkedInBot/1.0 (compatible; Mozilla/5.0; Apache-HttpClient +http://www.linkedin.com)
+
+  rules {
     description = "Known Bots Challenge"
     expression  = "(cf.client.bot)"
     action      = "managed_challenge"
