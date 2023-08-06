@@ -8,8 +8,8 @@ resource "cloudflare_ruleset" "waf" {
   # The order is as specified in this resource (top down)
   # Free plan can create up to 5 custom rules
   rules {
-    description = "Allow LinkedInBot"
-    expression  = "(http.user_agent contains \"LinkedInBot\")"
+    description = "Allow Good Bots"
+    expression  = "(http.user_agent contains \"LinkedInBot\") or (http.user_agent contains \"facebookexternalhit\")"
     action      = "skip"
     action_parameters {
       ruleset = "current"
