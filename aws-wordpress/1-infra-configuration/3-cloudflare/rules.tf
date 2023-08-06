@@ -20,8 +20,6 @@ resource "cloudflare_ruleset" "waf" {
     enabled = true
   }
 
-  # LinkedInBot/1.0 (compatible; Mozilla/5.0; Apache-HttpClient +http://www.linkedin.com)
-
   rules {
     description = "Known Bots Challenge"
     expression  = "(cf.client.bot)"
