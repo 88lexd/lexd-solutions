@@ -14,12 +14,19 @@ resource "cloudflare_ruleset" "waf" {
     enabled     = true
   }
 
-  # rules {
-  #   description = "Test challenge path"
-  #   expression  = "(http.request.uri.path eq \"/blaa\")"
-  #   action      = "managed_challenge"
-  #   enabled     = true
-  # }
+  rules {
+    description = "wp-login.php Challenge"
+    expression  = "(http.request.uri.path eq \"/wp-login.php\")"
+    action      = "challenge"
+    enabled     = true
+  }
+
+  rules {
+    description = "Test challenge path"
+    expression  = "(http.request.uri.path eq \"/waf-test\")"
+    action      = "challenge"
+    enabled     = true
+  }
 }
 
 resource "cloudflare_ruleset" "www" {

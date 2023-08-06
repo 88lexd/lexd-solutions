@@ -11,5 +11,6 @@ resource "cloudflare_zone_settings_override" "lexdsolutions" {
     development_mode = "off"
     brotli           = "on"
     always_use_https = "on"
+    ssl              = "full" # off| flexible | full | strict
   }
 }
