@@ -7,30 +7,30 @@ resource "cloudflare_ruleset" "waf" {
 
   # The order is as specified in this resource (top down)
   # Free plan can create up to 5 custom rules
-  # rules {
-  #   description = "Allow Good Bots"
-  #   expression  = "(http.user_agent contains \"LinkedInBot\") or (http.user_agent contains \"facebookexternalhit\")"
-  #   action      = "skip"
-  #   action_parameters {
-  #     ruleset = "current"
-  #   }
-  #   logging {
-  #     enabled = true
-  #   }
-  #   enabled = true
-  # }
+  rules {
+    description = "wp-login.php Challenge"
+    expression  = "(http.request.uri.path eq \"/wp-login.php\")"
+    action      = "challenge"
+    enabled     = true
+  }
+
+  rules {
+    description = "Allow Countries"
+    expression  = "(ip.geoip.country eq \"AU\")"
+    action      = "skip"
+    action_parameters {
+      ruleset = "current"
+    }
+    logging {
+      enabled = true
+    }
+    enabled = true
+  }
 
   rules {
     description = "Bad Bots Challenge"
     expression  = "(not cf.client.bot)"
     action      = "managed_challenge"
-    enabled     = true
-  }
-
-  rules {
-    description = "wp-login.php Challenge"
-    expression  = "(http.request.uri.path eq \"/wp-login.php\")"
-    action      = "challenge"
     enabled     = true
   }
 
