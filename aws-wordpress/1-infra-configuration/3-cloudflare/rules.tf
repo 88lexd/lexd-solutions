@@ -8,8 +8,8 @@ resource "cloudflare_ruleset" "waf" {
   # The order is as specified in this resource (top down)
   # Free plan can create up to 5 custom rules
   rules {
-    description = "wp-login.php Challenge"
-    expression  = "(http.request.uri.path eq \"/wp-login.php\")"
+    description = "Restricted Page Challenge"
+    expression  = "(http.request.uri.path eq \"/wp-login.php\") or (http.request.uri.path eq \"/xmlrpc.php\")"
     action      = "challenge"
     enabled     = true
   }
