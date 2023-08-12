@@ -8,6 +8,13 @@ resource "cloudflare_ruleset" "waf" {
   # The order is as specified in this resource (top down)
   # Free plan can create up to 5 custom rules
   rules {
+    description = "Block High Threat"
+    expression  = "(cf.threat_score gt 50)"
+    action      = "block"
+    enabled     = true
+  }
+
+  rules {
     description = "Restricted Page Challenge"
     expression  = "(http.request.uri.path eq \"/wp-login.php\") or (http.request.uri.path eq \"/xmlrpc.php\")"
     action      = "challenge"
@@ -16,7 +23,7 @@ resource "cloudflare_ruleset" "waf" {
 
   rules {
     description = "Allow Countries"
-    expression  = "(ip.geoip.country eq \"AU\")"
+    expression  = "(ip.geoip.country eq \"AU\" and cf.threat_score le 10)"
     action      = "skip"
     action_parameters {
       ruleset = "current"
@@ -28,18 +35,18 @@ resource "cloudflare_ruleset" "waf" {
   }
 
   rules {
-    description = "Bad Bots Challenge"
-    expression  = "(not cf.client.bot)"
+    description = "None Bot Challenge"
+    expression  = "(not cf.client.bot) "
     action      = "managed_challenge"
     enabled     = true
   }
 
-  rules {
-    description = "Test challenge path"
-    expression  = "(http.request.uri.path eq \"/waf-test\")"
-    action      = "challenge"
-    enabled     = true
-  }
+  # rules {
+  #   description = "Test challenge path"
+  #   expression  = "(http.request.uri.path eq \"/waf-test\")"
+  #   action      = "challenge"
+  #   enabled     = true
+  # }
 }
 
 resource "cloudflare_ruleset" "www" {
