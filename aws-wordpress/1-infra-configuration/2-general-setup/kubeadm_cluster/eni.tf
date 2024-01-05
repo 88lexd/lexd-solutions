@@ -3,7 +3,7 @@
 
 # terraform import module.kubeadm_cluster.aws_network_interface.k8s_master eni-xyz
 resource "aws_network_interface" "k8s_master" {
-  subnet_id = var.vpc_public_subnets[0]
+  subnet_id       = var.vpc_public_subnets[0]
   security_groups = [aws_security_group.k8s_master.id]
   tags = {
     Name = "k8s_master_eni"

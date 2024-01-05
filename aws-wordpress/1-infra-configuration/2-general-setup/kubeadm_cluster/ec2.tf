@@ -3,10 +3,16 @@ resource "aws_instance" "instances" {
 
   iam_instance_profile = each.value.iam_instance_profile_name
 
+  # Launch Template parameters will be used only once during instance creation.
+  # If want to update existing instances, will need to change parameters directly.
+  # Updating Launch Template specification will force a new instance.
   launch_template {
-    id = aws_launch_template.ec2_templates[each.key].id
+    id      = aws_launch_template.ec2_templates[each.key].id
     version = each.value.launch_template_version
   }
+
+  # Changing parameters directly
+  instance_type = each.value.instance_type
 
   tags = merge(each.value.tags, {
     Name = each.value.name

@@ -1,15 +1,18 @@
-data "aws_ami" "ubuntu" {
-  most_recent = true
+# Note: As of Jan 2024... not used, AMI name no longer exist..
+# Also locals.tf defines a hard coded AMI id during the recreation of the instances previously.
 
-  filter {
-    name   = "name"
-    values = [var.ec2_ami_name]
-  }
+# data "aws_ami" "ubuntu" {
+#   most_recent = true
 
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
+#   filter {
+#     name   = "name"
+#     values = [var.ec2_ami_name]
+#   }
 
-  owners = [var.ec2_ami_owner_id]
-}
+#   filter {
+#     name   = "virtualization-type"
+#     values = ["hvm"]
+#   }
+
+#   owners = [var.ec2_ami_owner_id]
+# }

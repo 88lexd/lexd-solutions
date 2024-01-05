@@ -22,7 +22,7 @@ jumpbox_sg_id = "sg-0db47122b8885fb8d"
 ec2_k8smaster_instance_name = "K8s Master"
 ec2_k8sworker_instance_name = "K8s Worker"
 
-ec2_k8smaster_instance_type = "t3a.small"
+ec2_k8smaster_instance_type = "t3a.micro" # On average instance uses just under 1GB RAM.. micro should do OK..
 ec2_k8sworker_instance_type = "t3a.small"
 
 ec2_k8smaster_instance_tags = {
