@@ -1,0 +1,37 @@
+---
+people:
+  - alex
+  - jess
+  - andrew
+  - amanda
+expenses:
+  andrew:
+    hotel:
+      amount: 500
+      split_with:
+        - test
+    flights:
+      amount: 2000
+  jess:
+    drinks:
+      amount: 100
+      split_with:
+        - jess
+        - amanda
+    lunch:
+      amount: 50
+  alex:
+    dinner:
+      amount: 200
+      split_with:
+        - alexxxx # force error during validation to check names
+        - andrew
+        - yyy
+
+
+# Manual calc to test logic
+# All = 2,550 (hotel, flights, lunch) / 4 = 637.5 each
+
+# Jess, Amanda = 100 (drinks) /2 = 50+637.5 = 687.5 each
+
+# Andrew = 200 (dinner) /2 = 100+637.5 = 737.5
