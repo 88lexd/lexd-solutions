@@ -27,14 +27,23 @@ def main():
         print("Double check and ensure the persons name you want to split bill with matches with the people defined.")
         sys.exit(1)
 
+    group = list()
+    for person in all_expenses['people']:
+        group.append(Person(
+            name=person,
+            expenses=all_expenses['expenses'].get(person, None)
+        ))
+    group
+
 
 # Validate people names and the names referenced for splitting.
 # References must match (UPPER CASE is enforced)
 def validate_names(all_expenses):
     all_names_for_splitting = list()
     for name, expenses in all_expenses['expenses'].items():
-        all_names_for_splitting.extend([
-            v['split_with'] for k,v in expenses.items() if 'split_with' in v.keys()][0])
+        result = [v['split_with'] for k,v in expenses.items() if 'split_with' in v.keys()]
+        if len(result) > 0:
+            all_names_for_splitting.extend(result[0])
 
     # Make unique
     uniq_names_for_splitting = list(set(all_names_for_splitting))
