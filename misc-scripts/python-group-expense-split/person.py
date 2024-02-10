@@ -8,3 +8,7 @@ class Person:
 
         # Debt is how much you owe
         self.debt = 0
+
+
+    def add_credit(self, amount):
+        self.credit += amount
