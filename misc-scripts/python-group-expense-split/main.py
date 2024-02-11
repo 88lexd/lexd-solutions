@@ -52,19 +52,26 @@ def main():
 
 
 def calculate_payments(creditors, debtors):
+    # Set final balance now that the debt/credit is fully updated
+    [i.set_final_balance() for i in creditors]
+    [i.set_final_balance() for i in debtors]
+
     for creditor in creditors:
-        creditor.set_final_balance()
         while (creditor.final_balance) > 0:
             for debtor in debtors:
-                debtor.set_final_balance()
-                if (creditor.final_balance + debtor.final_balance) > 0:
-                    print(f" - {debtor.name} pays {creditor.name} ${creditor.final_balance}")
-                    creditor.final_balance = creditor.final_balance + debtor.final_balance
-                    debtor.final_balance = debtor.final_balance + (debtor.final_balance * -1)
+                if debtor.final_balance == 0:
                     continue
-                else:
-                    debtor
 
+                if (creditor.final_balance + debtor.final_balance) > 0:
+                    balance_str = '{0:.2f}'.format(debtor.final_balance * -1)
+                    print(f" - {debtor.name} pays {creditor.name} ${balance_str}")
+                    creditor.final_balance = creditor.final_balance + debtor.final_balance
+                    debtor.final_balance = 0
+                else:
+                    balance_str = '{0:.2f}'.format(creditor.final_balance)
+                    print(f" - {debtor.name} pays {creditor.name} ${balance_str}")
+                    debtor.final_balance = debtor.final_balance + creditor.final_balance
+                    creditor.final_balance = 0
 
 
 def get_creditors_and_debtors(group):
