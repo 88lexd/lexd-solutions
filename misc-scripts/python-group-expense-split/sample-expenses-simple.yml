@@ -1,0 +1,22 @@
+# This simple sample uses numbers that can be easily divided to show the payments
+---
+# All the people in the group to split the bill
+people:
+  - alex
+  - jay
+  - lambo
+  - mandy
+expenses:
+  lambo:
+    # When "split_with" is not set, then is shared between everyone
+    hotel:
+      amount: 200
+  jay:
+    drinks:
+      amount: 100
+      split_with:
+        - jay
+        - mandy
+  alex:
+    dinner:
+      amount: 200
