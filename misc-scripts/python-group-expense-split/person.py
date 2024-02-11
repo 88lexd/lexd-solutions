@@ -12,3 +12,7 @@ class Person:
 
     def add_credit(self, amount):
         self.credit += amount
+
+
+    def add_debt(self, amount):
+        self.debt += amount

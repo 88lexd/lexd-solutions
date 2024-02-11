@@ -57,7 +57,6 @@ def validate_names_for_spitting(all_expenses):
         if name not in all_names_upper:
             bad_names.append(name)
 
-
     if len(bad_names) == 0:
         return True, None
     else:

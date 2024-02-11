@@ -21,9 +21,9 @@ def main():
     v.validate_yaml(all_expenses)
 
     print("Building instance for each person...")
-    group_expense = dict()
+    group = dict()
     for person in all_expenses['people']:
-        group_expense.update({
+        group.update({
             person: Person(
                     name=person,
                     expenses=all_expenses['expenses'].get(person, None)
@@ -36,13 +36,12 @@ def main():
     print("\n===============")
     print("Expense details")
     print("===============")
-    calculate_all_expenses(group_expense)
+    calculate_all_expenses(group)
 
 
-def calculate_all_expenses(group_expense):
-    # Calculate all the expenses and add it as the persons credit
+def calculate_all_expenses(group):
     group_total_expense = 0
-    for name, person in group_expense.items():
+    for name, person in group.items():
         if person.expenses is None:
             print(f"{name} has no expenses")
             continue
@@ -53,19 +52,37 @@ def calculate_all_expenses(group_expense):
             # Build display string for items split with specific individuals.
             if 'split_with' in details.keys():
                 split_with_str = f"(split with: {', '.join(details['split_with'])})"
-                # TODO: When adding split_with... I need to add as debt for the people in split_with
+                calculate_split_debt(group, details['split_with'], float(details['amount']))
             else:
                 split_with_str = ''
+                calculate_all_debt(group, float(details['amount']))
 
             # Add expense as credit to the person made the expense
-            person.add_credit(int(details['amount']))
+            person.add_credit(float(details['amount']))
 
             print(f" - ${details['amount']} on {item} {split_with_str}")
-            person_total_expenses += int(details['amount'])
+            person_total_expenses += float(details['amount'])
 
         group_total_expense += person_total_expenses
 
-    print(f"\nThe group has spent a total of: ${group_total_expense}")
+    group_total_expense_str = '{0:.2f}'.format(group_total_expense)
+    print(f"\nThe group has spent a total of: ${group_total_expense_str}")
+
+
+def calculate_split_debt(group, split_with, amount):
+    # Accumulate debt for those splitting the expense
+    split_between_number = len(split_with)
+    debt_per_person = float(amount / split_between_number)
+    for person in split_with:
+        group[person].add_debt(debt_per_person)
+
+
+def calculate_all_debt(group, amount):
+    # General expenses are split between everyone
+    split_between_number = len(group)
+    debt_per_person = float(amount / split_between_number)
+    for person in group:
+        group[person].add_debt(debt_per_person)
 
 
 def read_yaml(input_file):
