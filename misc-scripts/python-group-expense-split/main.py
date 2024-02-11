@@ -34,9 +34,59 @@ def main():
     print("Adding up expenses for each person...")
 
     print("\n===============")
-    print("Expense details")
+    print("Expense Details")
     print("===============")
     calculate_all_expenses(group)
+
+    print("\n=========================")
+    print("Group Debt/Credit Totals")
+    print("=========================")
+    show_debt_credit_info(group)
+
+    print("\n=========================")
+    print("Group Payout Information")
+    print("=========================")
+    creditors, debtors = get_creditors_and_debtors(group)
+    calculate_payments(creditors, debtors)
+    pass
+
+
+def calculate_payments(creditors, debtors):
+    for creditor in creditors:
+        creditor.set_final_balance()
+        while (creditor.final_balance) > 0:
+            for debtor in debtors:
+                debtor.set_final_balance()
+                if (creditor.final_balance + debtor.final_balance) > 0:
+                    print(f" - {debtor.name} pays {creditor.name} ${creditor.final_balance}")
+                    creditor.final_balance = creditor.final_balance + debtor.final_balance
+                    debtor.final_balance = debtor.final_balance + (debtor.final_balance * -1)
+                    continue
+                else:
+                    debtor
+
+
+
+def get_creditors_and_debtors(group):
+    creditors = list()
+    debtors = list()
+    for name, person in group.items():
+        if person.in_debt():
+            debtors.append(person)
+        else:
+            creditors.append(person)
+
+    return creditors, debtors
+
+
+def show_debt_credit_info(group):
+    for name, person in group.items():
+        if person.in_debt():
+            print(f"{name} owes ${person.balance() * -1} to the group money based on:")
+        else:
+            print(f"{name} is receiving ${person.balance()} from the group based on:")
+        print(f" - Credit: ${'{0:.2f}'.format(person.credit)}")
+        print(f" - Debt: ${'{0:.2f}'.format(person.debt)}")
 
 
 def calculate_all_expenses(group):

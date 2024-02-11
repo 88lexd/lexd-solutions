@@ -9,9 +9,11 @@ expenses:
   lambo:
     # When "split_with" is not set, then is shared between everyone
     hotel:
-      amount: 500
+      # amount: 500
+      amount: 200
     flights:
-      amount: 2000
+      # amount: 2000
+      amount: 500
   jay:
     drinks:
       amount: 100
@@ -19,7 +21,7 @@ expenses:
         - jay
         - mandy
     lunch:
-      amount: 50
+      amount: 550
   alex:
     dinner:
       amount: 200
