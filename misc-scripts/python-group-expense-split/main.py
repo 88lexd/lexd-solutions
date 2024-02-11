@@ -60,6 +60,7 @@ def calculate_payments(creditors, debtors):
         while (creditor.final_balance) > 0:
             for debtor in debtors:
                 if debtor.final_balance == 0:
+                    # Debtor is not owing any money. Skip..
                     continue
 
                 if (creditor.final_balance + debtor.final_balance) > 0:
@@ -67,11 +68,15 @@ def calculate_payments(creditors, debtors):
                     print(f" - {debtor.name} pays {creditor.name} ${balance_str}")
                     creditor.final_balance = creditor.final_balance + debtor.final_balance
                     debtor.final_balance = 0
+                    # Debtor has paid all debt, continue to next debtor
+                    continue
                 else:
                     balance_str = '{0:.2f}'.format(creditor.final_balance)
                     print(f" - {debtor.name} pays {creditor.name} ${balance_str}")
                     debtor.final_balance = debtor.final_balance + creditor.final_balance
                     creditor.final_balance = 0
+                    # Creditor is fully paid, break out of debtor loop
+                    break
 
 
 def get_creditors_and_debtors(group):
@@ -89,11 +94,13 @@ def get_creditors_and_debtors(group):
 def show_debt_credit_info(group):
     for name, person in group.items():
         if person.in_debt():
-            print(f"{name} owes ${person.balance() * -1} to the group money based on:")
+            balance_str = '{0:.2f}'.format(person.balance() * -1)
+            print(f"{name} owes ${balance_str} to the group money based on:")
         else:
-            print(f"{name} is receiving ${person.balance()} from the group based on:")
+            balance_str = '{0:.2f}'.format(person.balance())
+            print(f"{name} is receiving ${balance_str} from the group based on:")
         print(f" - Credit: ${'{0:.2f}'.format(person.credit)}")
-        print(f" - Debt: ${'{0:.2f}'.format(person.debt)}")
+        print(f" - Debt: -${'{0:.2f}'.format(person.debt)}")
 
 
 def calculate_all_expenses(group):
