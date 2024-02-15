@@ -48,7 +48,6 @@ def main():
     print("=========================")
     creditors, debtors = get_creditors_and_debtors(group)
     calculate_payments(creditors, debtors)
-    pass
 
 
 def calculate_payments(creditors, debtors):
