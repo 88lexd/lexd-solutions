@@ -35,6 +35,19 @@ resource "cloudflare_ruleset" "waf" {
   }
 
   rules {
+    description = "Allowed User Agents"
+    expression  = "(http.user_agent contains \"LinkedInBot/1.0\")"
+    action      = "skip"
+    action_parameters {
+      ruleset = "current"
+    }
+    logging {
+      enabled = true
+    }
+    enabled = true
+  }
+
+  rules {
     description = "None Bot Challenge"
     expression  = "(not cf.client.bot) "
     action      = "managed_challenge"
