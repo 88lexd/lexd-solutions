@@ -1,7 +1,5 @@
 # Lexd Solutions
-My name is Alex Dinh and I am an independent IT consultant based in Sydney, NSW Australia.
-
-Lexd Solutions is the company which I own and run. 
+My name is Alex Dinh and I am an IT consultant based in Sydney, NSW Australia.
 
 This public repository contains code and scripts which I would like to share with the world :)
 
