@@ -7,3 +7,8 @@ variable "zone_id" {
   description = "The DNS zone id for Cloudflare"
   type        = string
 }
+
+variable "email" {
+  description = "The email to send notifications"
+  type        = string
+}
