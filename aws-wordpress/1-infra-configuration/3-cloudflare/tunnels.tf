@@ -27,9 +27,9 @@ resource "cloudflare_tunnel_config" "lexd_solutions" {
 }
 
 resource "cloudflare_record" "lexd_solutions" {
-  zone_id  = var.zone_id
-  name     = "tftesting"
-  value    = "${cloudflare_tunnel.lexd_solutions.id}.cfargotunnel.com"
-  type     = "CNAME"
-  proxied  = true
+  zone_id = var.zone_id
+  name    = "tftesting"
+  value   = "${cloudflare_tunnel.lexd_solutions.id}.cfargotunnel.com"
+  type    = "CNAME"
+  proxied = true
 }
