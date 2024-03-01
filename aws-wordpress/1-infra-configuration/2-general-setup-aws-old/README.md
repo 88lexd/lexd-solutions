@@ -1,4 +1,9 @@
-# IMPORTANT: Prerequisites
+# General Setup - AWS
+Update as of early 2024. I have started migrating my blog to being self hosted. This directory is no longer maintained or used to manage the AWS infrastructure.
+
+However the S3 bucket to hold the Terraform state will still be used for Cloudflare configuration.
+
+## IMPORTANT: Prerequisites
 Before continuing, run the general setup. The following must be done first
 
  - Applied `cfn-base-setup.yml` (CloudFormation base setup)

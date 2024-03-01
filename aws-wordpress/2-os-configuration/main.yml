@@ -180,14 +180,14 @@
     tags:
     - nginx_ingress
 
-  - name: Configure nfs-subdir provisioner
-    include_tasks:
-      file: ansible_tasks/setup-nfs-subdir-provisioner.yml
-      apply:
-        tags: nfs_subdir
-        become: no  # Use standard user (it has kubeconfig set)
-    tags:
-    - nfs_subdir
+  # - name: Configure nfs-subdir provisioner
+  #   include_tasks:
+  #     file: ansible_tasks/setup-nfs-subdir-provisioner.yml
+  #     apply:
+  #       tags: nfs_subdir
+  #       become: no  # Use standard user (it has kubeconfig set)
+  #   tags:
+  #   - nfs_subdir
 
   - name: Configure local-path provisioner
     include_tasks:

@@ -12,15 +12,17 @@ From day 1, everything is built using IaC (infrastructure as code). The followin
  - Ansible (configure the OS and setup Kubernetes)
  - LetsEncrypt (TLS certificate for Ingress)
 
+**IMPORTANT UPDATE:** As of early 2024 I have migrated my website from AWS to be self hosted.
+
 # Folder Structure
 ## 1-infra-configuration
-Contains the code for configuring the AWS infrastructure. Tools used include:
+Contains the code for configuring my local infrastructure. Tools used include:
  - AWS CloudFormation
  - Terraform
+ - Ansible
 
 ## 2-os-configuration
 Contains the code for configuring the EC2 instances with Kubernetes and other custom settings on the OS. Tools used include:
-
  - Ansible
 
 ## 3-app-configuration
