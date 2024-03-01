@@ -88,6 +88,17 @@ Modify local `hostfile` with the following records for testing:
 104.21.51.90 www.lexdsolutions.com
 ```
 
+## Cloudflare Tunnel
+Background: Cloudflare tunnel allows me to selfhost my blog and not on AWS. Due to CGNAT limitation, I do not have a dedicated public IP available to use.
+
+Terraform is used to setup the tunnel and once it is setup:
+ - Manually log onto Cloudflare dashboard
+ - Look for the tunnel
+ - Inside the configuration, it provides the command to run `cloudflared` as a container, for example:
+    ```
+    $ docker run -d --restart unless-stopped cloudflare/cloudflared:latest tunnel --no-autoupdate run --token abc123
+    ```
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
