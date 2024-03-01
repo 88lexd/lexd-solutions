@@ -35,8 +35,8 @@ resource "cloudflare_ruleset" "waf" {
   }
 
   rules {
-    description = "Allowed User Agents"
-    expression  = "(http.user_agent contains \"LinkedInBot/1.0\")"
+    description = "Allowed User Agents and ASN"
+    expression  = "(http.user_agent contains \"LinkedInBot/1.0\") or (ip.geoip.asnum eq 8075) or (ip.geoip.asnum eq 14413)"
     action      = "skip"
     action_parameters {
       ruleset = "current"
