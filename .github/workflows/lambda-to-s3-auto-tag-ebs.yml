@@ -6,11 +6,11 @@ on:
   push:
     branches: [ main ]
     paths:
-    - 'aws-wordpress/3-app-configuration/lambda-auto-tag-ebs-volumes/src/**'
+    - 'wordpress/3-app-configuration/lambda-auto-tag-ebs-volumes/src/**'
   pull_request:
     branches: [ main ]
     paths:
-    - 'aws-wordpress/3-app-configuration/lambda-auto-tag-ebs-volumes/src/**'
+    - 'wordpress/3-app-configuration/lambda-auto-tag-ebs-volumes/src/**'
 
   # Allows workflow to run manually from the Actions tab
   workflow_dispatch:
@@ -28,7 +28,7 @@ jobs:
         run: |
           CURRENT_DIR=$(pwd)
           mkdir artifact
-          cd ./aws-wordpress/3-app-configuration/lambda-auto-tag-ebs-volumes/src/
+          cd ./wordpress/3-app-configuration/lambda-auto-tag-ebs-volumes/src/
           zip "${CURRENT_DIR}/artifact/lambda-auto-tag-ebs-volumes.zip" main.py
 
       - name: Custom docker container action to push object to S3

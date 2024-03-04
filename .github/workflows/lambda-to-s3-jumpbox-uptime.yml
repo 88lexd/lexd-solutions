@@ -6,11 +6,11 @@ on:
   push:
     branches: [ main ]
     paths:
-    - 'aws-wordpress/3-app-configuration/lambda-jumpbox-uptime/src/**'
+    - 'wordpress/3-app-configuration/lambda-jumpbox-uptime/src/**'
   pull_request:
     branches: [ main ]
     paths:
-    - 'aws-wordpress/3-app-configuration/lambda-jumpbox-uptime/src/**'
+    - 'wordpress/3-app-configuration/lambda-jumpbox-uptime/src/**'
 
   # Allows workflow to run manually from the Actions tab
   workflow_dispatch:
@@ -40,6 +40,6 @@ jobs:
         run: |
           CURRENT_DIR=$(pwd)
           mkdir artifact
-          cd ./aws-wordpress/3-app-configuration/lambda-jumpbox-uptime/src/
+          cd ./wordpress/3-app-configuration/lambda-jumpbox-uptime/src/
           zip "${CURRENT_DIR}/artifact/lambda-jumpbox-uptime.zip" main.py
           aws s3 cp "${CURRENT_DIR}/artifact/lambda-jumpbox-uptime.zip" s3://lexd-solutions-lambdas/lambda-jumpbox-uptime.zip
