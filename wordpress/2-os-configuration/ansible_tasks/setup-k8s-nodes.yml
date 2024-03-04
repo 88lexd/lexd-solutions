@@ -85,7 +85,7 @@
 # Install Kubernetes packages
 - name: Add Kubernetes GPG key
   ansible.builtin.apt_key:
-    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    url: "{{ k8s_gpg_key}}"
     state: present
     keyring: "{{ k8s_gpg_keyring_path }}"
 
@@ -123,7 +123,7 @@
 
 - name: Kubelet configuration for containerd
   ansible.builtin.copy:
-    dest: /etc/systemd/system/kubelet.service.d/0-containerd.conf
+    dest: /usr/lib/systemd/system/kubelet.service.d/0-containerd.conf
     content: |
       [Service]
       Environment="KUBELET_EXTRA_ARGS=--container-runtime=remote --runtime-request-timeout=15m --container-runtime-endpoint=unix:///run/containerd/containerd.sock"

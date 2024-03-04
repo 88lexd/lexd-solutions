@@ -70,11 +70,12 @@
     tags:
     - containerd
 
-  - name: Import fluentbit vars
-    ansible.builtin.include_vars:
-      file: vars/fluentbit.yml
-    tags:
-    - fluentbit
+  # Not required since moving away from AWS
+  # - name: Import fluentbit vars
+  #   ansible.builtin.include_vars:
+  #     file: vars/fluentbit.yml
+  #   tags:
+  #   - fluentbit
 
   - name: Import kubernetes vars so can be passed into the next include role task
     ansible.builtin.include_vars:
@@ -207,11 +208,12 @@
     tags:
     - metrics-server
 
-  - name: Configure fluentbit for Kubernetes cluster
-    include_tasks:
-      file: ansible_tasks/setup-fluentbit.yml
-      apply:
-        tags: fluentbit
-        become: no  # Use standard user (it has kubeconfig set)
-    tags:
-    - fluentbit
+  # Not required since moving away from AWS
+  # - name: Configure fluentbit for Kubernetes cluster
+  #   include_tasks:
+  #     file: ansible_tasks/setup-fluentbit.yml
+  #     apply:
+  #       tags: fluentbit
+  #       become: no  # Use standard user (it has kubeconfig set)
+  #   tags:
+  #   - fluentbit

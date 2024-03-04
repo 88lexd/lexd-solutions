@@ -1,9 +1,12 @@
-# Important Note
+# Important Note 1
 As of Jan 2022, I've created a new Kubernetes cluster to replace the initial MicroK8s deployment.
 
 In this new setup, I am using 2 nodes (1x Master / 1x Worker) in a cluster instead of 1 MicroK8s node.
 
 For those coming from my early blog posts, these old files can still be referenced in the `./old-microk8s` directory.
+
+# Important Note 2
+As of early 2024, I've migated out from AWS and is now self hosted. Some changes have been made for deploying to a non AWS machine.
 
 # OS Configuration
 This section contains the Ansible playbook for configuring the underlying EC2 Operating System (Ubuntu 20.04) to run Kubernetes.
@@ -57,7 +60,7 @@ This new playbook will configure the following:
 ## How to run the playbook:
 Use the following:
 ```
-$ ansible-playbook -i inventory_aws.ini main.yml --ask-vault-pass
+$ ansible-playbook -i inventory_local.ini main.yml --ask-vault-pass
 ```
 
 # Troubleshooting

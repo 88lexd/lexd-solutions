@@ -34,3 +34,4 @@
   ansible.builtin.service:
     name: codedeploy-agent
     state: started
+  when: OS_RESULT.stdout != "NON_AWS_OS"

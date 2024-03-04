@@ -4,14 +4,16 @@
 # kubelet version can be X-1 and kubectl version can be X-1 or X+1
 kubernetes_packages:
   - name: kubeadm
-    version: 1.23.3-00
+    version: 1.29.2-1.1
   - name: kubectl
-    version: 1.23.3-00
+    version: 1.29.2-1.1
   - name: kubelet
-    version: 1.23.3-00
+    version: 1.29.2-1.1
 
 # File to store the GPG key for when adding the Kubernetes APT repository
-k8s_gpg_keyring_path: /usr/share/keyrings/kubernetes-archive-keyring.gpg
+k8s_gpg_key: https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key
+k8s_gpg_keyring_path: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+k8s_repository: "https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /"
 
 # Ref: https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-init/
 kube_init_options:
@@ -20,16 +22,12 @@ kube_init_options:
   - --pod-network-cidr=172.16.0.0/16
   - --service-cidr=172.17.0.0/16  # This is the default CIDR but specifying it anyway
 
+# New kubernetes version does not use weave (previously using v1.23)
 # IMPORTANT! This MUST MATCH the --pod-network-cidr!
-weave_cni_cidr: 172.16.0.0/16
-
-# kubernetes-xenial is currently the latest repo.
-# See: https://apt.kubernetes.io/apt/dists
-k8s_repository: "https://apt.kubernetes.io/ kubernetes-xenial main"
-
+# weave_cni_cidr: 172.16.0.0/16
 
 # Get the latest version of Helm checking this URL: https://github.com/helm/helm/releases
-helm_binary_src: "https://get.helm.sh/helm-v3.7.2-linux-amd64.tar.gz"
+helm_binary_src: "https://get.helm.sh/helm-v3.14.2-linux-amd64.tar.gz"
 
-# Local Path Provisioner version
-local_path_provisioner_version: v0.0.22
+# Rancher - Local Path Provisioner version
+local_path_provisioner_version: v0.0.26
