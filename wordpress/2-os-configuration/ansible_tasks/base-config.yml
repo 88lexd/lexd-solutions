@@ -75,7 +75,7 @@
       - python3-pip  # require to install Kubernetes python modules which is used by Ansible
       - jq  # to extract info from kubectl or docker output
       - net-tools  # to troubleshoot network related issues
-      - nfs-common  # require on nodes for nfs-subdir to work
+      - unzip
       - iotop
       - iftop
     state: present
