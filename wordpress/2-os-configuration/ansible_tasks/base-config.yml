@@ -3,7 +3,7 @@
   ansible.builtin.blockinfile:
     path: /etc/hosts
     block: |
-      {{ hostvars.masternode.ansible_host }} masternode.lexd.local controlplane.lexd.local
+      {{ hostvars.masternode.ansible_host }} masternode.lexd.local {{ kubernetes_endpoint }}
       {{ hostvars.workernode1.ansible_host }} workernode1.lexd.local
 
 - name: Set OS hostname based on inventory_hostname

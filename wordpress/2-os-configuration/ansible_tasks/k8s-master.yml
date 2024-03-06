@@ -43,16 +43,31 @@
 
 ############################################
 # Begin Container Network Interface (CNI)
+# Maybe is always OK to apply this YAML? can decide later...
 - name: Check if there is Flannel is already deployed
   shell: kubectl get daemonsets.apps -n kube-flannel -o json | jq -r '.items[].metadata.name' | grep 'kube-flannel' || echo "NOT_FOUND"
   register: flannel_status
   become_user: "{{ ansible_env.SUDO_USER }}"
   changed_when: False  # Task will return ok instead of changed
 
+- name: Copy kube-flannel.yml to server
+  ansible.builtin.template:
+    src: ./files/kube-flannel.yml.j2
+    dest: /tmp/kube-flannel.yml
+  become_user: "{{ ansible_env.SUDO_USER }}"
+  register: kube_flannel_yml
+  when: flannel_status.stdout == "NOT_FOUND"
+
 - name: Install flannel CNI (Container Network Interface)
-  shell: kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
+  shell: kubectl apply -f /tmp/kube-flannel.yml
   become_user: "{{ ansible_env.SUDO_USER }}" # Must run as standard user as it as access to kubectl
   when: flannel_status.stdout == "NOT_FOUND"
+
+- name: Remove kube-flannel.yml file
+  ansible.builtin.file:
+    path: /tmp/kube-flannel.yml
+    state: absent
+  when: kube_flannel_yml.changed
 # End Container Network Interface (CNI)
 
 

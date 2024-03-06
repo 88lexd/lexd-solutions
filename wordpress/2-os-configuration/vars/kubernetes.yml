@@ -1,5 +1,6 @@
 ---
 # IMPORTANT: This var file is used in the kubernetes role and the task to configuring the jump server (gluster arbiter)
+kubernetes_endpoint: controlplane.lexd.local
 
 # kubelet version can be X-1 and kubectl version can be X-1 or X+1
 kubernetes_packages:
@@ -25,6 +26,8 @@ kube_init_options:
 # Weave doesn't seem like it exist anymore... the way the repo contains broken links etc..
 # IMPORTANT! This MUST MATCH the --pod-network-cidr!
 # weave_cni_cidr: 172.16.0.0/16
+
+flannel_cidr: 172.16.0.0/16
 
 # Get the latest version of Helm checking this URL: https://github.com/helm/helm/releases
 helm_binary_src: "https://get.helm.sh/helm-v3.14.2-linux-amd64.tar.gz"
