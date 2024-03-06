@@ -22,7 +22,7 @@ kube_init_options:
   - --pod-network-cidr=172.16.0.0/16
   - --service-cidr=172.17.0.0/16  # This is the default CIDR but specifying it anyway
 
-# New kubernetes version does not use weave (previously using v1.23)
+# Weave doesn't seem like it exist anymore... the way the repo contains broken links etc..
 # IMPORTANT! This MUST MATCH the --pod-network-cidr!
 # weave_cni_cidr: 172.16.0.0/16
 

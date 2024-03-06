@@ -19,6 +19,44 @@
   register: containerd_status
   changed_when: False  # Task will return ok instead of changed
 
+##################################
+# Begin runc download and install
+- name: Download runc
+  ansible.builtin.get_url:
+    url: "{{ runc_url }}"
+    dest: "/tmp/{{ runc_url.split('/')[-1] }}"
+  register: runc_tarball_dl
+  when: containerd_status.stdout == "CONTAINERD_NOT_RUNNING"
+
+- name: Install runc
+  shell: "install -m 755 {{ runc_tarball_dl.dest }} /usr/local/sbin/runc"
+  when: containerd_status.stdout == "CONTAINERD_NOT_RUNNING"
+# End runc download and install
+
+###########################################
+# Begin download and install CNI plugins
+- name: Download CNI plugins
+  ansible.builtin.get_url:
+    url: "{{ cni_plugins_url }}"
+    dest: "/tmp/{{ cni_plugins_url.split('/')[-1] }}"
+  register: cni_plugins_tarball_dl
+  when: containerd_status.stdout == "CONTAINERD_NOT_RUNNING"
+
+- name: Create directory for CNI plugin
+  ansible.builtin.file:
+    path: /opt/cni/bin
+    state: directory
+    # mode: '0755'
+  when: containerd_status.stdout == "CONTAINERD_NOT_RUNNING"
+
+- name: Extract CNI plugins tarball to /opt/cni/bin
+  ansible.builtin.unarchive:
+    src: "{{ cni_plugins_tarball_dl.dest }}"
+    remote_src: yes
+    dest: /opt/cni/bin
+  when: containerd_status.stdout == "CONTAINERD_NOT_RUNNING"
+# End download and install CNI plugins
+
 #######################################
 # Begin download and setup containerd
 # Download then extract on purpose. This way I can inspect the tarball for any issues.
@@ -56,46 +94,6 @@
     state: restarted
   when: containerd_status.stdout == "CONTAINERD_NOT_RUNNING"
 # End download and setup containerd
-
-
-##################################
-# Begin runc download and install
-- name: Download runc
-  ansible.builtin.get_url:
-    url: "{{ runc_url }}"
-    dest: "/tmp/{{ runc_url.split('/')[-1] }}"
-  register: runc_tarball_dl
-  when: containerd_status.stdout == "CONTAINERD_NOT_RUNNING"
-
-- name: Install runc
-  shell: "install -m 755 {{ runc_tarball_dl.dest }} /usr/local/sbin/runc"
-  when: containerd_status.stdout == "CONTAINERD_NOT_RUNNING"
-# End runc download and install
-
-
-###########################################
-# Begin download and install CNI plugins
-- name: Download CNI plugins
-  ansible.builtin.get_url:
-    url: "{{ cni_plugins_url }}"
-    dest: "/tmp/{{ cni_plugins_url.split('/')[-1] }}"
-  register: cni_plugins_tarball_dl
-  when: containerd_status.stdout == "CONTAINERD_NOT_RUNNING"
-
-- name: Create directory for CNI plugin
-  ansible.builtin.file:
-    path: /opt/cni/bin
-    state: directory
-    # mode: '0755'
-  when: containerd_status.stdout == "CONTAINERD_NOT_RUNNING"
-
-- name: Extract CNI plugins tarball to /opt/cni/bin
-  ansible.builtin.unarchive:
-    src: "{{ cni_plugins_tarball_dl.dest }}"
-    remote_src: yes
-    dest: /opt/cni/bin
-  when: containerd_status.stdout == "CONTAINERD_NOT_RUNNING"
-# End download and install CNI plugins
 
 - name: Remove containerd tarball
   ansible.builtin.file:

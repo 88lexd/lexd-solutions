@@ -44,6 +44,7 @@
   #   tags:
   #   - install_codedeploy_agent
 
+  # No longer using docker.. using containerd instead
   # - name: Import docker vars so can be passed into the next include role task
   #   ansible.builtin.include_vars:
   #     file: vars/docker.yml
@@ -79,61 +80,62 @@
   #   tags:
   #   - fluentbit
 
-#   - name: Import kubernetes vars so can be passed into the next include role task
-#     ansible.builtin.include_vars:
-#       file: vars/kubernetes.yml
-#     tags:
-#     - install_k8s
-#     - local_path_provisioner
+  - name: Import kubernetes vars so can be passed into the next include role task
+    ansible.builtin.include_vars:
+      file: vars/kubernetes.yml
+    tags:
+    - install_k8s
+    - create_k8s_cluster
+    - local_path_provisioner
 
-#   - name: Prepare K8s nodes by setting up prerequisites and installing K8s packages
-#     include_tasks:
-#       file: ansible_tasks/setup-k8s-nodes.yml
-#       apply:
-#         tags: install_k8s
-#     tags:
-#     - install_k8s
-#     - containerd  # There are 2 tasks in here that is related to containerd
+  - name: Prepare K8s nodes by setting up prerequisites and installing K8s packages
+    include_tasks:
+      file: ansible_tasks/setup-k8s-nodes.yml
+      apply:
+        tags: install_k8s
+    tags:
+    - install_k8s
+    - containerd  # There are 2 tasks in here that is related to containerd (NOT REQUIRED ANYMORE???)
 
 
 # ######################################
 # # Create Kubernetes Cluster on Master
-# - hosts: masternode
-#   gather_facts: no
-#   become: yes
-#   tasks:
-#   - name: Include Lets Encrypt vars for when creating the Kubernetes cluster
-#     ansible.builtin.include_vars:
-#       file: lets_encrypt.yml
-#     tags:
-#     - create_k8s_cluster
+- hosts: masternode
+  gather_facts: no
+  become: yes
+  tasks:
+  - name: Include Lets Encrypt vars for when creating the Kubernetes cluster
+    ansible.builtin.include_vars:
+      file: lets_encrypt.yml
+    tags:
+    - create_k8s_cluster
 
-#   - name: Create Kubernetes Cluster and setup all initial K8s secrets
-#     include_tasks:
-#       file: ansible_tasks/k8s-master.yml
-#       apply:
-#         tags: create_k8s_cluster
-#     tags:
-#     - create_k8s_cluster
+  - name: Create Kubernetes Cluster and setup all initial K8s secrets
+    include_tasks:
+      file: ansible_tasks/k8s-master.yml
+      apply:
+        tags: create_k8s_cluster
+    tags:
+    - create_k8s_cluster
 
-#   - name: Configure kubeconfig for non-root user
-#     include_tasks:
-#       file: ansible_tasks/nonroot-kubeconfig.yml
-#       apply:
-#         tags:
-#           - create_k8s_cluster
-#           - kubeconfig
-#     tags:
-#       - create_k8s_cluster
-#       - kubeconfig
+  - name: Configure kubeconfig for non-root user
+    include_tasks:
+      file: ansible_tasks/nonroot-kubeconfig.yml
+      apply:
+        tags:
+          - create_k8s_cluster
+          - kubeconfig
+    tags:
+      - create_k8s_cluster
+      - kubeconfig
 
-#   - name: Get cluster join command
-#     shell: kubeadm token create $(kubeadm token generate) --print-join-command
-#     become_user: "{{ ansible_env.SUDO_USER }}"
-#     register: cluster_join_command
-#     changed_when: False  # Task will return ok instead of changed
-#     tags:
-#     - create_k8s_cluster
+  # - name: Get cluster join command
+  #   shell: kubeadm token create $(kubeadm token generate) --print-join-command
+  #   become_user: "{{ ansible_env.SUDO_USER }}"
+  #   register: cluster_join_command
+  #   changed_when: False  # Task will return ok instead of changed
+  #   tags:
+  #   - create_k8s_cluster
 
 
 # ##################################

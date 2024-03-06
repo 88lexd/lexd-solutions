@@ -41,7 +41,22 @@
     group: "{{ ansible_env.SUDO_USER }}"
     mode: 0600
 
-# New kubernetes version does not use weave (previously using v1.23)
+############################################
+# Begin Container Network Interface (CNI)
+- name: Check if there is Flannel is already deployed
+  shell: kubectl get daemonsets.apps -n kube-flannel -o json | jq -r '.items[].metadata.name' | grep 'kube-flannel' || echo "NOT_FOUND"
+  register: flannel_status
+  become_user: "{{ ansible_env.SUDO_USER }}"
+  changed_when: False  # Task will return ok instead of changed
+
+- name: Install flannel CNI (Container Network Interface)
+  shell: kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
+  become_user: "{{ ansible_env.SUDO_USER }}" # Must run as standard user as it as access to kubectl
+  when: flannel_status.stdout == "NOT_FOUND"
+# End Container Network Interface (CNI)
+
+
+# Weave doesn't seem like it exist anymore... the way the repo contains broken links etc..
 # - name: Check if there is weavenet is already deployed
 #   shell: kubectl get daemonsets.apps -n kube-system -o json | jq -r '.items[].metadata.name' | grep 'weave-net' || echo "NOT_FOUND"
 #   register: weave_net_status
