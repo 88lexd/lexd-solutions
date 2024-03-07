@@ -63,25 +63,10 @@
   become_user: "{{ ansible_env.SUDO_USER }}" # Must run as standard user as it as access to kubectl
   when: flannel_status.stdout == "NOT_FOUND"
 
-- name: Remove kube-flannel.yml file
-  ansible.builtin.file:
-    path: /tmp/kube-flannel.yml
-    state: absent
-  when: kube_flannel_yml.changed
+# Do not remove kube-flannel.yml for troubleshooting.
+# - name: Remove kube-flannel.yml file
+#   ansible.builtin.file:
+#     path: /tmp/kube-flannel.yml
+#     state: absent
+#   when: kube_flannel_yml.changed
 # End Container Network Interface (CNI)
-
-
-# Weave doesn't seem like it exist anymore... the way the repo contains broken links etc..
-# - name: Check if there is weavenet is already deployed
-#   shell: kubectl get daemonsets.apps -n kube-system -o json | jq -r '.items[].metadata.name' | grep 'weave-net' || echo "NOT_FOUND"
-#   register: weave_net_status
-#   become_user: "{{ ansible_env.SUDO_USER }}"
-#   changed_when: False  # Task will return ok instead of changed
-
-# - name: Install Weave CNI
-#   shell: |
-#     kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')&env.IPALLOC_RANGE={{ weave_cni_cidr }}"
-#   args:
-#     executable: /bin/bash
-#   become_user: "{{ ansible_env.SUDO_USER }}"
-#   when: weave_net_status.stdout == "NOT_FOUND"

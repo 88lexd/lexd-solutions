@@ -1,8 +1,7 @@
 # This file was downloaded from: https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
 # Dated: 6 March 2024
-# Note: KUBERNETES_SERVICE_HOST and KUBERNETES_SERVICE_PORT has been added as per:
-#       https://github.com/flannel-io/flannel/issues/671
-#       Flannel is having issues locating the API server...
+# "{{ flannel_cidr }}" is passed into this template to generate the file
+---
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -154,10 +153,6 @@ spec:
               fieldPath: metadata.namespace
         - name: EVENT_QUEUE_DEPTH
           value: "5000"
-        - name: KUBERNETES_SERVICE_HOST
-          value: {{ kubernetes_endpoint }}
-        - name: KUBERNETES_SERVICE_PORT
-          value: "6443"
         image: docker.io/flannel/flannel:v0.24.2
         name: kube-flannel
         resources:
