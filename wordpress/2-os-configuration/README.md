@@ -71,3 +71,30 @@ To fix this, I had to run the following command:
 ```
 $ kubectl -n kube-system rollout restart deployment coredns
 ```
+
+## Containers exiting on Containerd
+When I uplifted the code to deploy a newer version of Kubernetes (v1.29), containers were failing to start or is starting but existing immediately. The following was used to help troubleshoot
+
+- SSH onto the master node
+- Run the following command to view all running containers
+  ```
+  $ sudo crictl -r unix:///run/containerd/containerd.sock ps -a
+  CONTAINER           IMAGE               CREATED             STATE               NAME                      ATTEMPT             POD ID              POD
+  f1e75514677a6       cbb01a7bd410d       21 hours ago        Running             coredns                   0                   d963255827ada       coredns-76f75df574-g8f22
+  b2bbed6883251       cbb01a7bd410d       21 hours ago        Running             coredns                   0                   3e409458f072d       coredns-76f75df574-tzz99
+  47d738d26e9ce       f9c73fde068fd       21 hours ago        Running             kube-flannel              0                   2fb75ca4be652       kube-flannel-ds-96mt8
+  4b45820c832f3       f9c73fde068fd       21 hours ago        Exited              install-cni               0                   2fb75ca4be652       kube-flannel-ds-96mt8
+  16294878ee89a       77c1250c26d96       21 hours ago        Exited              install-cni-plugin        0                   2fb75ca4be652       kube-flannel-ds-96mt8
+  8ec44c565d606       a0eed15eed449       22 hours ago        Running             etcd                      6                   5c048be2fd78d       etcd-masternode
+  fdace94d78b49       6fc5e6b7218c7       22 hours ago        Running             kube-scheduler            8                   4fa65020b96b8       kube-scheduler-masternode
+  a2a7c7d559bec       138fb5a3a2e34       22 hours ago        Running             kube-controller-manager   8                   77a6b7f3d4c98       kube-controller-manager-masternode
+  8ac2841c99e27       8a9000f98a528       22 hours ago        Running             kube-apiserver            4                   25ca960c5f830       kube-apiserver-masternode
+  56e7a9ba7ca98       a0eed15eed449       22 hours ago        Exited              etcd                      5                   08da439a52a9a       etcd-masternode
+  44f086d065422       6fc5e6b7218c7       22 hours ago        Exited              kube-scheduler            7                   39bd90e097c55       kube-scheduler-masternode
+  49c338919a4b3       138fb5a3a2e34       22 hours ago        Exited              kube-controller-manager   7                   1de94e940a0db       kube-controller-manager-masternode
+  31d8e3ab217be       8a9000f98a528       22 hours ago        Exited              kube-apiserver            3                   c82c058dceed7       kube-apiserver-masternode
+  ```
+- View the logs by running:
+  ```
+  $ sudo crictl -r unix:///run/containerd/containerd.sock logs <container-id>
+  ```
