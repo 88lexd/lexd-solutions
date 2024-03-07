@@ -17,7 +17,7 @@ resource "cloudflare_tunnel_config" "lexd_solutions" {
     ingress_rule {
       hostname = "tftesting.lexdsolutions.com"
       path     = "/"
-      service  = "http://192.168.0.21:8000"
+      service  = "http://192.168.0.23"
     }
 
     ingress_rule {
