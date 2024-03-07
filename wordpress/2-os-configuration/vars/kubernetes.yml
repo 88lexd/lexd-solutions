@@ -23,7 +23,7 @@ kube_init_options:
   - --pod-network-cidr=172.16.0.0/16
 
 # Must match the pod-network-cidr and is used by ./files/kube-flannel.yml.j2
-flannel_cidr: 172.16.0.0/24
+flannel_cidr: 172.16.0.0/16
 
 # Get the latest version of Helm checking this URL: https://github.com/helm/helm/releases
 helm_binary_src: "https://get.helm.sh/helm-v3.14.2-linux-amd64.tar.gz"
