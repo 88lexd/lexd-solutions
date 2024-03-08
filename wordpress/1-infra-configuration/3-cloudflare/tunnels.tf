@@ -15,7 +15,7 @@ resource "cloudflare_tunnel_config" "lexd_solutions" {
 
   config {
     ingress_rule {
-      hostname = "tftesting.lexdsolutions.com"
+      hostname = var.hostname_fqdn
       path     = "/"
       service  = "http://192.168.0.23"
     }
@@ -28,7 +28,7 @@ resource "cloudflare_tunnel_config" "lexd_solutions" {
 
 resource "cloudflare_record" "lexd_solutions" {
   zone_id = var.zone_id
-  name    = "tftesting"
+  name    = var.hostname_dns_record
   value   = "${cloudflare_tunnel.lexd_solutions.id}.cfargotunnel.com"
   type    = "CNAME"
   proxied = true
