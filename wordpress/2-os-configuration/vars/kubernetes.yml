@@ -1,0 +1,32 @@
+---
+# IMPORTANT: This var file is used in the kubernetes role and the task to configuring the jump server (gluster arbiter)
+kubernetes_endpoint: controlplane.lexd.local
+
+# kubelet version can be X-1 and kubectl version can be X-1 or X+1
+kubernetes_packages:
+  - name: kubeadm
+    version: 1.29.2-1.1
+  - name: kubectl
+    version: 1.29.2-1.1
+  - name: kubelet
+    version: 1.29.2-1.1
+
+# File to store the GPG key for when adding the Kubernetes APT repository
+k8s_gpg_key: https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key
+k8s_gpg_keyring_path: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+k8s_repository: "https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /"
+
+# Ref: https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-init/
+kube_init_options:
+  - --control-plane-endpoint=controlplane.lexd.local
+  - --apiserver-cert-extra-sans=controlplane
+  - --pod-network-cidr=172.16.0.0/16
+
+# Must match the pod-network-cidr and is used by ./files/kube-flannel.yml.j2
+flannel_cidr: 172.16.0.0/16
+
+# Get the latest version of Helm checking this URL: https://github.com/helm/helm/releases
+helm_binary_src: "https://get.helm.sh/helm-v3.14.2-linux-amd64.tar.gz"
+
+# Rancher - Local Path Provisioner version
+local_path_provisioner_version: v0.0.26

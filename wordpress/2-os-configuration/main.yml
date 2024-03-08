@@ -1,0 +1,227 @@
+# This playbook will setup GlusterFS and Kubernetes via kubeadm
+---
+- hosts: all
+  gather_facts: yes
+  become: yes
+  tasks:
+  - block:
+    - name: Check for unsupported distribution
+      debug:
+        msg: "[{{ ansible_distribution }}] is not an acceptable distribution. Only Ubuntu is accepted!"
+    - meta: end_play
+    when: ansible_distribution != "Ubuntu"
+
+
+######################################################################
+# All servers in the cluster group should have this base configuration
+- hosts: cluster
+  gather_facts: yes
+  become: yes
+  tasks:
+  - name: Import kubernetes vars for other tasks
+    ansible.builtin.include_vars:
+      file: vars/kubernetes.yml
+
+  - name: Apply base configuration
+    include_tasks:
+      file: ansible_tasks/base-config.yml
+      apply:
+        tags: base_config
+    tags:
+      - base_config
+
+  # No longer running on AWS
+  # - name: Setup AWS CloudWatch Agent
+  #   include_tasks:
+  #     file: ansible_tasks/setup-aws-cw-agent.yml
+  #     apply:
+  #       tags: install_cloudwatch_agent
+  #   tags:
+  #   - install_cloudwatch_agent
+
+  # No longer running on AWS
+  # - name: Setup AWS CodeDeploy Agent
+  #   include_tasks:
+  #     file: ansible_tasks/setup-aws-codedeploy-agent.yml
+  #     apply:
+  #       tags: install_codedeploy_agent
+  #   tags:
+  #   - install_codedeploy_agent
+
+  # No longer using docker.. using containerd instead
+  # - name: Import docker vars so can be passed into the next include role task
+  #   ansible.builtin.include_vars:
+  #     file: vars/docker.yml
+  #   tags:
+  #   - install_docker
+
+  # - name: Install and Configure Docker on K8s nodes
+  #   include_tasks:
+  #     file: ansible_tasks/setup-docker.yml
+  #     apply:
+  #       tags: install_docker
+  #   tags:
+  #   - install_docker
+
+  - name: Import containerd vars so can be passed into the next include_task
+    ansible.builtin.include_vars:
+      file: vars/containerd.yml
+    tags:
+    - containerd
+
+  - name: Install and Configure containerd on K8s nodes
+    include_tasks:
+      file: ansible_tasks/setup-containerd.yml
+      apply:
+        tags: containerd
+    tags:
+    - containerd
+
+  # Not required since moving away from AWS
+  # - name: Import fluentbit vars
+  #   ansible.builtin.include_vars:
+  #     file: vars/fluentbit.yml
+  #   tags:
+  #   - fluentbit
+
+  - name: Import kubernetes vars so can be passed into the next include role task
+    ansible.builtin.include_vars:
+      file: vars/kubernetes.yml
+    tags:
+    - install_k8s
+    - create_k8s_cluster
+    - local_path_provisioner
+
+  - name: Prepare K8s nodes by setting up prerequisites and installing K8s packages
+    include_tasks:
+      file: ansible_tasks/setup-k8s-nodes.yml
+      apply:
+        tags: install_k8s
+    tags:
+    - install_k8s
+    - containerd  # There are 2 tasks in here that is related to containerd (NOT REQUIRED ANYMORE???)
+
+
+# ######################################
+# # Create Kubernetes Cluster on Master
+- hosts: masternode
+  gather_facts: no
+  become: yes
+  tasks:
+  - name: Include Lets Encrypt vars for when creating the Kubernetes cluster
+    ansible.builtin.include_vars:
+      file: lets_encrypt.yml
+    tags:
+    - create_k8s_cluster
+
+  - name: Create Kubernetes Cluster and setup all initial K8s secrets
+    include_tasks:
+      file: ansible_tasks/k8s-master.yml
+      apply:
+        tags: create_k8s_cluster
+    tags:
+    - create_k8s_cluster
+
+  - name: Configure kubeconfig for non-root user
+    include_tasks:
+      file: ansible_tasks/nonroot-kubeconfig.yml
+      apply:
+        tags:
+          - create_k8s_cluster
+          - kubeconfig
+    tags:
+      - create_k8s_cluster
+      - kubeconfig
+
+  - name: Get cluster join command
+    shell: kubeadm token create $(kubeadm token generate) --print-join-command
+    become_user: "{{ ansible_env.SUDO_USER }}"
+    register: cluster_join_command
+    changed_when: False  # Task will return ok instead of changed
+    tags:
+    - create_k8s_cluster
+
+
+##################################
+# Join worker nodes to K8s cluster
+- hosts: k8s_workers
+  gather_facts: no
+  become: yes
+  tasks:
+  - name: Join nodes to Kubernetes cluster
+    include_tasks:
+      file: ansible_tasks/k8s-join-nodes-to-cluster.yml
+      apply:
+        tags: create_k8s_cluster
+    tags:
+    - create_k8s_cluster
+
+
+############################
+# Additional cluster configs
+- hosts: masternode
+  gather_facts: no
+  become: yes
+  tasks:
+  - name: Setup Helm binary on the master server
+    include_tasks:
+      file: ansible_tasks/setup-helm.yml
+      apply:
+        tags: helm_install
+    tags:
+    - helm_install
+
+  - name: Cluster Config - Create namespaces and secrets etc.
+    include_tasks:
+      file: ansible_tasks/k8s-cluster-configs.yml
+      apply:
+        tags: cluster_config
+        become: no  # not using sudo/root! run as the standard user!
+    tags:
+    - cluster_config
+
+  - name: Configure nginx-ingress-controller
+    include_tasks:
+      file: ansible_tasks/setup-nginx-ingress-controller.yml
+      apply:
+        tags: nginx_ingress
+        become: no  # Use standard user (it has kubeconfig set)
+    tags:
+    - nginx_ingress
+
+  # - name: Configure nfs-subdir provisioner
+  #   include_tasks:
+  #     file: ansible_tasks/setup-nfs-subdir-provisioner.yml
+  #     apply:
+  #       tags: nfs_subdir
+  #       become: no  # Use standard user (it has kubeconfig set)
+  #   tags:
+  #   - nfs_subdir
+
+  - name: Configure local-path provisioner
+    include_tasks:
+      file: ansible_tasks/setup-local-path-provisioner.yml
+      apply:
+        tags: local_path_provisioner
+        become: no  # Use standard user (it has kubeconfig set)
+    tags:
+    - local_path_provisioner
+
+  - name: Configure metrics-server for Kubernetes cluster
+    include_tasks:
+      file: ansible_tasks/setup-metrics-server.yml
+      apply:
+        tags: metrics-server
+        become: no  # Use standard user (it has kubeconfig set)
+    tags:
+    - metrics-server
+
+  # Not required since moving away from AWS
+  # - name: Configure fluentbit for Kubernetes cluster
+  #   include_tasks:
+  #     file: ansible_tasks/setup-fluentbit.yml
+  #     apply:
+  #       tags: fluentbit
+  #       become: no  # Use standard user (it has kubeconfig set)
+  #   tags:
+  #   - fluentbit

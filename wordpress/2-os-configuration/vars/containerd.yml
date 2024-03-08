@@ -1,0 +1,8 @@
+---
+containerd_tarball_url: https://github.com/containerd/containerd/releases/download/v1.7.13/containerd-1.7.13-linux-amd64.tar.gz
+
+runc_url: https://github.com/opencontainers/runc/releases/download/v1.1.12/runc.amd64
+
+# Note: Unsure why v1.4.0 takes forever to download.. failing back to v1.3.0..
+# Couldnt use: https://github.com/containernetworking/plugins/releases/download/v1.4.0/cni-plugins-linux-amd64-v1.4.0.tgz
+cni_plugins_url: https://github.com/containernetworking/plugins/releases/download/v1.3.0/cni-plugins-linux-amd64-v1.3.0.tgz

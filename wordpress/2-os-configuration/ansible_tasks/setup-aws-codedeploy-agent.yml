@@ -1,0 +1,37 @@
+# Install and setup AWS CodeDeploy Agent
+# Ref: https://docs.aws.amazon.com/codedeploy/latest/userguide/codedeploy-agent-operations-install-ubuntu.html
+---
+- name: Check if OS is hosted on AWS
+  shell: curl --max-time 3 http://169.254.169.254/latest/meta-data/instance-id || echo "NON_AWS_OS"
+  register: OS_RESULT
+  changed_when: False  # Task will return ok instead of changed
+
+- name: Show OS Result
+  debug:
+    var: OS_RESULT.stdout
+
+- name: Install prerequisites for CodeDeploy agent
+  ansible.builtin.apt:
+    name:
+      - ruby-full
+      - wget
+    update_cache: yes
+    state: present
+  when: OS_RESULT.stdout != "NON_AWS_OS"
+
+- name: Download CodeDeploy file
+  ansible.builtin.get_url:
+    url: https://aws-codedeploy-ap-southeast-2.s3.ap-southeast-2.amazonaws.com/latest/install
+    dest: /tmp/codedeploy-install
+    mode: '0775'
+  when: OS_RESULT.stdout != "NON_AWS_OS"
+
+- name: Install CodeDeploy agent
+  shell: /tmp/codedeploy-install auto
+  when: OS_RESULT.stdout != "NON_AWS_OS"
+
+- name: Start service codedeploy-agent, if not started
+  ansible.builtin.service:
+    name: codedeploy-agent
+    state: started
+  when: OS_RESULT.stdout != "NON_AWS_OS"

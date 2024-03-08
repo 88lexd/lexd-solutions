@@ -1,7 +1,7 @@
 [
-  "aws-wordpress/1-infra-configuration/2-general-setup",
-  "aws-wordpress/1-infra-configuration/2-general-setup/kubeadm_cluster",
-  "aws-wordpress/1-infra-configuration/3-cloudflare",
-  "aws-wordpress/3-app-configuration/lambda-auto-tag-ebs-volumes",
-  "aws-wordpress/3-app-configuration/lambda-jumpbox-uptime"
+  "wordpress/1-infra-configuration/2-general-setup-aws-old",
+  "wordpress/1-infra-configuration/2-general-setup-aws-old/kubeadm_cluster",
+  "wordpress/1-infra-configuration/3-cloudflare",
+  "wordpress/3-app-configuration/lambda-auto-tag-ebs-volumes",
+  "wordpress/3-app-configuration/lambda-jumpbox-uptime"
 ]

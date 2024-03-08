@@ -1,0 +1,82 @@
+##############
+# PROD SAMPLE
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-flask
+  namespace: prod
+  labels:
+    app: sample-flask
+    env: prod
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sample-flask
+      env: prod
+      tier: frontend
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: sample-flask
+        env: prod
+        tier: frontend
+    spec:
+      containers:
+      - name: sample-flask
+        image: docker.io/88lexd/sample-flask:latest
+        resources:
+          requests:
+            cpu: 0.5
+            memory: 512M
+          limits:
+            memory: 512M
+        env:
+        - name: APP_VAR_1
+          value: prod
+        - name: APP_VAR_2
+          value: RunningOnK8s
+
+##############
+# DEV SAMPLE
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: sample-flask
+#   namespace: fargate
+#   labels:
+#     env: dev
+# spec:
+#   replicas: 2
+#   selector:
+#     matchLabels:
+#       app: sample-flask
+#       env: dev
+#       tier: frontend
+#   strategy:
+#     type: RollingUpdate
+#   template:
+#     metadata:
+#       labels:
+#         app: sample-flask
+#         env: dev
+#         tier: frontend
+#     spec:
+#       containers:
+#       - name: sample-flask
+#         image: docker.io/88lexd/sample-flask:latest
+#         resources:
+#           requests:
+#             cpu: 0.5
+#             memory: 512M
+#           limits:
+#             memory: 512M
+#         env:
+#         - name: APP_VAR_1
+#           value: dev
+#         - name: APP_VAR_2
+#           value: Test2

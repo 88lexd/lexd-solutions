@@ -1,0 +1,32 @@
+---
+# This YAML file contains the "schema" for the values to build the prod resources
+wordpress:
+  deployment_image: null
+  deployment_replicas: null
+  ingress_url: null
+  ingress_tls_secret_name: null
+  container_resources: null
+
+mysql:
+  deployment_image: null
+  deployment_replicas: null
+  k8s_secret_name: null
+  container_resources: null
+
+# Cloudflare handled SSL.. no longer required
+# lets_encrypt:
+#   service_account_name: svc-tls-secret-handler
+#   # These 2 secrets are created by Ansible
+#   account_key_secret_name: lets-encrypt-account-key
+#   pivate_key_secret_name: lets-encrypt-private-key
+#   # Details below is used by openssl to generate a CSR.
+#   csr_configmap_name: csr-details-config
+#   csr_country: AU
+#   csr_state: NSW
+#   csr_location: Sydney
+#   csr_org: Lexd Solutions
+#   csr_org_unit: IT
+#   csr_email: alex.dinh@lexdsolutions.com
+#   csr_subject_cn: null  # This is the URL. Each environment will have its own host endpoint through ingress.
+
+time_zone: Australia/Sydney

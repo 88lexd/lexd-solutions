@@ -1,0 +1,19 @@
+---
+# This YAML file contains the "default" values to build the prod resources
+wordpress:
+  deployment_image: wordpress:5.8.1-apache
+  deployment_replicas: 1
+  ingress_url: lexdsolutions.com
+  # Cloudflare handles SSL. No longer required
+  # ingress_tls_secret_name: lexdsolutions.com.tls
+  container_resources: null  # Allow unlimited resources
+
+mysql:
+  deployment_image: mysql:5.6
+  deployment_replicas: 1
+  k8s_secret_name: mysql-prod  # This secret is created by Ansible during OS configuration
+  container_resources: null  # Allow unlimited resources
+
+# Cloudflare handles SSL. No longer required
+# lets_encrypt:
+#   csr_subject_cn: lexdsolutions.com
