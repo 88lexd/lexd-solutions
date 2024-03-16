@@ -1,4 +1,5 @@
 # This workflow will upload the code for the lambda-auto-tag-ebs-volumes to the S3 bucket called "lexd-solutions-lambdas"
+# 2024.03.17: Migrated home, no longer on AWS
 
 name: CI for Lambda to S3 for Auto Taging EBS
 

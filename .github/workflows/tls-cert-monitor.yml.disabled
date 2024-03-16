@@ -1,4 +1,5 @@
 name: CI to Docker Hub for TLS Cert Monitor
+# 2023/2024: No longer required, using Cloudflare's TLS certificate
 
 on:
   push:

@@ -1,4 +1,5 @@
 # This is a basic workflow to help you get started with Actions
+# 2023/2024: No longer required, using Cloudflare's TLS certificate
 
 name: CI to Docker Hub for Lets Encrypt Cron
 
