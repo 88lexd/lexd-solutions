@@ -29,6 +29,15 @@
       metadata:
         name: dev
 
+- name: Create MONITORING namespace in the cluster
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: monitoring
+
 ########################
 # Begin MySQL password
 - name: Create secret for the MySQL password in PROD

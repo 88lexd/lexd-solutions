@@ -1,0 +1,8 @@
+apiVersion: v2
+name: prometheus-grafana
+version: 0.1
+description: Monitoring tool on Kubernetes
+home: https://lexdsolutions.com
+maintainers:
+  - name: Alex Dinh
+    email: alex.dinh@lexdsolutions.com
