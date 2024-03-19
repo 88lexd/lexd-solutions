@@ -1,0 +1,54 @@
+# Access Prometheus via Ingress
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-service
+  namespace: {{ .Values.namespace }}
+  annotations:
+      prometheus.io/scrape: 'true'
+      prometheus.io/port:   '9090'
+
+spec:
+  selector:
+    app: prometheus-server
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 9090
+      nodePort: {{ .Values.prometheus.service_node_port }}
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: prometheus-ingress
+  namespace: {{ .Values.namespace }}
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  ingressClassName: nginx  # Must specify the ingress controller (no default set)
+  tls:
+  - hosts:
+    - {{ .Values.prometheus.ingress_url }}
+    secretName: prometheus-tls-secret
+  rules:
+  - host: {{ .Values.prometheus.ingress_url }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: prometheus-service
+            port:
+              number: 8080
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: prometheus-tls-secret
+  namespace: {{ .Values.namespace }}
+data:
+  tls.crt: {{ .Values.prometheus.tls_cert }}
+  tls.key: {{ .Values.prometheus.tls_key }}
