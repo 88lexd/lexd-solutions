@@ -32,6 +32,28 @@ spec:
       containers:
       - name: grafana
         image: {{ .Values.grafana.deployment_image }}
+        env:
+        - name: GF_SMTP_ENABLED
+          value: "true"
+        - name: GF_SMTP_HOST
+          value: smtp-mail.outlook.com:587
+        - name: GF_SMTP_STARTTLS_POLICY
+          value: MandatoryStartTLS
+        - name: GF_SMTP_FROM_ADDRESS
+          valueFrom:
+            secretKeyRef:
+              name: grafana-config-smtp
+              key: username
+        - name: GF_SMTP_USER
+          valueFrom:
+            secretKeyRef:
+              name: grafana-config-smtp
+              key: username
+        - name: GF_SMTP_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: grafana-config-smtp
+              key: password
         ports:
         - name: grafana
           containerPort: 3000
