@@ -1,0 +1,19 @@
+# This values file is dedicated for Loki helm install only
+# Refer to README.md
+#
+# Run the following to check what values we can configure.
+# $ helm show values grafana/loki
+---
+loki:
+  auth_enabled: false # Must set to false, otherwise Prometheus cannot talk to it
+  commonConfig:
+    replication_factor: 1
+  storage:
+    type: 'filesystem'
+singleBinary:
+  replicas: 1
+  # The following template was inspected to determine how the PVC is created
+  # https://github.com/grafana/loki/blob/main/production/helm/loki/templates/single-binary/statefulset.yaml
+  persistence:
+    enabled: true
+    storageClass: local-path

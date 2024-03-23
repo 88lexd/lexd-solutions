@@ -1,5 +1,5 @@
 # Helm Chart - Prometheus and Grafana
-Deploys Prometheus and Grafana into the Kubernetes cluster.
+Deploys Prometheus, Grafana and Loki into the Kubernetes cluster.
 
 This chart was inspired by:
   - https://devopscube.com/setup-prometheus-monitoring-on-kubernetes/
@@ -8,13 +8,36 @@ This chart was inspired by:
 
 All is done to wrapped this into a Helm chart and made a few changes to suit my own requirements for deployment.
 
+The Loki portion of the configuration is all custom for my specific chart.
+
 ## ClusterRole
 This chart deploys a ClusterRole which can only exist once per cluster.
 
 ## How to deploy
+### Grafana Loki and Promtail
+Loki and Promtail provides logging capability.
+```shell
+$ helm repo add grafana https://grafana.github.io/helm-charts
+$ helm repo update
+
+# Install Loki
+# Get version: `$ helm search repo loki`
+$ helm upgrade --install -n grafana-loki --values values-grafana-loki.yaml loki grafana/loki --version "5.47.1" --create-namespace
+
+# Install Promtail
+# Get version: `$ helm search repo promtail`
+# If required to overwrite values: `$ helm show values grafana/promtail`
+$ helm upgrade --install --values values-promtail.yaml promtail grafana/promtail --version "6.15.5" -n grafana-loki
+
+# Get secret off
+```
+
+### Prometheus and Grafana
+Prometheus and Grafana provides monitoring capability.
+
 Note: The namespace `monitoring` is created by Ansible during setup and is also defined in `values.yaml` in case this needs to be changed.
 ```shell
-$ helm [install/upgrade] prometheus-grafana .
+$ helm upgrade --install prometheus-grafana .
 ```
 
 ## Grafana Configuration

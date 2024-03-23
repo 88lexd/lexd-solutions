@@ -1,0 +1,10 @@
+# Cannot run daemon set, masternode not scheduleble
+daemonset:
+  enabled: false
+# Use a deployment instead
+deployment:
+  enabled: true
+  replicaCount: 1
+clients:
+# This URL is the `loki-gateway` service running under the `grafana-loki` namespace
+- url: http://loki-gateway.grafana-loki.svc.cluster.local/loki/api/v1/push

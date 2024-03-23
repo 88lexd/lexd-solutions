@@ -25,3 +25,8 @@ grafana:
   # Ref: https://hub.docker.com/r/grafana/grafana
   deployment_image: grafana/grafana:10.0.12
   service_node_port: 32000
+
+loki:
+  # This endpoint is created by the Helm chart in the `grafana-loki` namespace.
+  # Refer to README.md
+  url_endpoint: http://loki-gateway.grafana-loki.svc.cluster.local
