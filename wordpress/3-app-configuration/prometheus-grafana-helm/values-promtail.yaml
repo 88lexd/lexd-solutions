@@ -1,0 +1,98 @@
+# If required to overwrite values: `$ helm show values grafana/promtail`
+---
+lexd:
+  drop_namespace_regex: ^(grafana-loki|kube-flannel|kube-node-lease|kube-public|monitoring)$
+
+daemonset:
+  enabled: true
+clients:
+# This URL is the `loki-gateway` service running under the `grafana-loki` namespace
+- url: http://loki-gateway.grafana-loki.svc.cluster.local/loki/api/v1/push
+config:
+  snippets:
+    # My custom scrapeConfigs;
+    # The scrapeConfigs is taken from the default config at first deployment
+    # http://127.0.0.1:3101/config (kubectl port-forward -n grafana-loki pod/promtail-xxx 3101:3101)
+    # Under: `.scrape_configs.relabel_configs`
+    # Furthermore, the values from `helm show values grafana/promtail` was also used as some values were auto generated.
+    scrapeConfigs: |
+      - job_name: kubernetes-pods
+        pipeline_stages:
+        - cri: {}
+        kubernetes_sd_configs:
+          - role: pod
+        relabel_configs:
+        ###################
+        # My custom configs
+        - source_labels: [__meta_kubernetes_namespace] #
+          regex: {{ .Values.lexd.drop_namespace_regex }}
+          action: drop
+        # End custom rules
+        - source_labels: [__meta_kubernetes_pod_controller_name]
+          separator: ;
+          regex: ([0-9a-z-.]+?)(-[0-9a-f]{8,10})?
+          target_label: __tmp_controller_name
+          replacement: $1
+          action: replace
+        - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_name, __meta_kubernetes_pod_label_app,
+            __tmp_controller_name, __meta_kubernetes_pod_name]
+          separator: ;
+          regex: ^;*([^;]+)(;.*)?$
+          target_label: app
+          replacement: $1
+          action: replace
+        - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_instance, __meta_kubernetes_pod_label_instance]
+          separator: ;
+          regex: ^;*([^;]+)(;.*)?$
+          target_label: instance
+          replacement: $1
+          action: replace
+        - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_component, __meta_kubernetes_pod_label_component]
+          separator: ;
+          regex: ^;*([^;]+)(;.*)?$
+          target_label: component
+          replacement: $1
+          action: replace
+        - source_labels: [__meta_kubernetes_pod_node_name]
+          separator: ;
+          regex: (.*)
+          target_label: node_name
+          replacement: $1
+          action: replace
+        - source_labels: [__meta_kubernetes_namespace]
+          separator: ;
+          regex: (.*)
+          target_label: namespace
+          replacement: $1
+          action: replace
+        - source_labels: [namespace, app]
+          separator: /
+          regex: (.*)
+          target_label: job
+          replacement: $1
+          action: replace
+        - source_labels: [__meta_kubernetes_pod_name]
+          separator: ;
+          regex: (.*)
+          target_label: pod
+          replacement: $1
+          action: replace
+        - source_labels: [__meta_kubernetes_pod_container_name]
+          separator: ;
+          regex: (.*)
+          target_label: container
+          replacement: $1
+          action: replace
+        - source_labels: [__meta_kubernetes_pod_uid, __meta_kubernetes_pod_container_name]
+          separator: /
+          regex: (.*)
+          target_label: __path__
+          replacement: /var/log/pods/*$1/*.log
+          action: replace
+        - source_labels: [__meta_kubernetes_pod_annotationpresent_kubernetes_io_config_hash,
+            __meta_kubernetes_pod_annotation_kubernetes_io_config_hash, __meta_kubernetes_pod_container_name]
+          separator: /
+          regex: true/(.*)
+          target_label: __path__
+          replacement: /var/log/pods/*$1/*.log
+          action: replace

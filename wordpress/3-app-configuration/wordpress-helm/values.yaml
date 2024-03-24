@@ -1,5 +1,5 @@
 ---
-# This YAML file contains the "schema" for the values to build the prod resources
+# This YAML file contains the "schema" for the values to build the resources
 wordpress:
   deployment_image: null
   deployment_replicas: null

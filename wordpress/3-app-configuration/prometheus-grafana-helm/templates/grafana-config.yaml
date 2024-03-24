@@ -16,6 +16,15 @@ data:
                 "type": "prometheus",
                 "url": "http://prometheus-service.{{ .Values.namespace }}.svc:8080",
                 "version": 1
+            },
+            {
+               "access":"proxy",
+                "editable": true,
+                "name": "loki",
+                "orgId": 1,
+                "type": "loki",
+                "url": "{{ .Values.loki.url_endpoint }}",
+                "version": 1
             }
         ]
     }
