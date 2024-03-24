@@ -79,6 +79,8 @@ spec:
       - image: {{ .Values.mysql.deployment_image }}
         name: mysql
         env:
+        - name: TZ
+          value: {{ .Values.time_zone }}
         - name: MYSQL_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:

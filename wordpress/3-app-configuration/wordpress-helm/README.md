@@ -13,19 +13,13 @@ SSH onto remote server and continue the below (helm is installed on server serve
 ## Install Prod
 Note: Namespace is created by Ansible during setup
 ```
-$ helm install wordpress-prod . --namespace=prod --values=values-prod.yaml
+$ helm upgrade --install wordpress-prod --namespace=prod --values=values-prod.yaml .
 ```
 
 ## Install Dev
 Note: Namespace is created by Ansible during setup
 ```
-$ helm install wordpress-dev . --namespace=dev --values=values-dev.yaml
-```
-
-## Install Dev Local
-Note: Namespace is created by Ansible during setup
-```
-$ helm install wordpress-dev . --namespace=dev --values=values-dev-local.yaml
+$ helm upgrade --install wordpress-dev --namespace=dev --values=values-dev.yaml .
 ```
 
 # Troubleshooting

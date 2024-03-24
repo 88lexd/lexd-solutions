@@ -80,6 +80,8 @@ spec:
           value: wordpress-mysql  # Uses k8s DNS and is referencing the [service]metadata.name in 'deployment-mysql.yaml'
         - name: WORDPRESS_DB_USER
           value: root
+        - name: TZ
+          value: {{ .Values.time_zone }}
         - name: WORDPRESS_DB_PASSWORD
           valueFrom:
             secretKeyRef:

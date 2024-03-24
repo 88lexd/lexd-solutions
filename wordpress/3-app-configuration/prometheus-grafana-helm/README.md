@@ -22,12 +22,11 @@ $ helm repo update
 
 # Install Loki
 # Get version: `$ helm search repo loki`
-$ helm upgrade --install -n grafana-loki --values values-grafana-loki.yaml loki grafana/loki --version "5.47.1" --create-namespace
+$ helm upgrade loki --install -n grafana-loki --values values-grafana-loki.yaml grafana/loki --version "5.47.1" --create-namespace
 
 # Install Promtail
 # Get version: `$ helm search repo promtail`
-# If required to overwrite values: `$ helm show values grafana/promtail`
-$ helm upgrade --install --values values-promtail.yaml promtail grafana/promtail --version "6.15.5" -n grafana-loki
+$ helm upgrade promtail --install --values values-promtail.yaml grafana/promtail --version "6.15.5" -n grafana-loki
 
 # Get secret off
 ```
@@ -55,3 +54,19 @@ The secrets are manually created on the cluster for security reasons. The follow
 ```
 $ kubectl create secret -n monitoring generic grafana-config-smtp --type string --from-literal=username=some-email@sample.com --from-literal=password=abc123
 ```
+
+## Troubleshooting
+### Promtail
+Promtail ships logs to Loki, but when I first deployed this, it wasnt sending log for some of my pods. The following is used for troubleshooting.
+
+Create a port forward so I can access the service cluster IP of the promtail service.
+
+```shell
+# Get the promtail pod name (running as daemon set, check master and worker node as required)
+# Port is <local-port>:<promtail-port>
+$ kubectl port-forward -n grafana-loki pod/promtail-xxx 3101:3101
+```
+
+Open a browser and connect to: http://127.0.0.1:3101/targets
+
+This will show the targets which promtail is currently fetching logs from.
