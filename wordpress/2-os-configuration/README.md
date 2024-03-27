@@ -9,7 +9,7 @@ For those coming from my early blog posts, these old files can still be referenc
 As of early 2024, I've migated out from AWS and is now self hosted. Some changes have been made for deploying to a non AWS machine.
 
 # OS Configuration
-This section contains the Ansible playbook for configuring the underlying EC2 Operating System (Ubuntu 20.04) to run Kubernetes.
+This section contains the Ansible playbook for configuring the underlying Operating System (Ubuntu 22.04) to run Kubernetes.
 
 ## Install Ansible and Dependencies
 Install Ansible (ansible-core) through pip.
@@ -44,10 +44,10 @@ $ ansible-galaxy collection install kubernetes.core community.general ansible.po
 Note: Install the collection by using standard account (not root). The collection will be saved to `~/.ansible/collections`
 
 ## What this Playbook does
-This new playbook will configure the following:
+This playbook will configure the following:
 
  1) Apply base OS configuration with my personal settings on all nodes
- 2) Install and Setup CloudWatch agent on all nodes
+ 2) <del>Install and Setup CloudWatch agent on all nodes</del>
  3) Install and configure Containerd as the Container Runtime on all nodes
  4) Prepare nodes for Kubernetes install (e.g. disabling swap, configuring br_netfilter etc.)
  5) Install Kubernetes packages on all nodes (e.g. kubeadm, kubectl, kubelet)
@@ -55,7 +55,8 @@ This new playbook will configure the following:
  7) Join worker node to cluster
  8) Apply cluster config such as deploying existing secrets and creating namespaces
  9) Install and setup Nginx Ingress Controller
- 10) Install and setup NFS-Subdir External Provisioner (this enables dynamic PV provisioning on EFS)
+ 10) <del>Install and setup NFS-Subdir External Provisioner (this enables dynamic PV provisioning on EFS)</del>
+ 10) Install and setup local-path-provisioner (this enables dynamic PV provisioning on local disk for simplicity)</del>
 
 ## How to run the playbook:
 Use the following:
