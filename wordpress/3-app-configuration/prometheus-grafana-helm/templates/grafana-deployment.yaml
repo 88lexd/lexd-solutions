@@ -36,14 +36,14 @@ spec:
         - name: GF_SMTP_ENABLED
           value: "true"
         - name: GF_SMTP_HOST
-          value: smtp-mail.outlook.com:587
+          value: smtp-relay.brevo.com:587
         - name: GF_SMTP_STARTTLS_POLICY
           value: MandatoryStartTLS
         - name: GF_SMTP_FROM_ADDRESS
           valueFrom:
             secretKeyRef:
               name: grafana-config-smtp
-              key: username
+              key: fromaddr
         - name: GF_SMTP_USER
           valueFrom:
             secretKeyRef:
