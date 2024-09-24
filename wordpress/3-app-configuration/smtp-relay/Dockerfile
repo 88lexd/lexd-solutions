@@ -7,10 +7,12 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Install Postfix and SASL for authentication
 RUN apt-get update && \
     apt-get install -y \
-        nullmailer \
-        mailutils \
-        socat && \
+        ca-certificates \
+        opensmtpd \
+        mailutils && \
     rm -rf /var/lib/apt/lists/*
+
+RUN update-ca-certificates
 
 # Configure Postfix
 COPY entrypoint.sh /entrypoint.sh

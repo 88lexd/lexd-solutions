@@ -1,17 +1,34 @@
 #!/bin/bash
 
-echo "$DEFAULT_DOMAIN" > /etc/nullmailer/defaultdomain
+mkdir -p /etc/smtpd/tables
 
-echo "$ADMIN_ADDR" > /etc/nullmailer/adminaddr
+# Secrets
+cat << EOF > /etc/smtpd/tables/relay_secrets
+# Syntax: alias smtp-username:smtp-password
 
-echo "$SMTP_SERVER smtp --auth-login --port=$SMTP_PORT --starttls --user=$SMTP_USER --pass=\"$SMTP_PASS\"" > /etc/nullmailer/remotes
+# SMTP account for Brevo
+myalias ${SMTP_USER}:${SMTP_PASS}
+EOF
 
-chmod 600 /etc/nullmailer/remotes
 
-# Fake syslog
-touch /var/log/custom_syslog.log && chmod 666 /var/log/custom_syslog.log
-socat UNIX-LISTEN:/dev/log,reuseaddr,mode=666,fork SYSTEM:'tee -a /var/log/custom_syslog.log' &
+# Permissions
+chmod -R 750 /etc/smtpd/
+chmod 640 /etc/smtpd/tables/relay_secrets
+chown -R root:opensmtpd /etc/smtpd/
 
-service nullmailer start
 
-tail -f /var/log/custom_syslog.log
+# Main Config
+cat << EOF > /etc/smtpd.conf
+table relay_secrets file:/etc/smtpd/tables/relay_secrets
+
+listen on 0.0.0.0 port 25
+
+listen on socket
+
+action "my_relay" relay host smtp+tls://myalias@${SMTP_SERVER}:${SMTP_PORT} auth <relay_secrets>
+
+match from any for any action "my_relay"
+EOF
+
+# Start daemon in debug (use -dv with debug!)
+smtpd -d
