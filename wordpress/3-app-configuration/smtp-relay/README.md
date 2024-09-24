@@ -8,25 +8,23 @@ This service will use `nullmailer` and is run as a standalone container under th
 ## Build
 ```shell
 # In WSL
-$ sudo service docker start
+sudo service docker start
 
-$ docker build -t 88lexd/smtp-relay .
+docker build -t 88lexd/smtp-relay .
 
-$ docker login
+docker login
 # Login with creds
-$ docker push 88lexd/smtp-relay
+
+docker push 88lexd/smtp-relay
 ```
 
 ## Run
 ```shell
-docker run -d --name smtp-relay \
-  --rm \
-  -e DEFAULT_DOMAIN=lexdsolutions.com \
-  -e ADMIN_ADDR=noreply@lexdsolutions.com \
-  -e SMTP_SERVER=some-smtp-server.com \
+docker run -d --restart unless-stopped --name smtp-relay \
+  -e SMTP_SERVER=smtp-server.com \
   -e SMTP_PORT=587 \
-  -e SMTP_USER=myuser \
-  -e SMTP_PASS=somepassword123 \
+  -e SMTP_USER=123@server.com \
+  -e SMTP_PASS=super-password \
   -p 25:25 \
   88lexd/smtp-relay
 ```
@@ -42,5 +40,5 @@ docker stop smtp-relay && docker rm smtp-relay
 docker exec -it smtp-relay bash
 
 # Inside the container run:
-echo "test" |  mail -r "noreply@lexdsolutions.com" -s "This is just a test with nullmailer" "myemail@domain.com"
+echo "$(whoami)@$(hostname)" | mail --subject=testsubject --append="From: noreply@lexdsolutions.com" test@domain.com
 ```
