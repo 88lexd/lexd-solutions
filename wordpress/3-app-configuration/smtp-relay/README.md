@@ -3,7 +3,7 @@ With a recent change from my email provider now blocking Basic Authentication, I
 
 To ensure that I can future proof myself, I am setting up this SMTP relay service so all my internal services don't ever need to change again if I do decide to later change providers in the future.
 
-This service will use Postfix and is run as a standalone container under the management machine.
+This service will use `nullmailer` and is run as a standalone container under the management machine.
 
 ## Build
 ```shell
@@ -21,11 +21,12 @@ $ docker push 88lexd/smtp-relay
 ```shell
 docker run -d --name smtp-relay \
   --rm \
-  -e UPSTREAM_SMTP=smtp-relay.brevo.com \
-  -e UPSTREAM_PORT=587 \
-  -e SMTP_USER=xxxxxx@smtp-brevo.com \
-  -e SMTP_PASS=xxxx \
-  -e FROM_ADDRESS=notifications@lexdsolutions.com \
+  -e DEFAULT_DOMAIN=lexdsolutions.com \
+  -e ADMIN_ADDR=noreply@lexdsolutions.com \
+  -e SMTP_SERVER=some-smtp-server.com \
+  -e SMTP_PORT=587 \
+  -e SMTP_USER=myuser \
+  -e SMTP_PASS=somepassword123 \
   -p 25:25 \
   88lexd/smtp-relay
 ```
@@ -35,10 +36,11 @@ Clean up if required
 docker stop smtp-relay && docker rm smtp-relay
 ```
 
-## Test SMTP (NOT WORKING???)
+## Test SMTP
 ```
 # If required; install package and select no configuration when prompted
-sudo apt-get install -y mailutils
+docker exec -it smtp-relay bash
 
-echo "Test email - $(date)" | mail -s "Test Subject" -S smtp=smtp://192.168.0.21:25 alex.dinh@hotmail.com
+# Inside the container run:
+echo "test" |  mail -r "noreply@lexdsolutions.com" -s "This is just a test with nullmailer" "myemail@domain.com"
 ```

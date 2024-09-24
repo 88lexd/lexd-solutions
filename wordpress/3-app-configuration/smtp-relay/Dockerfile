@@ -6,18 +6,18 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install Postfix and SASL for authentication
 RUN apt-get update && \
-    apt-get install -y postfix libsasl2-modules mailutils && \
+    apt-get install -y \
+        nullmailer \
+        mailutils \
+        socat && \
     rm -rf /var/lib/apt/lists/*
 
-# Fix Name service error for postfix
-RUN echo 'nameserver 8.8.8.8' >> /var/spool/postfix/etc/resolv.conf
-
 # Configure Postfix
-COPY postfix.sh /postfix.sh
-RUN chmod +x /postfix.sh
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 # Expose Postfix port 25 for SMTP
 EXPOSE 25
 
 # Start Postfix when the container starts
-CMD ["/postfix.sh"]
+CMD ["/entrypoint.sh"]
