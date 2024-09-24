@@ -1,9 +1,9 @@
 # SMTP Relay
 With a recent change from my email provider now blocking Basic Authentication, I have now went with a different SMTP service.
 
-To ensure that I can future proof myself, I am setting up this SMTP relay service so all my internal services don't ever need to change again if I do decide to later change providers in the future.
+To ensure that I can future proof myself, I am setting up this SMTP relay service in my internal network. This way, I can decide to later change providers in the future and only need to update a single endpoint.
 
-This service will use `nullmailer` and is run as a standalone container under the management machine.
+This service uses `opensmtpd` and is run as a standalone container under the management machine.
 
 ## Build
 ```shell
