@@ -1,0 +1,76 @@
+---
+title: "Coloured Text using ANSI Escape Code"
+date: "2024-12-05"
+tags:
+  - "scripts-and-automation"
+  - "tips-and-tricks"
+layout: layouts/post.njk
+---
+
+This post primarily focuses on running scripts in a CI/CD pipeline.
+
+Often times when we write scripts that prints/echo onto the console, we want important messages to capture our attention. This is especially useful for printing error messages and/or any informative messages.
+
+While in Python or other similar languages may have libraries to handle this for you, but sometimes we may run simple Shell scripts that would require the same text colouring capability.
+
+To keep things consistent in my scripts, I have opted to use ANSI escape codes which works almost exactly the same for me when writing scripts in both Python or Bash/Shell.
+
+### What's an ANSI Escape Code?
+
+ANSI escape sequences were established in the 1970s as a standard for adding color, font styling, and other formatting options to text terminals. Today, they are widely supported by modern terminals on operating systems such as Windows, macOS, and Linux.
+
+### Python Example
+
+Here is an example on how I apply colour to my print statements in Python. The colours can also be used when raising Exceptions.
+
+```python
+# utils.py
+class Colour:
+    MAGENTA = '\033[95m'
+    BLUE = '\033[94m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
+    END = '\x1b[0m'
+
+# main.py
+from utils import Colour
+
+print(f"{Colour.MAGENTA}Hello World{Colour.END}")
+print(f"{Colour.BLUE}Hello World{Colour.END}")
+print(f"{Colour.GREEN}Hello World{Colour.END}")
+print(f"{Colour.YELLOW}Hello World{Colour.END}")
+print(f"{Colour.RED}Hello World{Colour.END}")
+```
+
+### Bash Example
+
+Here is an example on how I apply colours in my bash scripts.
+
+```shell
+# common.sh
+##########################
+# Term Colours
+export C_MAGENTA='\033[95m'
+export C_BLUE='\033[94m'
+export C_GREEN='\033[92m'
+export C_YELLOW='\033[93m'
+export C_RED='\033[91m'
+export C_END='\x1b[0m'
+
+
+# run.sh
+source common.sh
+echo -e "${C_MAGENTA} Hello World${C_END}"
+echo -e "${C_BLUE} Hello World${C_END}"
+echo -e "${C_GREEN} Hello World${C_END}"
+echo -e "${C_YELLOW} Hello World${C_END}"
+echo -e "${C_RED} Hello World${C_END}"
+```
+
+### Screenshot Example
+
+The output on the terminal here is exactly the same for both Python and Bash. The same colour will be shown when running the same script in a pipeline.
+
+![](/img/ansi-color.png)
+

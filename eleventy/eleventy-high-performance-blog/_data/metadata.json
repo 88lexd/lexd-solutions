@@ -1,0 +1,26 @@
+{
+  "title": "Lexd Solutions",
+  "url": "https://lexdsolutions.com",
+  "domain": "lexdsolutions.com",
+  "description": "Description of the website. Update me.",
+  "genre": "tech blog",
+  "googleAnalyticsId": "GA ID. Update me. Note, that this is not compatible with the not-yet-commonly used version 4 of Google Analytics (Alex: Ref: https://github.com/google/eleventy-high-performance-blog/issues/160)",
+  "sendWebVitals": false,
+  "feed": {
+    "subtitle": "Subtitle. Update me.",
+    "filename": "feed.xml",
+    "path": "/feed/feed.xml",
+    "id": "https://lexdsolutions.com"
+  },
+  "jsonfeed": {
+    "path": "/feed/feed.json",
+    "url": "https://lexdsolutions.com/feed/feed.json"
+  },
+  "author": {
+    "name": "Alex Dinh",
+    "twitterHandle": "update_me"
+  },
+  "publisher": {
+    "name": "Publisher name. Update me."
+  }
+}

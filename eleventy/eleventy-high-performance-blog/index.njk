@@ -1,0 +1,16 @@
+---
+title: Lexd Solutions
+layout: layouts/home.njk
+description: Automation
+image: https://upload.wikimedia.org/wikipedia/en/a/a9/Example.jpg
+date: Last Modified
+---
+<p>My name is Alex Dinh and I am an IT consulatant based in Sydney, NSW Australia.</p>
+
+<p>This is my personal tech blog which I will write about various IT topics but mainly focusing on automation.</p>
+
+<div id="posts">
+  <h3>Posts</h3>
+  {% set postslist = collections.posts %}
+  {% include "postslist.njk" %}
+</div>
