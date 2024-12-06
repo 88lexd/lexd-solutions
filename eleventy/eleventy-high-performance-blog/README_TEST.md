@@ -23,4 +23,6 @@ Once its running, I can make changes and it will refresh the page automatically.
 
 
 ## Notes
-Google Analytics - See: /home/alex/code/git/lexd-solutions/eleventy/eleventy-high-performance-blog/_data/metadata.json
+- Google Analytics - See: /home/alex/code/git/lexd-solutions/eleventy/eleventy-high-performance-blog/_data/metadata.json
+
+- Wordpress posts have been converted to Markdown and is saved onto OneDrive (Personal Docs/temp/wordpress-markdowns-backup)
