@@ -1,0 +1,174 @@
+---
+title: "Python Expense Splitter Script"
+description: >-
+  A few weeks ago I was on a weekend trip with friends and everyone paid for various different things.
+  In the end we dropped all the expenses into a spreadsheet and someone had to perform the calculations manually to determine how we split the expenses.
+pubDate: 'Feb 25 2024'
+heroImage: '../../assets/images/Group-Expense-Splitter.png'
+category: Tips and Tricks
+tags:
+  - "scripts-and-automation"
+  - "tips-and-tricks"
+---
+
+A few weeks ago I was on a weekend trip with friends and everyone paid for various different things. In the end we dropped all the expenses into a spreadsheet and someone had to perform the calculations manually to determine how we split the expenses.
+
+A week after the trip with my friends, I was then off to an overseas trip with my family and I thought why don't I just write my own script for this while on my 9 hour flight!
+
+_Heads up! There are already many existing mobile apps and websites for this. These apps and websites allows everyone in the group to add their own expenses in and it'll do the calculation for you._
+
+This script is purely written out of boredom during my long flight and it's to challenge myself as I personally haven't written any Python code for awhile. I also wanted to show how the credit/debt totals for each person and how the final calculation has came about.
+
+## The Script
+
+You can find the Python script at the following GitHub repo:
+[https://github.com/88lexd/group-expense-splitter](https://github.com/88lexd/group-expense-splitter)
+
+## How it works
+
+This script works by taking in a YAML file which someone in the group still needs to gather all the expenses from everyone and then drop them into this file. In the repository, I have as sample expense file which contains:
+
+```yaml
+---
+# All the people in the group to split the bill
+people:
+  - alex
+  - jay
+  - lambo
+  - mandy
+expenses:
+  lambo:
+    # When "split_with" is not set, then is shared between everyone
+    hotel:
+      amount: 200
+  jay:
+    drinks:
+      amount: 100
+      split_with:
+        - jay
+        - mandy
+  alex:
+    dinner:
+      amount: 200
+```
+
+Once you have populated this file, you can then execute the script by calling:
+
+```bash
+$ python3 main.py ./sample-expenses-simple.yml
+```
+
+The output it generates:
+
+```
+===============================
+Group Expense Splitter Script
+Author: Alex Dinh
+===============================
+
+Reading expenses from ./sample-expenses-simple.yml
+Validating the expense names to match name defined under people...
+Validating the expenses to ensure names are referenced correctly..
+Building instance for each person...
+Adding up expenses for each person...
+
+===============
+Expense Details
+===============
+alex has spent:
+ - $200 on dinner
+jay has spent:
+ - $100 on drinks (split with: jay, mandy)
+lambo has spent:
+ - $200 on hotel
+mandy has no expenses
+
+The group has spent a total of: $500.00
+
+=========================
+Group Debt/Credit Totals
+=========================
+alex is receiving $100.00 from the group based on:
+ - Credit: $200.00
+ - Debt: -$100.00
+jay owes $50.00 to the group money based on:
+ - Credit: $100.00
+ - Debt: -$150.00
+lambo is receiving $100.00 from the group based on:
+ - Credit: $200.00
+ - Debt: -$100.00
+mandy owes $150.00 to the group money based on:
+ - Credit: $0.00
+ - Debt: -$150.00
+
+=========================
+Group Payout Information
+=========================
+ - JAY pays ALEX $50.00
+ - MANDY pays ALEX $50.00
+ - MANDY pays LAMBO $100.00
+```
+
+## Basic Validation
+
+Since the script is taking in a YAML file, there is a chance of a typo somewhere such as not detecting the correct names for splitting the expenses. Here are some examples on how the script catches an error.
+
+**Name under expenses must match people**
+
+```yaml
+---
+people:
+  - alex
+expenses:
+  alexxxxx: # <------ Name is typed incorrectly
+    hotel:
+      amount: 200
+```
+
+Error output:
+
+```
+Reading expenses from sample-expenses-simple.yml
+Validating the expense names to match name defined under people...
+
+Error: When setting the names under "expenses", the name must match with whats under "people"
+The following names are not valid (CASE SENSITIVE).
+ - alexxxxx
+Double check and ensure the names under expenses match whats defined under "people".
+```
+
+**When split\_with is used, the name must be valid**
+
+```yaml
+---
+people:
+  - jay
+  - mandy
+expenses:
+  jay:
+    drinks:
+      amount: 100
+      split_with:
+        - jay
+        - mandyyyyyy # <----- WRONG name to split with
+
+```
+
+Error output:
+
+```
+Reading expenses from sample-expenses-simple.yml
+Validating the expense names to match name defined under people...
+Validating the expenses to ensure names are referenced correctly..
+
+Error: When using "split_with", the following names do not match whats under "people"
+Not case-sensitive, match is forced to using UPPER CASE.
+ - MANDYYYYYY
+Double check and ensure the persons name you want to split bill with matches with the people defined.
+```
+
+## Conclusion
+
+This script was fun to write, it's something very different to the rest the technical automation scripts I have ever written in the past.
+
+I hope you find this script interesting and I am open to any pull requests if you can help enhanced this script in anyway :)
