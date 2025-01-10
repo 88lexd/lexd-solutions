@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://lexdsolutions.com/sitemap-index.xml
