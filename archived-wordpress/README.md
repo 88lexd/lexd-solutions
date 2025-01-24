@@ -1,3 +1,12 @@
+# Important Update!
+As of December 2024, I have fully migrated off WordPress and my blog now runs on Astro.
+
+Most of the code here in this directory is now archived with only a few things that are still being used.
+
+The new repo that hosts my new blog is located at: https://github.com/88lexd/website-astro
+
+As I get time, I will be slowly moving my code over to the new repo. This repo will contain generic code such as what I currently have in `misc-scripts`.
+
 # My AWS Wordpress Site
 This directory contains all the code used to build out my personal WordPress site (https://lexdsolutions.com).
 
